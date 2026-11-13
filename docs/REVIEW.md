@@ -6,7 +6,7 @@ Reviewed November 12, 2026, using the supplied Markdown and `zmaxitaxi/LifeLine`
 
 The concept and proposed stack are suitable for a focused hackathon prototype. The original scope correctly emphasizes physics, synthetic data, operator-defined critical loads, deterministic optimization, and truthful shortage reporting. The additions below make the handoff sufficiently specific for three people to begin in parallel.
 
-**Person 1’s model, MILP, heuristic, and command-line comparison are implemented and tested.** API and dashboard work remain unimplemented; demo readiness is still conditional on the application checks in [ACCEPTANCE.md](ACCEPTANCE.md). See the [current handoff](PERSON_1_HANDOFF.md). The original review below records the planning decisions and initial repository state.
+**Person 1’s model, MILP, heuristic, and command-line comparison are implemented and tested.** The API is now implemented and tested too; the dashboard remains unimplemented. Full demo readiness is still conditional on the application checks in [ACCEPTANCE.md](ACCEPTANCE.md). See the [current handoff](PERSON_1_HANDOFF.md). The original review below records the planning decisions and initial repository state.
 
 ## Gaps resolved in the detailed specification
 
@@ -38,7 +38,7 @@ With the same 14 kWh initial battery, an 8% solar multiplier still leaves the ba
 
 High Demand retains Normal's weather and starting battery. The additional protected demand makes hours 20 and 21 require 4.660 kWh each, with no solar available. The battery can deliver at most 4.000 kWh per hour. Thus those hours each have at least 0.660 kWh of critical shortfall, independent of sufficient stored energy. The reference critical-only dispatch reaches that 1.320 kWh lower bound.
 
-These are checks on a simplified scenario model, not measured benefits or optimizer performance. The future solver must reproduce these feasibility facts and pass independent conservation tests.
+These are checks on a simplified scenario model, not measured benefits or optimizer performance. The implemented solver and API now reproduce these feasibility facts and pass independent conservation tests.
 
 ## Verified references
 
@@ -56,9 +56,9 @@ Technical choices were checked against [SciPy's MILP documentation](https://docs
 |---|---|---|
 | Actual teammate names and GitHub handles | Team | Replace role labels when known; no need to delay implementation |
 | Event deadline and submission requirements | Person 2 | Verify against the event's actual rules; the supplied brief is the only event source provided |
-| Tested dependency versions and target machine | Person 2 | Scaffold, lock dependencies, install on a clean checkout, and record versions |
+| Tested dependency versions and target machine | Person 2 | Backend dependencies pinned and verified in a clean source copy/new environment; frontend setup and demo-laptop checks remain |
 | Solver behavior, numerical tolerances, and response speed | Person 1 | Implemented and numerically tested; local timing evidence recorded; re-measure on demo laptop |
-| Dashboard, API, offline execution, and screenshots | Persons 2 and 3 | Implement and complete the release checklist |
+| Dashboard, offline execution, and screenshots | Person 3 | Backend HTTP/API tests pass; complete UI and full-application release checks |
 | Hosting | Team | Local demonstration is the MVP target; a public deployment is optional and outside this review delivery |
 | Licensing and partner access | Repository owner | Choose a license if desired; no license or external endorsement is assumed |
 
@@ -68,4 +68,8 @@ Do not add trained-model claims, API keys, real clinic data, or hardware integra
 
 The user prioritized a same-work scheduling demonstration. Added `scheduling` with identical inputs across baseline, heuristic, and MILP. Both alternatives serve 2.1 kWh of flexible work and all critical demand. The daily minimum increases by 0.368421 kWh, midnight battery by 2.210526 kWh, and conversion losses decrease by 0.110526 kWh. Sunshine-first matches MILP in this case; constrained-window tests separately establish when optimization can help. These are computed synthetic outcomes, not measured field benefits.
 
-The earlier three presets are retained for behavior and limitations. Storm and High Demand defer work, so their battery gains must not be presented as the primary same-work improvement. The API/dashboard remain future work under the user’s restriction to Person 1.
+The earlier three presets are retained for behavior and limitations. Storm and High Demand defer work, so their battery gains must not be presented as the primary same-work improvement. The later Person 2 request implements the API; the dashboard remains future work.
+
+## Person 2 verification update
+
+The API returns live baseline/heuristic/optimized results, effective inputs, computed comparisons, per-plan warnings, and templated explanations. Strict requests and startup configuration checks reject malformed data; verified solver failures map to 503 instead of risk results. 177 backend tests pass in the workspace and an isolated source copy with a new pinned environment. Live HTTP results are in [the evidence](evidence/person-2-http-results.json). The OpenAPI/schema example handoff is ready for Person 3. Frontend, screenshots, built preview, and submission verification remain outstanding.

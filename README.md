@@ -2,7 +2,37 @@
 
 Energy scheduling for a fictional solar-powered clinic. LifeLine compares an existing equipment schedule, a sunshine-first heuristic, and a constrained MILP schedule using identical physical inputs.
 
-**Person 1's numerical implementation is complete. The API and dashboard remain Person 2/3 work.** This branch contains a working command-line model, not a web application.
+**Persons 1 and 2 are implemented: numerical model, FastAPI endpoints, validation, and explanations. Person 3's dashboard remains to be built.**
+
+## Run the API
+
+From the repository root with Python 3.11+ (locally verified on 3.12.5):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r backend/requirements-dev.txt
+python -m pytest backend/tests -q
+python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+```
+
+Open [API docs](http://127.0.0.1:8000/docs) or [OpenAPI JSON](http://127.0.0.1:8000/openapi.json). The JSON endpoints work without external services after installation; the optional Swagger UI uses externally hosted JavaScript/CSS.
+
+In another terminal:
+
+```bash
+curl http://127.0.0.1:8000/api/health
+curl http://127.0.0.1:8000/api/scenarios
+curl -X POST http://127.0.0.1:8000/api/simulate \
+  -H 'Content-Type: application/json' \
+  -d '{"scenario":"scheduling"}'
+```
+
+`POST /api/simulate` returns full `baseline`, `heuristic`, and `optimized` plans, computed `comparison` metrics, effective inputs/equipment, assumptions, warnings scoped to each plan, and deterministic recommendations. All four presets calculate fresh results; no development fixture is used by the routes.
+
+Omit overrides to use a preset's defaults; explicit zero is honored. Invalid values, unknown fields, numeric strings, booleans, and explicit null return structured 422 errors. Battery capacity changes never silently clamp initial energy or reserve. Solver failures return 503, distinct from successful simulations reporting reserve risk or critical shortages (HTTP 200).
+
+Runtime-only installation uses `backend/requirements.txt`; development requirements include tests and the example exporter. Dependencies are pinned. Backend CI checks Python 3.11 and 3.12; check the [workflow results](https://github.com/zmaxitaxi/LifeLine/actions) for remote status.
 
 ## Run the model
 
@@ -41,13 +71,14 @@ Storm still cannot maintain reserve when optional work is deferred. High Demand 
 ## Implementation and handoff
 
 - [Person 1 handoff, interfaces, results, limitations](docs/PERSON_1_HANDOFF.md)
+- [Person 2 API handoff and Person 3 integration instructions](docs/PERSON_2_HANDOFF.md)
 - [Machine-readable calculated evidence](docs/evidence/person-1-results.json)
 - [Updated build brief](docs/BUILD_BRIEF.md)
 - [Three-person responsibilities](docs/TEAM_PLAN.md)
 - [Review and current readiness](docs/REVIEW.md)
 - [Acceptance checklist and remaining API/UI gates](docs/ACCEPTANCE.md)
 
-The original [source brief](docs/source/LifeLine_Codex_Build_Brief.md) is preserved unchanged. Numerical presets are in [contracts/scenarios.json](contracts/scenarios.json); API shapes are in [contracts/api.ts](contracts/api.ts). Person 2 must extend the outer API response for heuristic/comparison data as described in the handoff. Each numerical plan already follows the existing `PlanResult` fields.
+The original [source brief](docs/source/LifeLine_Codex_Build_Brief.md) is preserved unchanged. Numerical presets are in [contracts/scenarios.json](contracts/scenarios.json); API shapes are in [contracts/api.ts](contracts/api.ts) and [OpenAPI](contracts/openapi.json). A [computed scheduling response](contracts/examples/scheduling.response.json) is available for frontend development, not as a live fallback. Regenerate both artifacts with `python scripts/export_api_contract.py` after installing development requirements.
 
 Run the independent reference calibration check:
 
@@ -59,7 +90,9 @@ This checks reference dispatch and inputs, separately from the optimizer's tests
 
 ## Remaining work
 
-Person 2 owns FastAPI, Pydantic validation, warnings/explanations, integration, CI, and release packaging. Person 3 owns the interactive comparison, dashboard, and browser checks. Future application commands in the build brief are targets until those components exist.
+Person 3 should build the interactive equipment schedule comparison using the real API, with cancellation/loading/error states, editable inputs, all four presets, and responsive charts. Use a Vite `/api` proxy to `http://127.0.0.1:8000`; direct cross-origin requests are not enabled. Frontend build/browser/full-application release checks remain pending.
+
+The current suite has **177 passing tests** (62 model tests plus 115 API/configuration/contract checks), verified in the workspace and a clean source copy with a fresh virtual environment. Live localhost requests confirm all four statuses and the primary improvement. See [HTTP evidence](docs/evidence/person-2-http-results.json).
 
 The supplied hackathon deadline is Saturday, November 14, 2026, 11:59 PM America/Los_Angeles; event rules have not been independently verified. The prototype supports investigation of SDG 7 and SDG 3; it does not demonstrate measured health outcomes.
 

@@ -1,6 +1,6 @@
 # Person 1 — implemented energy model and scheduling comparison
 
-Scope: pure Python forecast, physical baseline, sunshine-first heuristic, MILP, complete plan results, and automated numerical tests. No API endpoints or dashboard have been implemented. The supplied brief is preserved unchanged.
+Scope: pure Python forecast, physical baseline, sunshine-first heuristic, MILP, complete plan results, and automated numerical tests. The original Person 1 delivery did not include API endpoints or a dashboard. The API is now implemented separately; see [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md). The dashboard remains pending. The supplied brief is preserved unchanged.
 
 ## What works
 
@@ -71,6 +71,8 @@ Tests cover accounting, efficiencies, bounds/rates, curtailment, critical priori
 Recorded comparison times were approximately 0.277 seconds for the first case and 0.008–0.012 seconds subsequently, with numerical dependencies already imported. These are local model timings, not HTTP latency or guarantees; re-measure on the demo laptop.
 
 ## Person 2 handoff
+
+These numerical handoff requirements have now been implemented in the API layer. The bullets below record the original integration requirements; use the [Person 2 handoff](PERSON_2_HANDOFF.md) for the current HTTP contract and run commands.
 
 - Reuse the numerical interfaces; keep HTTP validation and explanation templates outside the solver. Import/preload SciPy during service startup so its cold import does not delay the first request.
 - `load_inputs` is an integration example, not full startup validation of arbitrary edited JSON. Add strict Pydantic requests, configuration validation, endpoints, and exception mapping.

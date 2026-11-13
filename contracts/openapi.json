@@ -1,0 +1,1090 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LifeLine API",
+    "description": "Synthetic energy planning; not for clinical or operational use.",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/scenarios": {
+      "get": {
+        "summary": "Scenarios",
+        "operationId": "scenarios_api_scenarios_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simulate": {
+      "post": {
+        "summary": "Simulate",
+        "operationId": "simulate_api_simulate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ApiErrorResponse"
+      },
+      "ComparisonMetrics": {
+        "properties": {
+          "same_flexible_work_completed": {
+            "type": "boolean",
+            "title": "Same Flexible Work Completed"
+          },
+          "battery_preserved_at_midnight_kwh": {
+            "type": "number",
+            "title": "Battery Preserved At Midnight Kwh"
+          },
+          "minimum_battery_improvement_kwh": {
+            "type": "number",
+            "title": "Minimum Battery Improvement Kwh"
+          },
+          "evening_minimum_improvement_kwh": {
+            "type": "number",
+            "title": "Evening Minimum Improvement Kwh"
+          },
+          "conversion_loss_reduction_kwh": {
+            "type": "number",
+            "title": "Conversion Loss Reduction Kwh"
+          },
+          "heuristic_matches_optimizer_metrics": {
+            "type": "boolean",
+            "title": "Heuristic Matches Optimizer Metrics"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "same_flexible_work_completed",
+          "battery_preserved_at_midnight_kwh",
+          "minimum_battery_improvement_kwh",
+          "evening_minimum_improvement_kwh",
+          "conversion_loss_reduction_kwh",
+          "heuristic_matches_optimizer_metrics"
+        ],
+        "title": "ComparisonMetrics"
+      },
+      "CriticalEquipment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "category": {
+            "type": "string",
+            "const": "critical",
+            "title": "Category"
+          },
+          "power_kw": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Power Kw"
+          },
+          "required_hours": {
+            "items": {
+              "type": "integer",
+              "maximum": 23.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "title": "Required Hours"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "power_kw",
+          "required_hours"
+        ],
+        "title": "CriticalEquipment"
+      },
+      "EffectiveConfig": {
+        "properties": {
+          "battery_capacity_kwh": {
+            "type": "number",
+            "maximum": 200.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Battery Capacity Kwh"
+          },
+          "initial_battery_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Initial Battery Kwh"
+          },
+          "reserve_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Reserve Kwh"
+          },
+          "pv_capacity_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pv Capacity Kw"
+          },
+          "charge_efficiency": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Charge Efficiency"
+          },
+          "discharge_efficiency": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Discharge Efficiency"
+          },
+          "max_charge_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Max Charge Kw"
+          },
+          "max_discharge_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Max Discharge Kw"
+          },
+          "additional_critical_kw": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Additional Critical Kw"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "battery_capacity_kwh",
+          "initial_battery_kwh",
+          "reserve_kwh",
+          "pv_capacity_kw",
+          "charge_efficiency",
+          "discharge_efficiency",
+          "max_charge_kw",
+          "max_discharge_kw",
+          "additional_critical_kw"
+        ],
+        "title": "EffectiveConfig"
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "INVALID_REQUEST",
+              "SOLVER_UNAVAILABLE",
+              "SOLVER_TIME_LIMIT",
+              "NUMERICAL_ERROR",
+              "INTERNAL_ERROR"
+            ],
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "details": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetail"
+            },
+            "type": "array",
+            "title": "Details"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorBody"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Loc"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "loc",
+          "message",
+          "type"
+        ],
+        "title": "ErrorDetail"
+      },
+      "FlexibleEquipment": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "category": {
+            "type": "string",
+            "const": "flexible",
+            "title": "Category"
+          },
+          "max_power_kw": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Power Kw"
+          },
+          "required_energy_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Required Energy Kwh"
+          },
+          "allowed_hours": {
+            "items": {
+              "type": "integer",
+              "maximum": 23.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Allowed Hours"
+          },
+          "baseline_allocations": {
+            "items": {
+              "$ref": "#/components/schemas/RequestedTaskAllocation"
+            },
+            "type": "array",
+            "title": "Baseline Allocations"
+          },
+          "divisible": {
+            "type": "boolean",
+            "const": true,
+            "title": "Divisible"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "max_power_kw",
+          "required_energy_kwh",
+          "allowed_hours",
+          "baseline_allocations",
+          "divisible"
+        ],
+        "title": "FlexibleEquipment"
+      },
+      "FlexibleTaskResult": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "requested_kwh": {
+            "type": "number",
+            "title": "Requested Kwh"
+          },
+          "served_kwh": {
+            "type": "number",
+            "title": "Served Kwh"
+          },
+          "deferred_kwh": {
+            "type": "number",
+            "title": "Deferred Kwh"
+          },
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/TaskAllocation"
+            },
+            "type": "array",
+            "title": "Allocations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "task_id",
+          "requested_kwh",
+          "served_kwh",
+          "deferred_kwh",
+          "allocations"
+        ],
+        "title": "FlexibleTaskResult"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status",
+            "default": "ok"
+          },
+          "api_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Api Version",
+            "default": "1.0"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "HealthResponse"
+      },
+      "HourlyResult": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Hour"
+          },
+          "pv_kwh": {
+            "type": "number",
+            "title": "Pv Kwh"
+          },
+          "critical_requested_kwh": {
+            "type": "number",
+            "title": "Critical Requested Kwh"
+          },
+          "critical_served_kwh": {
+            "type": "number",
+            "title": "Critical Served Kwh"
+          },
+          "critical_unserved_kwh": {
+            "type": "number",
+            "title": "Critical Unserved Kwh"
+          },
+          "flexible_planned_kwh": {
+            "type": "number",
+            "title": "Flexible Planned Kwh"
+          },
+          "flexible_served_kwh": {
+            "type": "number",
+            "title": "Flexible Served Kwh"
+          },
+          "flexible_unserved_kwh": {
+            "type": "number",
+            "title": "Flexible Unserved Kwh"
+          },
+          "charge_input_kwh": {
+            "type": "number",
+            "title": "Charge Input Kwh"
+          },
+          "discharge_output_kwh": {
+            "type": "number",
+            "title": "Discharge Output Kwh"
+          },
+          "curtailed_kwh": {
+            "type": "number",
+            "title": "Curtailed Kwh"
+          },
+          "soc_start_kwh": {
+            "type": "number",
+            "title": "Soc Start Kwh"
+          },
+          "soc_end_kwh": {
+            "type": "number",
+            "title": "Soc End Kwh"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hour",
+          "pv_kwh",
+          "critical_requested_kwh",
+          "critical_served_kwh",
+          "critical_unserved_kwh",
+          "flexible_planned_kwh",
+          "flexible_served_kwh",
+          "flexible_unserved_kwh",
+          "charge_input_kwh",
+          "discharge_output_kwh",
+          "curtailed_kwh",
+          "soc_start_kwh",
+          "soc_end_kwh"
+        ],
+        "title": "HourlyResult"
+      },
+      "PlanMetrics": {
+        "properties": {
+          "total_solar_kwh": {
+            "type": "number",
+            "title": "Total Solar Kwh"
+          },
+          "critical_requested_kwh": {
+            "type": "number",
+            "title": "Critical Requested Kwh"
+          },
+          "critical_unserved_kwh": {
+            "type": "number",
+            "title": "Critical Unserved Kwh"
+          },
+          "critical_coverage_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Critical Coverage Pct"
+          },
+          "min_soc_kwh": {
+            "type": "number",
+            "title": "Min Soc Kwh"
+          },
+          "final_soc_kwh": {
+            "type": "number",
+            "title": "Final Soc Kwh"
+          },
+          "flexible_requested_kwh": {
+            "type": "number",
+            "title": "Flexible Requested Kwh"
+          },
+          "flexible_served_kwh": {
+            "type": "number",
+            "title": "Flexible Served Kwh"
+          },
+          "flexible_deferred_kwh": {
+            "type": "number",
+            "title": "Flexible Deferred Kwh"
+          },
+          "curtailed_kwh": {
+            "type": "number",
+            "title": "Curtailed Kwh"
+          },
+          "conversion_loss_kwh": {
+            "type": "number",
+            "title": "Conversion Loss Kwh"
+          },
+          "critical_shortage_hours": {
+            "items": {
+              "type": "integer",
+              "maximum": 23.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "title": "Critical Shortage Hours"
+          },
+          "reserve_breach_boundaries": {
+            "items": {
+              "type": "integer",
+              "maximum": 24.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "title": "Reserve Breach Boundaries"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "total_solar_kwh",
+          "critical_requested_kwh",
+          "critical_unserved_kwh",
+          "critical_coverage_pct",
+          "min_soc_kwh",
+          "final_soc_kwh",
+          "flexible_requested_kwh",
+          "flexible_served_kwh",
+          "flexible_deferred_kwh",
+          "curtailed_kwh",
+          "conversion_loss_kwh",
+          "critical_shortage_hours",
+          "reserve_breach_boundaries"
+        ],
+        "title": "PlanMetrics"
+      },
+      "PlanResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "RESERVE_AT_RISK",
+              "CRITICAL_SHORTAGE"
+            ],
+            "title": "Status"
+          },
+          "hourly": {
+            "items": {
+              "$ref": "#/components/schemas/HourlyResult"
+            },
+            "type": "array",
+            "maxItems": 24,
+            "minItems": 24,
+            "title": "Hourly"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/PlanMetrics"
+          },
+          "flexible_tasks": {
+            "items": {
+              "$ref": "#/components/schemas/FlexibleTaskResult"
+            },
+            "type": "array",
+            "title": "Flexible Tasks"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "hourly",
+          "metrics",
+          "flexible_tasks"
+        ],
+        "title": "PlanResult"
+      },
+      "Recommendation": {
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ],
+            "title": "Severity"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "hours": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer",
+                  "maximum": 23.0,
+                  "minimum": 0.0
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hours"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "severity",
+          "title",
+          "explanation"
+        ],
+        "title": "Recommendation"
+      },
+      "RequestedTaskAllocation": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Hour"
+          },
+          "requested_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Requested Kwh"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hour",
+          "requested_kwh"
+        ],
+        "title": "RequestedTaskAllocation"
+      },
+      "ScenarioListResponse": {
+        "properties": {
+          "api_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Api Version",
+            "default": "1.0"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioSummary"
+            },
+            "type": "array",
+            "title": "Scenarios"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenarios"
+        ],
+        "title": "ScenarioListResponse"
+      },
+      "ScenarioSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "scheduling",
+              "normal",
+              "storm",
+              "high_demand"
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "data_source": {
+            "type": "string",
+            "const": "synthetic",
+            "title": "Data Source",
+            "default": "synthetic"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/EffectiveConfig"
+          },
+          "expected_status": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "RESERVE_AT_RISK",
+              "CRITICAL_SHORTAGE"
+            ],
+            "title": "Expected Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "defaults",
+          "expected_status"
+        ],
+        "title": "ScenarioSummary"
+      },
+      "SimulationRequest": {
+        "properties": {
+          "battery_capacity_kwh": {
+            "type": "number",
+            "maximum": 200.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Battery Capacity Kwh"
+          },
+          "initial_battery_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Initial Battery Kwh"
+          },
+          "reserve_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Reserve Kwh"
+          },
+          "pv_capacity_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pv Capacity Kw"
+          },
+          "charge_efficiency": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Charge Efficiency"
+          },
+          "discharge_efficiency": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Discharge Efficiency"
+          },
+          "max_charge_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Max Charge Kw"
+          },
+          "max_discharge_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Max Discharge Kw"
+          },
+          "additional_critical_kw": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Additional Critical Kw"
+          },
+          "scenario": {
+            "type": "string",
+            "enum": [
+              "scheduling",
+              "normal",
+              "storm",
+              "high_demand"
+            ],
+            "title": "Scenario"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenario"
+        ],
+        "title": "SimulationRequest"
+      },
+      "SimulationResponse": {
+        "properties": {
+          "api_version": {
+            "type": "string",
+            "const": "1.0",
+            "title": "Api Version",
+            "default": "1.0"
+          },
+          "model_version": {
+            "type": "string",
+            "const": "energy-1.0",
+            "title": "Model Version",
+            "default": "energy-1.0"
+          },
+          "scenario": {
+            "type": "string",
+            "enum": [
+              "scheduling",
+              "normal",
+              "storm",
+              "high_demand"
+            ],
+            "title": "Scenario"
+          },
+          "scenario_name": {
+            "type": "string",
+            "title": "Scenario Name"
+          },
+          "data_source": {
+            "type": "string",
+            "const": "synthetic",
+            "title": "Data Source",
+            "default": "synthetic"
+          },
+          "timezone": {
+            "type": "string",
+            "const": "Africa/Nairobi",
+            "title": "Timezone",
+            "default": "Africa/Nairobi"
+          },
+          "horizon_hours": {
+            "type": "integer",
+            "const": 24,
+            "title": "Horizon Hours",
+            "default": 24
+          },
+          "dt_hours": {
+            "type": "integer",
+            "const": 1,
+            "title": "Dt Hours",
+            "default": 1
+          },
+          "pv_performance_ratio": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Pv Performance Ratio"
+          },
+          "effective_config": {
+            "$ref": "#/components/schemas/EffectiveConfig"
+          },
+          "equipment": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CriticalEquipment"
+                },
+                {
+                  "$ref": "#/components/schemas/FlexibleEquipment"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "category",
+                "mapping": {
+                  "critical": "#/components/schemas/CriticalEquipment",
+                  "flexible": "#/components/schemas/FlexibleEquipment"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Equipment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assumptions"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OK",
+              "RESERVE_AT_RISK",
+              "CRITICAL_SHORTAGE"
+            ],
+            "title": "Status"
+          },
+          "baseline": {
+            "$ref": "#/components/schemas/PlanResult"
+          },
+          "heuristic": {
+            "$ref": "#/components/schemas/PlanResult"
+          },
+          "optimized": {
+            "$ref": "#/components/schemas/PlanResult"
+          },
+          "comparison": {
+            "$ref": "#/components/schemas/ComparisonMetrics"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/SimulationWarning"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/Recommendation"
+            },
+            "type": "array",
+            "title": "Recommendations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scenario",
+          "scenario_name",
+          "pv_performance_ratio",
+          "effective_config",
+          "equipment",
+          "assumptions",
+          "status",
+          "baseline",
+          "heuristic",
+          "optimized",
+          "comparison",
+          "warnings",
+          "recommendations"
+        ],
+        "title": "SimulationResponse"
+      },
+      "SimulationWarning": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "CRITICAL_UNSERVED",
+              "RESERVE_BELOW_TARGET",
+              "FLEXIBLE_DEFERRED"
+            ],
+            "title": "Code"
+          },
+          "plan": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "heuristic",
+              "optimized"
+            ],
+            "title": "Plan"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "plan",
+          "message"
+        ],
+        "title": "SimulationWarning"
+      },
+      "TaskAllocation": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Hour"
+          },
+          "served_kwh": {
+            "type": "number",
+            "title": "Served Kwh"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hour",
+          "served_kwh"
+        ],
+        "title": "TaskAllocation"
+      }
+    }
+  }
+}

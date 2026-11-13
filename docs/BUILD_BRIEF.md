@@ -1,6 +1,6 @@
 # LifeLine — detailed implementation specification
 
-Version 1.0, November 12, 2026. This refines the [supplied brief](source/LifeLine_Codex_Build_Brief.md). If this handoff and the source differ, use the decisions here and in the committed contracts for the planned implementation. Person 1’s numerical model is now implemented; the API/dashboard sections remain build targets. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) for executed checks and integration interfaces.
+Version 1.0, November 12, 2026. This refines the [supplied brief](source/LifeLine_Codex_Build_Brief.md). If this handoff and the source differ, use the decisions here and in the committed contracts for the planned implementation. The numerical model and Person 2’s FastAPI integration are implemented. Dashboard sections remain build targets. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) and [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md) for executed checks and integration interfaces.
 
 ## 1. Outcome and limits
 
@@ -16,7 +16,7 @@ Critical loads are supplied by a hypothetical facility operator. The software do
 
 Use React, TypeScript, Vite, Tailwind CSS, and Recharts for the frontend. Use Python 3.11, FastAPI, Pydantic, NumPy, SciPy MILP, and Pytest for the backend. Keep the pure energy model independent of FastAPI and UI code. No LLM, external credentials, or runtime network service is required.
 
-Person 2 pins the tested versions and commits dependency files. Target Node 22.12+ within Node 22 and the Vite version compatible with that environment. Do not spend the hackathon upgrading stacks or introducing a database.
+Backend versions and transitive dependencies are pinned in `backend/requirements.txt` and `requirements-dev.txt`. Person 3 still owns frontend dependencies. Target Node 22.12+ within Node 22 and the Vite version compatible with that environment. Do not spend the hackathon upgrading stacks or introducing a database.
 
 Planned implementation layout:
 
@@ -206,13 +206,13 @@ Only claim improvements calculated from matching plans, such as the difference i
 
 ## 9. API contract
 
-Use [contracts/api.ts](../contracts/api.ts) for exact fields. Person 2 mirrors these with Pydantic models and verifies response parity; the file is a language-level contract, not runtime validation by itself.
+Use [contracts/api.ts](../contracts/api.ts) and [OpenAPI](../contracts/openapi.json) for exact fields. `backend/app/models.py` now mirrors the contract with runtime Pydantic validation. The response includes all three plans, computed comparison metrics, warnings for baseline/heuristic/optimized, and deterministic recommendations. Nullable recommendation metadata is documented in the TypeScript contract.
 
 | Method and path | Success | Purpose |
 |---|---|---|
 | `GET /api/health` | 200 `HealthResponse` | Local service health and API version |
 | `GET /api/scenarios` | 200 `ScenarioListResponse` | Four choices, complete defaults, and synthetic descriptions |
-| `POST /api/simulate` | 200 `SimulationResponse` | Resolve overrides, simulate both plans, return diagnostics |
+| `POST /api/simulate` | 200 `SimulationResponse` | Resolve overrides, calculate all three plans, return comparisons and diagnostics |
 
 Request example:
 
@@ -269,4 +269,4 @@ External weather, trained forecasting, LLM explanations, CSV export, multi-clini
 
 ## Implemented numerical handoff
 
-`compare_schedules(ModelInput)` returns existing, sunshine-first, and optimized `PlanResult` objects with computed comparison fields. The shared scenario enum adds `scheduling`; Person 2 must extend the outer HTTP response with heuristic/comparison fields without dropping existing data. No routes, dashboard, or explanation prose are implemented in Person 1’s scope. Requirements and exact run commands are in the [handoff](PERSON_1_HANDOFF.md).
+`compare_schedules(ModelInput)` returns existing, sunshine-first, and optimized `PlanResult` objects with computed comparison fields. The shared scenario enum adds `scheduling`; Person 2 has extended the HTTP response with heuristic/comparison fields while retaining existing data. Routes, strict configuration/override validation, error mapping, and computed explanation templates are implemented. The dashboard remains unimplemented. Requirements, examples, and exact run commands are in the [API handoff](PERSON_2_HANDOFF.md).

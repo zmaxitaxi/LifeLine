@@ -1,5 +1,5 @@
 /**
- * LifeLine API contract v1.0 — planned implementation, not an API client.
+ * LifeLine API contract v1.0 — implemented by backend/app/models.py.
  * Numeric values are finite. Hour is a slot index 0..23, boundary is 0..24.
  * See docs/BUILD_BRIEF.md for validation and cross-field constraints.
  */
@@ -139,7 +139,7 @@ export interface PlanResult {
 
 export interface SimulationWarning {
   code: "CRITICAL_UNSERVED" | "RESERVE_BELOW_TARGET" | "FLEXIBLE_DEFERRED";
-  plan: "baseline" | "optimized";
+  plan: "baseline" | "heuristic" | "optimized";
   message: string;
 }
 
@@ -147,8 +147,22 @@ export interface Recommendation {
   severity: "info" | "warning" | "critical";
   title: string;
   explanation: string;
-  task_id?: string;
-  hours?: number[];
+  task_id?: string | null;
+  hours?: number[] | null;
+}
+
+export interface ComparisonMetrics {
+  /** Compare per-task served energy, not just the total. */
+  same_flexible_work_completed: boolean;
+  /** Signed optimized minus baseline stored energy at boundary 24. */
+  battery_preserved_at_midnight_kwh: number;
+  minimum_battery_improvement_kwh: number;
+  /** Difference between minimum stored energy over boundaries 18..24. */
+  evening_minimum_improvement_kwh: number;
+  /** Signed baseline minus optimized conversion loss. */
+  conversion_loss_reduction_kwh: number;
+  /** Key metric equality within 1e-6, not necessarily identical allocations. */
+  heuristic_matches_optimizer_metrics: boolean;
 }
 
 export interface SimulationResponse {
@@ -167,7 +181,9 @@ export interface SimulationResponse {
   /** Always equals optimized.status, never a preassigned scenario label. */
   status: RiskStatus;
   baseline: PlanResult;
+  heuristic: PlanResult;
   optimized: PlanResult;
+  comparison: ComparisonMetrics;
   warnings: SimulationWarning[];
   recommendations: Recommendation[];
 }

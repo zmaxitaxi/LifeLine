@@ -1,0 +1,185 @@
+{
+  "scope": "Live local HTTP verification; API only, no dashboard",
+  "scenarios": {
+    "scheduling": {
+      "http_status": 200,
+      "elapsed_seconds": 0.0288119581528008,
+      "status": "OK",
+      "comparison": {
+        "same_flexible_work_completed": true,
+        "battery_preserved_at_midnight_kwh": 2.2105263157894735,
+        "minimum_battery_improvement_kwh": 0.3684210526315743,
+        "evening_minimum_improvement_kwh": 2.2105263157894735,
+        "conversion_loss_reduction_kwh": 0.1105263157894733,
+        "heuristic_matches_optimizer_metrics": true
+      },
+      "optimized_metrics": {
+        "total_solar_kwh": 9.193557090648468,
+        "critical_requested_kwh": 5.34,
+        "critical_unserved_kwh": 0.0,
+        "critical_coverage_pct": 100.0,
+        "min_soc_kwh": 4.985927821751641,
+        "final_soc_kwh": 6.82803308490954,
+        "flexible_requested_kwh": 2.1,
+        "flexible_served_kwh": 2.0999999999999996,
+        "flexible_deferred_kwh": 0.0,
+        "curtailed_kwh": 0.6575866732694398,
+        "conversion_loss_kwh": 0.26793733246948603,
+        "critical_shortage_hours": [],
+        "reserve_breach_boundaries": []
+      },
+      "warnings": [
+        {
+          "code": "RESERVE_BELOW_TARGET",
+          "plan": "baseline",
+          "message": "Minimum stored energy 4.617507 kWh is below the 4.800000 kWh target; breach boundaries: [23, 24] (0\u201324)."
+        }
+      ]
+    },
+    "normal": {
+      "http_status": 200,
+      "elapsed_seconds": 0.012981167063117027,
+      "status": "OK",
+      "comparison": {
+        "same_flexible_work_completed": true,
+        "battery_preserved_at_midnight_kwh": 2.2105263157894726,
+        "minimum_battery_improvement_kwh": 1.0658141036401503e-14,
+        "evening_minimum_improvement_kwh": 2.2105263157894726,
+        "conversion_loss_reduction_kwh": 0.11052631578947403,
+        "heuristic_matches_optimizer_metrics": true
+      },
+      "optimized_metrics": {
+        "total_solar_kwh": 30.64519030216156,
+        "critical_requested_kwh": 5.34,
+        "critical_unserved_kwh": 0.0,
+        "critical_coverage_pct": 100.0,
+        "min_soc_kwh": 12.989473684210534,
+        "final_soc_kwh": 18.989473684210527,
+        "flexible_requested_kwh": 2.1,
+        "flexible_served_kwh": 2.0999999999999996,
+        "flexible_deferred_kwh": 0.0,
+        "curtailed_kwh": 17.745688917120013,
+        "conversion_loss_kwh": 0.47002770083102474,
+        "critical_shortage_hours": [],
+        "reserve_breach_boundaries": []
+      },
+      "warnings": []
+    },
+    "storm": {
+      "http_status": 200,
+      "elapsed_seconds": 0.011128709185868502,
+      "status": "RESERVE_AT_RISK",
+      "comparison": {
+        "same_flexible_work_completed": false,
+        "battery_preserved_at_midnight_kwh": 2.210526315789471,
+        "minimum_battery_improvement_kwh": 2.210526315789471,
+        "evening_minimum_improvement_kwh": 2.210526315789471,
+        "conversion_loss_reduction_kwh": 0.11052631578947353,
+        "heuristic_matches_optimizer_metrics": false
+      },
+      "optimized_metrics": {
+        "total_solar_kwh": 2.451615224172925,
+        "critical_requested_kwh": 5.34,
+        "critical_unserved_kwh": 0.0,
+        "critical_coverage_pct": 100.0,
+        "min_soc_kwh": 2.95810427876126,
+        "final_soc_kwh": 2.95810427876126,
+        "flexible_requested_kwh": 2.1,
+        "flexible_served_kwh": 0.0,
+        "flexible_deferred_kwh": 2.1,
+        "curtailed_kwh": 0.0,
+        "conversion_loss_kwh": 0.15351094541166255,
+        "critical_shortage_hours": [],
+        "reserve_breach_boundaries": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ]
+      },
+      "warnings": [
+        {
+          "code": "RESERVE_BELOW_TARGET",
+          "plan": "baseline",
+          "message": "Minimum stored energy 0.747578 kWh is below the 4.000000 kWh target; breach boundaries: [18, 19, 20, 21, 22, 23, 24] (0\u201324)."
+        },
+        {
+          "code": "RESERVE_BELOW_TARGET",
+          "plan": "heuristic",
+          "message": "Minimum stored energy 0.749069 kWh is below the 4.000000 kWh target; breach boundaries: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] (0\u201324)."
+        },
+        {
+          "code": "RESERVE_BELOW_TARGET",
+          "plan": "optimized",
+          "message": "Minimum stored energy 2.958104 kWh is below the 4.000000 kWh target; breach boundaries: [18, 19, 20, 21, 22, 23, 24] (0\u201324)."
+        },
+        {
+          "code": "FLEXIBLE_DEFERRED",
+          "plan": "optimized",
+          "message": "2.100000 kWh of optional work is unserved within this horizon; no next-day completion is guaranteed."
+        }
+      ]
+    },
+    "high_demand": {
+      "http_status": 200,
+      "elapsed_seconds": 0.010876957792788744,
+      "status": "CRITICAL_SHORTAGE",
+      "comparison": {
+        "same_flexible_work_completed": false,
+        "battery_preserved_at_midnight_kwh": 1.8947368421052602,
+        "minimum_battery_improvement_kwh": 1.8947368421052602,
+        "evening_minimum_improvement_kwh": 1.8947368421052602,
+        "conversion_loss_reduction_kwh": 0.09473684210526301,
+        "heuristic_matches_optimizer_metrics": false
+      },
+      "optimized_metrics": {
+        "total_solar_kwh": 30.64519030216156,
+        "critical_requested_kwh": 14.34,
+        "critical_unserved_kwh": 1.3200000000000003,
+        "critical_coverage_pct": 90.7949790794979,
+        "min_soc_kwh": 10.905263157894737,
+        "final_soc_kwh": 10.905263157894737,
+        "flexible_requested_kwh": 2.1,
+        "flexible_served_kwh": 0.0,
+        "flexible_deferred_kwh": 2.1,
+        "curtailed_kwh": 19.845688917120004,
+        "conversion_loss_kwh": 0.8742382271468143,
+        "critical_shortage_hours": [
+          20,
+          21
+        ],
+        "reserve_breach_boundaries": []
+      },
+      "warnings": [
+        {
+          "code": "CRITICAL_UNSERVED",
+          "plan": "baseline",
+          "message": "1.320000 kWh of critical demand is unserved in slots starting 20:00, 21:00."
+        },
+        {
+          "code": "FLEXIBLE_DEFERRED",
+          "plan": "baseline",
+          "message": "0.300000 kWh of optional work is unserved within this horizon; no next-day completion is guaranteed."
+        },
+        {
+          "code": "CRITICAL_UNSERVED",
+          "plan": "heuristic",
+          "message": "1.320000 kWh of critical demand is unserved in slots starting 20:00, 21:00."
+        },
+        {
+          "code": "CRITICAL_UNSERVED",
+          "plan": "optimized",
+          "message": "1.320000 kWh of critical demand is unserved in slots starting 20:00, 21:00."
+        },
+        {
+          "code": "FLEXIBLE_DEFERRED",
+          "plan": "optimized",
+          "message": "2.100000 kWh of optional work is unserved within this horizon; no next-day completion is guaranteed."
+        }
+      ]
+    }
+  }
+}

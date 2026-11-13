@@ -1,12 +1,14 @@
 # Three-person implementation plan
 
-The roles below are ready to assign to actual teammates. Each person owns a bounded part of the repository and reviews another person's work. The three people are human implementation owners; this document does not imply that three contributors have already joined that cross-person integration has been completed.
+The roles below are ready to assign to actual teammates. Each person owns a bounded part of the repository and reviews another person's work. The three people are human implementation owners; these labels do not imply that three separate contributors have joined or that frontend integration is complete.
 
 The supplied deadline is **Saturday, November 14, 2026, 11:59 PM America/Los_Angeles (PST)**. All times in this plan use that timezone. Person 2 must verify event rules. Target a completed demo at 8:00 PM Saturday and submission by 10:30 PM, leaving 89 minutes before the stated deadline.
 
 ## Current progress
 
-Person 1’s numerical modules, sunshine-first heuristic, scheduling-improvement preset, CLI, comparison metrics, and model tests are implemented on `codex/energy-model`. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md). A2–A7 have implementation/test evidence; A1’s units and interfaces are documented for Person 2 review. Cross-person integration/review remains pending. Person 2 and Person 3 tasks have not been implemented.
+Person 1’s numerical modules, sunshine-first heuristic, scheduling-improvement preset, CLI, comparison metrics, and model tests are implemented on `codex/energy-model`. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md). A2–A7 have implementation/test evidence; A1’s units and interfaces are documented for Person 2 review. Person 2’s backend integration is now implemented and checked against Person 1’s outputs. See [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md). Person 3’s dashboard and frontend integration remain pending.
+
+B1–B7 backend deliverables are implemented: endpoints, strict validation, real model orchestration, computed examples, explanations, pinned dependencies, backend CI, clean-install checks, and live HTTP evidence. Frontend version coordination, browser/built-preview checks, and complete release rehearsal await Person 3. Event rules still need an authoritative source.
 
 The primary demo now compares the same amount of completed work under an existing schedule, sunshine-first, and MILP. Keep Normal, Storm, and High Demand as additional behavior/limitation presets.
 

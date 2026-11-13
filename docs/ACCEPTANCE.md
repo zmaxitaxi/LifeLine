@@ -1,6 +1,6 @@
 # Validation and release checklist
 
-Person 1’s numerical implementation is complete; API and dashboard checks remain uncompleted. Checked model gates do not imply a working web application. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) and the [calculated evidence](evidence/person-1-results.json).
+The numerical model and API are implemented and tested; dashboard and full-application checks remain uncompleted. Checked model gates do not imply a working web application. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) and the [calculated evidence](evidence/person-1-results.json).
 
 ## Planning verification
 
@@ -13,7 +13,7 @@ Person 1’s numerical implementation is complete; API and dashboard checks rema
 
 ## Current numerical verification
 
-Model tests cover T01–T12 and T17, plus the numerical portion of T18. T14/T15 have numerical input checks only; complete API validation remains Person 2’s responsibility. T13–T16 are not complete as API gates. Tests additionally verify the primary same-work scheduling gain, an honest heuristic tie, a constrained-window advantage for MILP, corrupt output rejection, and a shared solve budget. See test count below.
+Model tests cover T01–T12 and T17, plus the numerical portion of T18. T13–T16 and the API portion of T18 now pass in the API/configuration tests, including strict validation, solver failures, response schemas, fresh computations, and zero critical demand. The full suite has 177 passing tests (62 numerical plus 115 API/configuration/contract checks). Tests additionally verify the primary same-work scheduling gain, an honest heuristic tie, a constrained-window advantage for MILP, corrupt output rejection, and a shared solve budget. See test count below.
 
 ## Automated check matrix
 
@@ -44,13 +44,13 @@ Randomized small valid inputs are useful as an additional accounting check if ti
 
 ## End-to-end gates
 
-- [ ] Install from a clean checkout using committed dependency files and lockfile.
-- [ ] README backend/frontend commands work as written on the demo laptop.
-- [x] Numerical tests: `.venv/bin/python -m pytest backend/tests -q` passes (see latest count below). API tests are still pending.
+- [x] Backend pinned install, tests, and `pip check` verified in an isolated clean source copy/new virtual environment. Full frontend installation remains pending.
+- [x] README backend commands verified locally, including real Uvicorn HTTP calls. Frontend/demo-laptop setup remains pending.
+- [x] `.venv/bin/python -m pytest backend/tests -q`: 177 model/API/configuration/contract tests pass.
 - [ ] `npm --prefix frontend run typecheck` passes.
 - [ ] `npm --prefix frontend run build` passes.
 - [ ] Built frontend can reach the API using the documented local preview configuration.
-- [ ] Scheduling improvement, Normal, Storm, and High Demand each issue fresh API calculations; results match numerical expectations.
+- [x] All four scenarios calculate fresh API results matching numerical expectations (HTTP and TestClient). UI interaction remains pending.
 - [ ] Editable controls change the effective inputs and results; Reset restores the preset.
 - [ ] Rapid scenario switching cannot display a late result under the wrong scenario label.
 - [ ] Loading, validation errors, offline backend, timeout, and retry are understandable.
@@ -61,7 +61,7 @@ Randomized small valid inputs are useful as an additional accounting check if ti
 - [ ] Baseline warnings remain visible independently of optimized status.
 - [ ] Storm visibly discloses its lower starting battery; no misleading cloud-only comparison.
 - [ ] Disconnect external internet after installing dependencies and run all four presets, charts, and local assets successfully.
-- [ ] Measure preset response times on the demo laptop; target under 2 seconds; fail visibly if the total solve budget exceeds 5 seconds.
+- [x] Warm local HTTP responses measured at approximately 0.011–0.029 seconds; shared solve-budget failures verified as 503. Re-measure the complete app on the demo laptop.
 - [ ] Rehearse against the release commit; confirm no development fixtures are used in the live path.
 - [ ] Keep the illustrative-use disclaimer and synthetic-input labeling visible.
 - [ ] Verify event requirements and submit the repository/demo materials before the stated deadline.
@@ -101,4 +101,10 @@ Only call the MVP demo-ready after the required gates have evidence. Operational
 
 ## Person 1 verification record
 
-Python 3.12.5; NumPy 2.2.6; SciPy 1.15.3; Pytest 8.3.5. **62 numerical tests passed** (`.venv/bin/python -m pytest backend/tests -q`, 0.68 seconds); independent reference calibration also passes. No HTTP, frontend build, browser, full-application offline, or deployment checks have been completed. Original supplied brief remains byte-for-byte intact.
+Python 3.12.5; NumPy 2.2.6; SciPy 1.15.3; Pytest 8.3.5. **62 numerical tests passed** (`.venv/bin/python -m pytest backend/tests -q`, 0.68 seconds); independent reference calibration also passes. At the original Person 1 handoff, no HTTP/frontend checks were complete; see the Person 2 update below for current API verification. Frontend, browser, full-application offline, and deployment checks remain pending. Original supplied brief remains byte-for-byte intact.
+
+## Person 2 verification record
+
+177 tests pass in the workspace and a clean source copy/new environment; `pip check` succeeds. Live Uvicorn health, scenario listing, OpenAPI, all four simulations, and a 422 validation response verified. Tests also block outbound socket connections while exercising all four calculations. Full-application offline/browser checks remain uncompleted.
+
+Versions: Python 3.12.5, FastAPI 0.115.12, Pydantic 2.14.3, Uvicorn 0.34.2, NumPy 2.2.6, SciPy 1.15.3, Pytest 8.3.5. One dependency-level Starlette/AnyIO deprecation warning is present. Backend CI is configured for Python 3.11 and 3.12; actual remote status is available in GitHub Actions. See [API handoff](PERSON_2_HANDOFF.md) and [HTTP evidence](evidence/person-2-http-results.json).
