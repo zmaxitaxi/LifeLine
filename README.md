@@ -25,6 +25,8 @@ npm --prefix frontend run build
 python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
+On Windows PowerShell, create the environment with `python -m venv .venv`. Skip the `source` line and use `.\.venv\Scripts\python.exe` for the remaining Python commands. The pinned requirements install the IANA timezone data used by the forecast planner on Windows.
+
 Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it serves `frontend/dist` and the API from one local origin. Synthetic/historical planning works offline after installation; fresh forecasts require internet. The optional Swagger explorer uses external assets.
 
 For local AI, install/start Ollama and ensure `ollama list` includes `llama3.1:8b` (already installed on this Mac). If it is not running, use a separate terminal:
@@ -60,7 +62,7 @@ npm run test:e2e
 
 The backend suite has **266 passing tests**. The browser suite now contains **22 Chromium journeys**, including local-agent tools, provider failure, explicit requirement adoption, capacity search and the competing-window demo; the final run is recorded in [the objective checklist](FINAL_CHECKLIST.md). TypeScript/production-build and built-application/API checks are required. CI covers Python 3.11/3.12 and Chromium; remote results are in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
 
-For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright artifacts go to `/tmp/lifeline-playwright-results` unless `LIFELINE_TEST_OUTPUT` is set.
+For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright uses the repo's `.venv` on Windows and Unix, and writes artifacts to `lifeline-playwright-results` in the OS temporary directory unless `LIFELINE_TEST_OUTPUT` is set.
 
 Read [RESEARCH.md](RESEARCH.md), [DATA_SOURCES.md](DATA_SOURCES.md), [PRODUCT_VALIDATION.md](PRODUCT_VALIDATION.md), [computed benchmark](BENCHMARK.md), [demo script](DEMO.md), and [UI verification](docs/FRONTEND_VALIDATION.md). No user interviews, deployment partnerships, measured clinic savings, health outcomes, or guaranteed availability are claimed.
 

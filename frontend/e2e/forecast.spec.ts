@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { test, expect, type Page } from "@playwright/test";
+import { testPython } from "../test-python";
 
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/agent/status", (route) =>
@@ -21,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 function fixture(path: string, body?: unknown) {
   return JSON.parse(
     execFileSync(
-      resolve("../.venv/bin/python"),
+      testPython,
       ["backend/tests/forecast_browser_fixture.py"],
       {
         cwd: resolve(".."),

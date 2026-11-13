@@ -22,6 +22,8 @@ The slide is not a complete judging rubric: scoring weights, required submission
 
 ## Before submission
 
+On November 13, 2026, a public search found the [Open Project club site](https://openprojectberkeley.com/) but no official rules or submission form for this specific event. The team still needs the organizer's instructions to verify the items below.
+
 - [ ] Confirm official eligibility/rubric, especially any mandatory LLM requirement.
 - [ ] Reverify fresh forecast retrieval: the latest API connection failed. Earlier actual retrieval and a labeled local-LLM/recorded-weather replay are evidence, not current live data.
 - [ ] Verify exact deadline/timezone, team registration, submission form, and required links.

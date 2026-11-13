@@ -89,24 +89,21 @@ The current recommended walkthrough is the [two-minute interactive demo](../DEMO
 
 Use the actual release output in narration. If the computation differs after a model change, investigate and update the evidence; do not preserve a scripted number by changing the display alone. A short local screen recording of the working release is an optional presentation fallback, labeled as a recording.
 
-## Release record to fill in
+## Release record
 
-```text
-Release commit:
-Python / Node / SciPy versions:
-Demo laptop / OS:
-Backend test command, count, result:
-Frontend typecheck result:
-Frontend production build result:
-Clean install and built-preview check:
-Observed preset statuses and unmet energy:
-Slowest preset response time:
-Offline run result:
-Desktop/mobile screenshots:
-Known limitations:
-Event deadline/rules source:
-Submission confirmation:
-```
+November 13, 2026 local verification covered the code candidate `aaa4de9df3b965829b131c44033e0359603b3469` on Windows NT build 26300, Python 3.13.5, SciPy 1.15.3, and Node 24.14.0. The test machine's use as the presentation laptop is unconfirmed.
+
+| Check | Observed result |
+|---|---|
+| Clean dependency setup | Fresh `.venv` from `python -m venv .venv`. `python -m pip install -r backend/requirements-dev.txt`, `python -m pip check`, and `npm --prefix frontend ci --include=dev` succeeded. The Windows runtime now installs the pinned IANA database. |
+| Backend and calibration | `python -m pytest backend/tests -q --tb=short` passed all 241 tests, including OpenAPI snapshot parity, structured solver errors, and forecast cache behavior. Starlette emitted one dependency deprecation warning. `python scripts/check_plan.py` passed all four reference presets. |
+| Production build and Chromium | `npm --prefix frontend run build` passed TypeScript and Vite. After Chromium installation, `npm --prefix frontend run test:e2e` with `LIFELINE_API_PORT=8033` passed 17 tests, covering stale input, reset, failure/retry, keyboard/mobile, and built same-origin serving. |
+| Local HTTP | Uvicorn on port 8034 served the built index, health, planning status, four scenarios, and three real plans per simulation. Explicit zero PV was preserved and an incompatible capacity returned structured 422. Scheduling and Normal were `OK`; Storm was `RESERVE_AT_RISK`. High Demand returned HTTP 200 with `CRITICAL_SHORTAGE` and 1.320 kWh of essential demand unmet. The slowest of the four observed preset requests was 38 ms on this machine. |
+| Offline browser smoke | The built dashboard on port 8034 computed synthetic and bundled Kisumu historical plans with non-local browser requests blocked. |
+| Live forecast | `python scripts/check_live_forecast.py --api-url http://127.0.0.1:8034 --midnight-battery-kwh 6` passed its energy-accounting assertions. Open-Meteo retrieved at `2026-11-13T17:48:29.869694Z` for November 14 in Africa/Nairobi. The modeled forecast had 7.844 kWh of solar and no flexible work deferred. The 50%-lower-sunshine case had 3.922 kWh of solar and 2.100 kWh deferred, with zero essential shortfall in both. Chromium verified the computed plan, attribution and sensitivity table using the cached result of that retrieval. |
+| Hosted CI | The [baseline run for `f881eea`](https://github.com/zmaxitaxi/LifeLine/actions/runs/43399555064) passed Linux backend Python 3.11/3.12 and frontend Node 22 jobs. The local candidate is unpublished and has no hosted CI run. |
+
+Pending release gates are team rehearsal on the presentation machine, confirmation of official event rules and required links, and submission confirmation. See the [submission checklist](../HACKATHON_CHECKLIST.md). The browser checks above are automated runs. Presentation screenshots were not captured.
 
 Only call the MVP demo-ready after the required gates have evidence. Operational deployment would require separate validated facility data, engineering and healthcare review, and safety/cybersecurity work beyond this hackathon.
 
