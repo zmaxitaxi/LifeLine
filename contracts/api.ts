@@ -179,7 +179,14 @@ export interface SimulationResponse {
   cloud_factors: number[];
   input_provenance: Record<string, string>;
   weather_dataset: string;
-  diagnosis: {assessment: string; explanation: string; constraints: string[]; discharge_limited_hours: number[]; optimistic_energy_deficit_kwh: number; window_limited_tasks: string[]};
+  diagnosis: {
+    assessment: string;
+    explanation: string;
+    constraints: string[];
+    discharge_limited_hours: number[];
+    optimistic_energy_deficit_kwh: number;
+    window_limited_tasks: string[];
+  };
   timezone: "Africa/Nairobi";
   horizon_hours: 24;
   dt_hours: 1;
@@ -212,5 +219,43 @@ export interface ApiErrorResponse {
       message: string;
       type: string;
     }>;
+  };
+}
+
+/** The bundled assistant works without an external AI provider. */
+export interface PlanningQuestion {
+  kind:
+    | "intent"
+    | "equipment"
+    | "deadline"
+    | "duration"
+    | "power"
+    | "start"
+    | "battery";
+  prompt: string;
+  task_id: string | null;
+  equipment_name: string;
+  power_w: number | null;
+  deadline: number;
+  duration_h: number | null;
+}
+export interface AssistantResponse {
+  mode: "offline";
+  message: string;
+  question: PlanningQuestion | null;
+  request: SimulationRequest | null;
+  result: SimulationResponse | null;
+  tools_used: string[];
+}
+export interface PlanningStatus {
+  assistant: "offline";
+  timezone: "Africa/Nairobi";
+  forecast: {
+    available: false;
+    reason: string;
+    source: null;
+    forecast_date: null;
+    requested_date: string;
+    updated_at: null;
   };
 }

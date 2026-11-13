@@ -58,6 +58,22 @@
         }
       }
     },
+    "/api/planning-status": {
+      "get": {
+        "summary": "Planning Status",
+        "operationId": "planning_status_api_planning_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/simulate": {
       "post": {
         "summary": "Simulate",
@@ -115,6 +131,44 @@
           }
         }
       }
+    },
+    "/api/assistant": {
+      "post": {
+        "summary": "Assistant",
+        "operationId": "assistant_api_assistant_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -131,6 +185,94 @@
           "error"
         ],
         "title": "ApiErrorResponse"
+      },
+      "AssistantRequest": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Message"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SimulationRequest"
+          },
+          "pending": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanningQuestion"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "message",
+          "plan"
+        ],
+        "title": "AssistantRequest"
+      },
+      "AssistantResponse": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "const": "offline",
+            "title": "Mode",
+            "default": "offline"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "question": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanningQuestion"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "request": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimulationRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimulationResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tools_used": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools Used",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "AssistantResponse"
       },
       "ComparisonMetrics": {
         "properties": {
@@ -504,6 +646,19 @@
         ],
         "title": "FlexibleTaskResult"
       },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -730,6 +885,83 @@
           "flexible_tasks"
         ],
         "title": "PlanResult"
+      },
+      "PlanningQuestion": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "intent",
+              "equipment",
+              "deadline",
+              "duration",
+              "power",
+              "start",
+              "battery"
+            ],
+            "title": "Kind"
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          },
+          "equipment_name": {
+            "type": "string",
+            "title": "Equipment Name",
+            "default": ""
+          },
+          "power_w": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power W"
+          },
+          "deadline": {
+            "type": "integer",
+            "maximum": 24.0,
+            "minimum": 1.0,
+            "title": "Deadline",
+            "default": 12
+          },
+          "duration_h": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 24.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration H"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "prompt"
+        ],
+        "title": "PlanningQuestion"
       },
       "Recommendation": {
         "properties": {
@@ -1253,6 +1485,39 @@
           "served_kwh"
         ],
         "title": "TaskAllocation"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }

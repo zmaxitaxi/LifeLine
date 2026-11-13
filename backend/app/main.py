@@ -4,6 +4,8 @@ import asyncio
 from contextlib import asynccontextmanager
 import importlib
 import logging
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -20,6 +22,7 @@ from .models import (ApiErrorResponse, HealthResponse, ScenarioListResponse,
                      SimulationRequest, SimulationResponse)
 from .optimizer import SolverError
 from .scenarios import CONFIG_PATH, load_catalog, load_weather
+from .assistant import AssistantRequest, AssistantResponse, prepare, summarize
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +91,16 @@ def create_app(config_path: Path = CONFIG_PATH):
     async def weather_datasets():
         return {'datasets': [load_weather()]}
 
+    @app.get('/api/planning-status')
+    async def planning_status():
+        # No forecast provider is configured in this offline application. Do not
+        # present bundled historical data as tomorrow's weather or a live check.
+        return {'assistant': 'offline', 'forecast': {'available': False,
+            'reason': 'No live forecast provider is connected.', 'source': None,
+            'forecast_date': None,
+            'requested_date': (datetime.now(ZoneInfo('Africa/Nairobi')) + timedelta(days=1)).date().isoformat(),
+            'updated_at': None}, 'timezone': 'Africa/Nairobi'}
+
     @app.post('/api/simulate', response_model=SimulationResponse, responses={
         422: {'model': ApiErrorResponse}, 503: {'model': ApiErrorResponse}, 500: {'model': ApiErrorResponse}})
     async def simulate(body: SimulationRequest, request: Request):
@@ -126,6 +139,49 @@ def create_app(config_path: Path = CONFIG_PATH):
             status=results['optimized']['status'], baseline=results['baseline'], heuristic=results['heuristic'],
             optimized=results['optimized'], comparison=results['comparison'], warnings=warnings,
             recommendations=recommendations)
+
+    @app.post('/api/assistant', response_model=AssistantResponse)
+    async def assistant(body: AssistantRequest, request: Request):
+        try:
+            decision = prepare(body, request.app.state.catalog)
+        except ValidationError as exc:
+            return error_response(422, 'INVALID_REQUEST', 'Please check the clinic requirements.',
+                                  validation_details(exc.errors(), ('body',)))
+        if isinstance(decision, AssistantResponse):
+            return decision
+        candidates = decision if isinstance(decision, list) else [decision]
+        computed = []
+        for candidate in candidates:
+            result = await simulate(candidate, request)
+            if isinstance(result, JSONResponse):
+                return result
+            computed.append((candidate, result))
+        # Minimize essential shortages, then reserve breaches, then maximize
+        # minimum and final stored energy. All candidates use the real solver.
+        selected, result = min(computed, key=lambda pair: (
+            pair[1].optimized.metrics.critical_unserved_kwh,
+            len(pair[1].optimized.metrics.reserve_breach_boundaries),
+            -pair[1].optimized.metrics.min_soc_kwh,
+            -pair[1].optimized.metrics.final_soc_kwh))
+        message = summarize(result)
+        previous_clouds = body.plan.cloud_factors if body.plan.cloud_factors is not None else request.app.state.catalog.preset(body.plan.scenario).cloud_factors
+        if selected.cloud_factors is not None and sum(previous_clouds) > 0 and sum(selected.cloud_factors) < sum(previous_clouds) - 1e-8:
+            fraction = 100 * sum(selected.cloud_factors) / sum(previous_clouds)
+            message = f'I tested one day with {fraction:g}% of the sunshine in your current inputs, keeping equipment and starting battery charge unchanged. ' + message
+        if 'reliab' in body.message.lower():
+            metrics = result.optimized.metrics
+            if result.diagnosis.discharge_limited_hours:
+                message += ' Battery output is too limited during some essential hours, even with energy still stored.'
+            elif metrics.reserve_breach_boundaries:
+                message += ' The battery drops below its reserve target during this day.'
+            else:
+                message += ' The battery stays at or above its reserve target during this day.'
+            message += ' This checks one day of energy use, not battery health or aging.'
+        if isinstance(decision, list):
+            item = result.equipment[-1]
+            message += f' The added equipment was checked as a fixed hourly load from {min(item.required_hours):02d}:00 to {max(item.required_hours)+1:02d}:00. Actual sterilization cycles still require validation.'
+        return AssistantResponse(message=message, request=selected, result=result,
+            tools_used=['energy_simulator', 'schedule_optimizer', 'schedule_comparison'])
 
     @app.api_route('/api/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], include_in_schema=False)
     async def invalid_api_path(path: str, request: Request):

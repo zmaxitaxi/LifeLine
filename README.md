@@ -1,10 +1,12 @@
 # LifeLine
 
-LifeLine is an offline-capable energy reliability planning prototype for technicians and managers supporting resource-constrained healthcare facilities. It helps assess configured requirements and compare scheduling and infrastructure alternatives; it does not guarantee power or control medical devices.
+LifeLine is an offline-capable electricity planning prototype for staff supporting resource-constrained healthcare clinics. It helps check equipment requirements and compare schedules and infrastructure alternatives; it does not guarantee power or control medical devices.
 
 **The interactive application is implemented:** editable clinic/equipment, computed reliability assessment, three operating schedules, battery charts, adverse-weather testing, and Capacity Explorer. It reuses the original simulator, MILP, and FastAPI architecture.
 
-The shadcn/ui + Tailwind interface leads with measured stored-energy improvement and a simple **Before → After** equipment schedule. Coverage, completed work, and conversion losses are smaller supporting metrics. Expand **Detailed analysis** for the 24-hour timeline, battery forecasts, and full sunshine-first comparison. Advanced power/efficiency settings start collapsed; mobile clinic configuration is collapsible so the result appears immediately. Shortages and unequal work completion receive explicit warnings rather than a success claim.
+The shadcn/ui + Tailwind interface opens in **Simple mode**: choose a demonstration clinic, ask a question, or choose **Plan tomorrow’s electricity**, **Prepare for cloudy weather**, or **Check battery reliability**. A plan shows an overall assessment, its main limitation, at most three actions, and an equipment timeline. Exact model values and warnings are expandable. **Detailed mode** retains equipment editing, all three schedules, battery charts, computed comparisons, capacity alternatives, and JSON export. **Advanced settings** contains solar/battery capacities, charge, reserve, power limits, efficiencies, sunshine adjustments, and model details.
+
+The bundled **offline assistant is rule-based, not a connected AI model**. It supports electricity checks, battery checks, cloudier-day tests, equipment duration/deadline changes, and focused follow-up questions. Unsupported requests ask for clarification. A missing sterilizer prompts for power, whole-hour runtime, and earliest start, then compares real consecutive fixed-hour energy checks before its deadline; this does not validate sterilization cycles. Both conversation and forms use the same simulator and optimizer. No OpenAI credentials or live weather provider are connected. Forecast unavailability, demonstration conditions, historical date/source, and unavailable update time are explicit. The synthetic and bundled historical experiences need no external service after installation.
 
 ## Run the complete demo
 
@@ -23,7 +25,7 @@ Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it s
 
 For development, run the backend as above and `npm --prefix frontend run dev` in another terminal; open [localhost:5173](http://127.0.0.1:5173/). `npm --prefix frontend run preview` serves the build on port 4173 with an API proxy.
 
-Workflow: configure infrastructure and equipment → assess reliability → compare actual hourly equipment schedules → test adverse weather → explore a proposed system. Valid changes recalculate after a short debounce; the Generate button recalculates immediately. Existing results are marked stale while inputs differ. Equipment is capped at 20 rows to bound the local prototype's solve size.
+Workflow: choose a clinic example → ask or choose an action → read the assessment and timeline → change a requirement → inspect updated results. Valid edits recalculate after a short debounce once a plan exists. Previous results are hidden while inputs differ or a conversational requirement is unresolved. Invalid requirements have plain-language errors. If the assistant endpoint fails, **Retry with local planner** runs the entered requirements directly. Equipment is capped at 20 rows to bound the local prototype's solve size.
 
 Critical hours stay fixed. Flexible duration × power defines energy; the selected existing start fills subsequent allowed slots, with partial-hour energy supported. Flexible work is divisible/interruptible, **not a validated appliance cycle**. Users supply critical/flexible classification; the app does not make medical priorities.
 
@@ -44,7 +46,9 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Verified locally: **194 backend tests**, **7 Chromium end-to-end tests**, TypeScript/production build, and built-dashboard/API integration. Browser tests include unfamiliar equipment, adding/removing loads, power/duration editing, preset switching, validation/reset, capacity bottlenecks, mobile layout, failure recovery, and bundled historical data with external requests blocked. Backend CI covers Python 3.11/3.12; frontend CI builds and exercises Chromium. Current remote results are available in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
+The current suite includes **204 backend tests** and **13 Chromium end-to-end tests**, plus TypeScript/production-build checks and built-application/API integration. Browser journeys cover first-time clinic selection, conversation and focused follow-ups, real requirement changes, explicit essential shortages, equipment editing, all three schedules, capacity bottlenecks, mobile/keyboard use, failure recovery, and historical planning with external requests blocked. Backend CI covers Python 3.11/3.12; frontend CI builds and exercises Chromium. Current remote results are available in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
+
+For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright artifacts go to `/tmp/lifeline-playwright-results` unless `LIFELINE_TEST_OUTPUT` is set.
 
 Read [RESEARCH.md](RESEARCH.md), [DATA_SOURCES.md](DATA_SOURCES.md), [PRODUCT_VALIDATION.md](PRODUCT_VALIDATION.md), [computed benchmark](BENCHMARK.md), [demo script](DEMO.md), and [UI verification](docs/FRONTEND_VALIDATION.md). No user interviews, deployment partnerships, measured clinic savings, health outcomes, or guaranteed availability are claimed.
 

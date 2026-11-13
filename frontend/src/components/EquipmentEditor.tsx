@@ -64,8 +64,8 @@ export function EquipmentEditor({ equipment, onChange }: Props) {
         </Button>
       </div>
       <p className="muted">
-        Protect fixed requirements. Move optional work into available sunshine.
-        Edit a row to set its operating hours.
+        Keep essential equipment on its required hours. Choose when other work
+        can run. Edit a row to change its requirements.
       </p>
       <div className="equipment-list">
         {equipment.map((e) => (
@@ -83,7 +83,7 @@ export function EquipmentEditor({ equipment, onChange }: Props) {
               <strong>{e.name || "Unnamed equipment"}</strong>
               <span className="equipment-summary">
                 {Number((e.power * 1000).toFixed(3))} W · {e.duration} h ·{" "}
-                {e.category === "critical" ? "Protected" : "Flexible"}
+                {e.category === "critical" ? "Essential" : "Can be moved"}
               </span>
               <span className="edit-label">Edit</span>
             </CollapsibleTrigger>
@@ -135,10 +135,10 @@ export function EquipmentEditor({ equipment, onChange }: Props) {
                     }}
                   >
                     <NativeSelectOption value="critical">
-                      Critical · fixed
+                      Essential · fixed hours
                     </NativeSelectOption>
                     <NativeSelectOption value="flexible">
-                      Flexible · schedulable
+                      Can be moved
                     </NativeSelectOption>
                   </NativeSelect>
                 </label>
