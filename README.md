@@ -1,82 +1,66 @@
 # LifeLine
 
-AI-assisted energy planning for a fictional off-grid clinic. LifeLine will forecast solar generation, simulate a battery, and recommend when to run flexible electrical loads while reporting critical shortages honestly.
+Energy scheduling for a fictional solar-powered clinic. LifeLine compares an existing equipment schedule, a sunshine-first heuristic, and a constrained MILP schedule using identical physical inputs.
 
-**Current status: reviewed build specification and three-person implementation plan. The application has not been implemented.** This repository does not yet contain a running dashboard, backend, solver, or application test results.
+**Person 1's numerical implementation is complete. The API and dashboard remain Person 2/3 work.** This branch contains a working command-line model, not a web application.
 
-## Start here
+## Run the model
 
-1. Read the [review and decisions](docs/REVIEW.md) for what changed and what remains unverified.
-2. Use the [detailed build brief](docs/BUILD_BRIEF.md) as the implementation specification.
-3. Pick one of the three roles in the [team plan](docs/TEAM_PLAN.md).
-4. Implement against the shared [API types](contracts/api.ts) and [scenario configuration](contracts/scenarios.json).
-5. Complete the [acceptance checklist](docs/ACCEPTANCE.md) before calling the MVP demo-ready.
+Python 3.11+ is required; verified here with Python 3.12.5, NumPy 2.2.6, SciPy 1.15.3, and Pytest 8.3.5.
 
-The [original supplied brief](docs/source/LifeLine_Codex_Build_Brief.md) is preserved verbatim for comparison. Its embedded instructions are source material; this delivery reviews and expands that material into a build handoff.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r backend/requirements-model.txt
+python -m pytest backend/tests -q
+PYTHONPATH=backend python -m app.model_demo scheduling
+```
 
-## The three owners
+The final command returns complete hourly JSON for all three schedules and computed comparisons. Replace `scheduling` with `normal`, `storm`, or `high_demand` to inspect limitations. No API keys, external services, or internet connection are needed after dependency installation.
 
-| Owner | Responsibility | First handoff |
-|---|---|---|
-| Person 1 — Energy and optimization | Forecast, physical simulator, baseline, constrained solver, model tests | Pure Python functions returning the agreed plan data |
-| Person 2 — API and integration | FastAPI, validation, fixtures, dependency setup, CI, integration, release checklist | Validated endpoints and a response the dashboard can consume |
-| Person 3 — Dashboard and demo | React dashboard, accessible responsive charts, scenario controls, recommendations, demo | A complete screen connected to the API |
+## Verified primary demonstration
 
-Use these role labels until actual teammate names are supplied. The roles are assignments in the plan; no GitHub users have been assigned or contacted.
+The `scheduling` preset uses a synthetic 1.5 kW solar array, 8 kWh battery, 6 kWh initial battery, and 4.8 kWh reserve target. The existing schedule runs optional device charging and auxiliary laundry in the evening. Both alternatives move that work into sunshine.
 
-## Verify the planning inputs now
+| Computed metric | Existing schedule | Sunshine-first | MILP |
+|---|---:|---:|---:|
+| Flexible work completed | 2.100 kWh | 2.100 kWh | 2.100 kWh |
+| Critical energy coverage | 100% | 100% | 100% |
+| Minimum battery across all 25 boundaries | 4.618 kWh | 4.986 kWh | 4.986 kWh |
+| Minimum evening battery, 18:00–24:00 | 4.618 kWh | 6.828 kWh | 6.828 kWh |
+| Battery at midnight | 4.618 kWh | 6.828 kWh | 6.828 kWh |
+| Battery conversion losses | 0.378 kWh | 0.268 kWh | 0.268 kWh |
+| Status | Reserve at risk | Within modeled limits | Within modeled limits |
 
-Requires Python 3.11+ and no third-party packages or network access:
+The improvement is **2.211 kWh more stored energy at midnight**, **0.368 kWh higher daily minimum**, and **0.111 kWh less conversion loss**, with the same work completed. These are distinct metrics; do not label the midnight difference as the daily minimum improvement.
+
+**Sunshine-first matches the optimizer's key metrics in this primary case.** A separate constrained-window test demonstrates an advantage for the MILP. No general superiority or empirical clinic benefit is claimed.
+
+Storm still cannot maintain reserve when optional work is deferred. High Demand still has 1.320 kWh critical shortfall due to an hourly discharge limit. Their battery improvements come with less flexible work completed; do not present those as the same-work demonstration.
+
+## Implementation and handoff
+
+- [Person 1 handoff, interfaces, results, limitations](docs/PERSON_1_HANDOFF.md)
+- [Machine-readable calculated evidence](docs/evidence/person-1-results.json)
+- [Updated build brief](docs/BUILD_BRIEF.md)
+- [Three-person responsibilities](docs/TEAM_PLAN.md)
+- [Review and current readiness](docs/REVIEW.md)
+- [Acceptance checklist and remaining API/UI gates](docs/ACCEPTANCE.md)
+
+The original [source brief](docs/source/LifeLine_Codex_Build_Brief.md) is preserved unchanged. Numerical presets are in [contracts/scenarios.json](contracts/scenarios.json); API shapes are in [contracts/api.ts](contracts/api.ts). Person 2 must extend the outer API response for heuristic/comparison data as described in the handoff. Each numerical plan already follows the existing `PlanResult` fields.
+
+Run the independent reference calibration check:
 
 ```bash
 python3 scripts/check_plan.py
 ```
 
-This checks the committed synthetic profiles and a reference physical dispatch. It verifies why the three presets produce useful demo conditions. It does **not** implement or validate the future optimizer, API, or dashboard.
+This checks reference dispatch and inputs, separately from the optimizer's tests.
 
-Expected calibration, rounded for display:
+## Remaining work
 
-| Preset | Initial battery | Solar / 24 h | Critical demand / 24 h | Reference result |
-|---|---:|---:|---:|---|
-| Normal | 14 kWh | 30.645 kWh | 5.340 kWh | Critical demand and all baseline flexible demand served; reserve maintained |
-| Storm | 6 kWh | 2.452 kWh | 5.340 kWh | Critical-only minimum 2.958 kWh; baseline minimum 0.748 kWh; reserve unavoidably at risk |
-| High Demand | 14 kWh | 30.645 kWh | 14.340 kWh | At least 1.320 kWh critical shortfall from the 4 kW discharge limit at hours 20 and 21 |
+Person 2 owns FastAPI, Pydantic validation, warnings/explanations, integration, CI, and release packaging. Person 3 owns the interactive comparison, dashboard, and browser checks. Future application commands in the build brief are targets until those components exist.
 
-Storm explicitly starts with a depleted battery to illustrate earlier cloudy days. High Demand adds a fictional operator-protected 4.5 kW load at 20:00–22:00. These are synthetic demonstration choices, not measurements or medical recommendations. Overrides can change the expected statuses.
+The supplied hackathon deadline is Saturday, November 14, 2026, 11:59 PM America/Los_Angeles; event rules have not been independently verified. The prototype supports investigation of SDG 7 and SDG 3; it does not demonstrate measured health outcomes.
 
-## Run the application after implementation
-
-The following are the **required future development commands**, not commands that work in this planning-only repository. Person 2 must create the referenced dependency files and verify the commands before release.
-
-Backend, from the repository root:
-
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r backend/requirements-dev.txt
-python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
-```
-
-Frontend, in a second terminal:
-
-```bash
-cd frontend
-npm ci
-npm run dev -- --host 127.0.0.1 --port 5173
-```
-
-Required release checks, from the repository root:
-
-```bash
-python -m pytest backend/tests
-npm --prefix frontend run typecheck
-npm --prefix frontend run build
-```
-
-Target Python 3.11 and Node 22.12+ within the Node 22 line. Commit exact tested dependency versions and `frontend/package-lock.json` during implementation. Vite's current setup requirements are documented in its [official guide](https://vite.dev/guide/). Serve all demo data, icons, and fonts locally; after dependency installation, the demo must run with internet access disabled.
-
-## Delivery target
-
-The supplied brief lists **Saturday, November 14, 2026 at 11:59 PM America/Los_Angeles** as the hackathon deadline. Treat this as a team planning assumption until checked against the actual event rules. The team plan targets an earlier release to leave time for submission.
-
-Illustrative simulation; not for clinical or operational use. No hardware integration, medical equipment control, clinical advice, or deployment certification is included.
+All clinic inputs are synthetic. Illustrative simulation; not for clinical or operational use. No medical equipment control, hardware integration, or real-world certification.

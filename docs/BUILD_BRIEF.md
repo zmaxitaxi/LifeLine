@@ -1,6 +1,6 @@
 # LifeLine — detailed implementation specification
 
-Version 1.0, November 12, 2026. This refines the [supplied brief](source/LifeLine_Codex_Build_Brief.md). If this handoff and the source differ, use the decisions here and in the committed contracts for the planned implementation. This is a build specification, not a claim that the software already works.
+Version 1.0, November 12, 2026. This refines the [supplied brief](source/LifeLine_Codex_Build_Brief.md). If this handoff and the source differ, use the decisions here and in the committed contracts for the planned implementation. Person 1’s numerical model is now implemented; the API/dashboard sections remain build targets. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) for executed checks and integration interfaces.
 
 ## 1. Outcome and limits
 
@@ -99,7 +99,7 @@ The naive baseline uses these fixed requested flexible schedules. Within each ho
 
 For each scenario, baseline and optimization receive the exact same resolved configuration, weather, load profiles, and task energy requirements. A baseline is a comparator, not a claim about actual clinic behavior.
 
-## 5. Forecast and three presets
+## 5. Forecast and four presets
 
 For the midpoint of hour `t`, with synthetic daylight from 06:00 to 18:00:
 
@@ -113,6 +113,7 @@ Cloud factors lie in `[0, 1]`. All nighttime PV is exactly zero. This is a scena
 
 | ID | Cloud factor | Starting energy | Added protected load | Expected optimized status with defaults |
 |---|---:|---:|---|---|
+| `scheduling` | 1.00 | 6 kWh | None; 1.5 kW PV, 8 kWh capacity, 4.8 kWh reserve | `OK` |
 | `normal` | 1.00 | 14 kWh | None | `OK` |
 | `storm` | 0.08 | 6 kWh | None | `RESERVE_AT_RISK` |
 | `high_demand` | 1.00 | 14 kWh | 4.5 kW in slots 20 and 21 | `CRITICAL_SHORTAGE` |
@@ -120,6 +121,8 @@ Cloud factors lie in `[0, 1]`. All nighttime PV is exactly zero. This is a scena
 Show Storm's lower initial battery beside its lower sunshine. It represents synthetic depletion from preceding cloudy days; the preceding days are not simulated. Do not attribute all differences between presets to optimization or cloud cover alone. For High Demand, explain the per-hour discharge limit: daily energy alone cannot prove feasibility.
 
 Scenario selection loads that preset's defaults and requests a fresh simulation. Apply user overrides only after selecting the preset. “Reset” restores the selected preset; switching presets resets edited values so the intended demo is reproducible. Show all effective values returned by the backend.
+
+The primary demo is `scheduling`: both alternatives complete the same 2.1 kWh of work, improve the daily minimum by 0.368421 kWh, retain 2.210526 kWh more at midnight, and reduce conversion losses by 0.110526 kWh. Sunshine-first ties the MILP on these metrics. The existing schedule runs flexible work in evening hours; alternatives use allowed daytime hours. All physical inputs and requirements are identical across comparisons. Results are synthetic, not empirical clinic benefits.
 
 ## 6. Physical model
 
@@ -208,7 +211,7 @@ Use [contracts/api.ts](../contracts/api.ts) for exact fields. Person 2 mirrors t
 | Method and path | Success | Purpose |
 |---|---|---|
 | `GET /api/health` | 200 `HealthResponse` | Local service health and API version |
-| `GET /api/scenarios` | 200 `ScenarioListResponse` | Three choices, complete defaults, and synthetic descriptions |
+| `GET /api/scenarios` | 200 `ScenarioListResponse` | Four choices, complete defaults, and synthetic descriptions |
 | `POST /api/simulate` | 200 `SimulationResponse` | Resolve overrides, simulate both plans, return diagnostics |
 
 Request example:
@@ -245,10 +248,10 @@ Return the resolved configuration, equipment profiles, and assumptions with ever
 Use an off-white background, dark navy text, green/amber/red status accents, clear typography, and restrained cards. The dashboard must work at 1440 px and 375 px widths without horizontal page scrolling.
 
 1. Header: LifeLine, “Simulated clinic,” selected scenario, fictional Kenya context, and synthetic-data label.
-2. Scenario buttons: Normal / Storm / High Demand, selected state, keyboard operation, and a visible recalculation indicator.
+2. Scenario buttons: Scheduling improvement (default) / Normal / Storm / High Demand, selected state, keyboard operation, and a visible recalculation indicator.
 3. Editable controls: PV capacity, battery capacity, initial kWh, reserve kWh, and additional kW for High Demand. Submit changes explicitly; show units, validation errors, and reset.
 4. Four metric cards: initial battery kWh and %, total scenario solar kWh, critical coverage %, and optimized risk status. Show minimum and final battery in the chart summary so the initial-level card is unambiguous.
-5. Battery chart: 25 boundaries labeled 00:00 through 24:00; baseline and optimized energy in kWh; reserve reference line. Include keyboard/readable summary text and distinguish lines by dash pattern as well as color.
+5. Centerpiece: before/after equipment timelines with actual served allocations, the same-work flag, and sunshine-first comparison. Show computed midnight preservation separately from daily minimum improvement and conversion-loss reduction. Clearly acknowledge heuristic ties. Battery chart: 25 boundaries labeled 00:00 through 24:00; baseline and optimized energy in kWh; reserve reference line. Include keyboard/readable summary text and distinguish lines by dash pattern as well as color.
 6. Energy chart: solar and requested critical plus planned flexible demand per hourly slot. Label requested versus served explicitly; do not hide unserved demand by plotting only consumption.
 7. Equipment table: category, power, required/allowed hours, requested energy, served/deferred energy, and optimized allocations. Clearly label divisible flexible approximations.
 8. Recommendation panel: computed explanations, critical shortage hours/kWh, reserve breaches, deferred tasks, and baseline comparison.
@@ -260,6 +263,10 @@ Use a Vite `/api` proxy to `http://127.0.0.1:8000` during development. Document 
 
 ## 11. Delivery and release
 
-Ship all three scenarios, valid baseline and optimized dispatches, editable controls, clear explanations, responsive layout, automated model/API tests, and verified README commands. Use [TEAM_PLAN.md](TEAM_PLAN.md) for owners and [ACCEPTANCE.md](ACCEPTANCE.md) for required evidence.
+Ship all four scenarios, valid baseline and optimized dispatches, editable controls, clear explanations, responsive layout, automated model/API tests, and verified README commands. Use [TEAM_PLAN.md](TEAM_PLAN.md) for owners and [ACCEPTANCE.md](ACCEPTANCE.md) for required evidence.
 
 External weather, trained forecasting, LLM explanations, CSV export, multi-clinic support, and public hosting are stretch work only after the release gates pass. The core demo must remain deterministic and able to run offline after dependencies are installed.
+
+## Implemented numerical handoff
+
+`compare_schedules(ModelInput)` returns existing, sunshine-first, and optimized `PlanResult` objects with computed comparison fields. The shared scenario enum adds `scheduling`; Person 2 must extend the outer HTTP response with heuristic/comparison fields without dropping existing data. No routes, dashboard, or explanation prose are implemented in Person 1’s scope. Requirements and exact run commands are in the [handoff](PERSON_1_HANDOFF.md).

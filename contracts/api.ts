@@ -3,7 +3,7 @@
  * Numeric values are finite. Hour is a slot index 0..23, boundary is 0..24.
  * See docs/BUILD_BRIEF.md for validation and cross-field constraints.
  */
-export type ScenarioId = "normal" | "storm" | "high_demand";
+export type ScenarioId = "scheduling" | "normal" | "storm" | "high_demand";
 export type RiskStatus = "OK" | "RESERVE_AT_RISK" | "CRITICAL_SHORTAGE";
 
 export interface EffectiveConfig {

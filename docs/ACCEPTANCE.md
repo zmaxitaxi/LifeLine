@@ -1,6 +1,6 @@
 # Validation and release checklist
 
-All application checks start **unchecked**. The repository currently contains a planning package, shared inputs/types, and a planning checker. Checked planning items do not imply that the application has been built.
+Person 1’s numerical implementation is complete; API and dashboard checks remain uncompleted. Checked model gates do not imply a working web application. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) and the [calculated evidence](evidence/person-1-results.json).
 
 ## Planning verification
 
@@ -11,7 +11,11 @@ All application checks start **unchecked**. The repository currently contains a 
 - [x] Original contextual reference links checked.
 - [ ] Event-specific rules and deadline independently verified.
 
-## Required automated checks after implementation
+## Current numerical verification
+
+Model tests cover T01–T12 and T17, plus the numerical portion of T18. T14/T15 have numerical input checks only; complete API validation remains Person 2’s responsibility. T13–T16 are not complete as API gates. Tests additionally verify the primary same-work scheduling gain, an honest heuristic tie, a constrained-window advantage for MILP, corrupt output rejection, and a shared solve budget. See test count below.
+
+## Automated check matrix
 
 Use independent assertions on solver outputs, rather than testing only the same helper that constructed the constraints. Unless otherwise stated, absolute energy tolerance is `1e-6 kWh`. Check full precision, not rounded UI values. Person 2 owns the release record; model ownership remains with Person 1.
 
@@ -29,7 +33,7 @@ Use independent assertions on solver outputs, rather than testing only the same 
 | T10 | Flexible windows, task power/energy caps | All allocations within allowed slots; no per-slot or total over-service; per-task served + deferred = requirement | 1 |
 | T11 | Reserve, including initially below target | Storm remains at risk; initial boundary counts; flexible service cannot worsen the feasible floor | 1 |
 | T12 | Fair baseline and optimization objectives | Identical inputs; fixed baseline schedule; baseline may leave work unserved; ordered objective priorities respected | 1 |
-| T13 | Health/scenarios/simulation API | Contract fields, finite JSON numbers, exactly three preset IDs, effective config, valid response models | 2 |
+| T13 | Health/scenarios/simulation API | Contract fields, finite JSON numbers, exactly four preset IDs, effective config, valid response models | 2 |
 | T14 | Invalid request/configuration | Reject negative/out-of-range values, invalid enum, unknown fields, null, bool-as-number, NaN/infinity, initial/reserve above capacity, malformed slots | 2 |
 | T15 | Defaults and overrides | Omitted fields use selected defaults; explicit zero honored; changing battery size does not silently clamp initial/reserve | 2 |
 | T16 | Simulated solver failures | Time limit and numerical/solver failure return structured 503; never report healthy or shortage results without a verified solve | 2 |
@@ -42,11 +46,11 @@ Randomized small valid inputs are useful as an additional accounting check if ti
 
 - [ ] Install from a clean checkout using committed dependency files and lockfile.
 - [ ] README backend/frontend commands work as written on the demo laptop.
-- [ ] `python -m pytest backend/tests` passes with the count and command recorded.
+- [x] Numerical tests: `.venv/bin/python -m pytest backend/tests -q` passes (see latest count below). API tests are still pending.
 - [ ] `npm --prefix frontend run typecheck` passes.
 - [ ] `npm --prefix frontend run build` passes.
 - [ ] Built frontend can reach the API using the documented local preview configuration.
-- [ ] Normal, Storm, and High Demand each issue fresh backend calculations; observed results match numerical expectations.
+- [ ] Scheduling improvement, Normal, Storm, and High Demand each issue fresh API calculations; results match numerical expectations.
 - [ ] Editable controls change the effective inputs and results; Reset restores the preset.
 - [ ] Rapid scenario switching cannot display a late result under the wrong scenario label.
 - [ ] Loading, validation errors, offline backend, timeout, and retry are understandable.
@@ -56,7 +60,7 @@ Randomized small valid inputs are useful as an additional accounting check if ti
 - [ ] Requested energy, served energy, deferred tasks, and unmet critical energy are distinguishable.
 - [ ] Baseline warnings remain visible independently of optimized status.
 - [ ] Storm visibly discloses its lower starting battery; no misleading cloud-only comparison.
-- [ ] Disconnect external internet after installing dependencies and run all three presets, charts, and local assets successfully.
+- [ ] Disconnect external internet after installing dependencies and run all four presets, charts, and local assets successfully.
 - [ ] Measure preset response times on the demo laptop; target under 2 seconds; fail visibly if the total solve budget exceeds 5 seconds.
 - [ ] Rehearse against the release commit; confirm no development fixtures are used in the live path.
 - [ ] Keep the illustrative-use disclaimer and synthetic-input labeling visible.
@@ -67,9 +71,9 @@ Randomized small valid inputs are useful as an additional accounting check if ti
 | Time | Action | Evidence and wording |
 |---|---|---|
 | 0–20 s | Explain the problem | Rural clinics need dependable electricity for essential services. LifeLine explores whether a simple planning tool can help reveal energy constraints. |
-| 20–35 s | Show Normal | Identify synthetic inputs, protected versus flexible loads, and the battery comparison. Do not promise a large improvement in an abundant-energy case. |
-| 35–60 s | Select Storm | State that this preset changes cloud cover and starts with a depleted battery. Show full critical coverage, deferred optional work, and the remaining reserve warning. |
-| 60–80 s | Select High Demand | Show hours 20 and 21 and the computed unmet critical energy. Explain that the 4 kW discharge limit cannot supply the 4.66 kW critical demand, even with stored energy available. |
+| 20–55 s | Show Scheduling improvement | Show existing evening task allocations, then the computed daytime schedule. Both complete 2.1 kWh. Identify 2.211 kWh more at midnight, 0.368 kWh higher daily minimum, and the heuristic tie. |
+| 55–70 s | Select Storm | State that this preset changes cloud cover and starts with a depleted battery. Show full critical coverage, deferred optional work, and the remaining reserve warning. |
+| 70–80 s | Select High Demand | Show hours 20 and 21 and the computed unmet critical energy. Explain that the 4 kW discharge limit cannot supply the 4.66 kW critical demand, even with stored energy available. |
 | 80–90 s | State the scope | This is a deterministic decision-support prototype, with synthetic data and explicit limits; it does not control medical equipment. |
 
 Use the actual release output in narration. If the computation differs after a model change, investigate and update the evidence; do not preserve a scripted number by changing the display alone. A short local screen recording of the working release is an optional presentation fallback, labeled as a recording.
@@ -94,3 +98,7 @@ Submission confirmation:
 ```
 
 Only call the MVP demo-ready after the required gates have evidence. Operational deployment would require separate validated facility data, engineering and healthcare review, and safety/cybersecurity work beyond this hackathon.
+
+## Person 1 verification record
+
+Python 3.12.5; NumPy 2.2.6; SciPy 1.15.3; Pytest 8.3.5. **62 numerical tests passed** (`.venv/bin/python -m pytest backend/tests -q`, 0.68 seconds); independent reference calibration also passes. No HTTP, frontend build, browser, full-application offline, or deployment checks have been completed. Original supplied brief remains byte-for-byte intact.

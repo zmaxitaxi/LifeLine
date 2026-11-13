@@ -42,7 +42,7 @@ def validate(data: dict) -> None:
     require(model["sunrise_hour"] == 6 and model["sunset_hour"] == 18, "unexpected daylight")
     require(0 < model["performance_ratio"] <= 1, "invalid performance ratio")
     scenarios = data["scenarios"]
-    require([s["id"] for s in scenarios] == ["normal", "storm", "high_demand"], "expected three ordered presets")
+    require([s["id"] for s in scenarios] == ["scheduling", "normal", "storm", "high_demand"], "expected four ordered presets")
     all_ids = [e["id"] for e in data["critical_equipment"] + data["flexible_equipment"]]
     require(len(set(all_ids)) == len(all_ids), "equipment IDs must be unique")
     require("additional_protected_load" not in all_ids, "extra-load ID is reserved")
@@ -160,7 +160,7 @@ def reference_dispatch(pv: list, critical: list, flexible: list, config: dict) -
 def main() -> None:
     data = json.loads((ROOT / "contracts/scenarios.json").read_text())
     validate(data)
-    print("Planning-input verification only; the application optimizer is not implemented.")
+    print("Reference preset verification only; run pytest to verify the implemented optimizer.")
     for scenario in data["scenarios"]:
         config = data["defaults"] | scenario["overrides"]
         pv, critical, flexible = profiles(data, scenario, config)
@@ -182,7 +182,7 @@ def main() -> None:
             close(critical_only["curtailed_kwh"], 0, "storm critical-only uses all available PV")
             require(critical_only["final_soc_kwh"] < config["reserve_kwh"] - TOL, "storm must remain below reserve without flexible work")
             require(critical_only["min_soc_kwh"] > baseline["min_soc_kwh"] + TOL, "storm deferral must improve reserve")
-        else:
+        elif scenario["id"] == "high_demand":
             # This lower bound is independent of battery accounting/dispatch:
             # no source can exceed PV + the shared discharge power limit.
             rate_shortfall = sum(max(0.0, c - p - config["max_discharge_kw"]) for c, p in zip(critical, pv))

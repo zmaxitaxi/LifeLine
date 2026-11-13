@@ -1,8 +1,14 @@
 # Three-person implementation plan
 
-The roles below are ready to assign to actual teammates. Each person owns a bounded part of the repository and reviews another person's work. The three people are human implementation owners; this document does not imply that three contributors have already joined or that any code has already been built.
+The roles below are ready to assign to actual teammates. Each person owns a bounded part of the repository and reviews another person's work. The three people are human implementation owners; this document does not imply that three contributors have already joined that cross-person integration has been completed.
 
 The supplied deadline is **Saturday, November 14, 2026, 11:59 PM America/Los_Angeles (PST)**. All times in this plan use that timezone. Person 2 must verify event rules. Target a completed demo at 8:00 PM Saturday and submission by 10:30 PM, leaving 89 minutes before the stated deadline.
+
+## Current progress
+
+Person 1’s numerical modules, sunshine-first heuristic, scheduling-improvement preset, CLI, comparison metrics, and model tests are implemented on `codex/energy-model`. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md). A2–A7 have implementation/test evidence; A1’s units and interfaces are documented for Person 2 review. Cross-person integration/review remains pending. Person 2 and Person 3 tasks have not been implemented.
+
+The primary demo now compares the same amount of completed work under an existing schedule, sunshine-first, and MILP. Keep Normal, Storm, and High Demand as additional behavior/limitation presets.
 
 ## Ownership
 
@@ -28,7 +34,7 @@ Work in `codex/energy-model` after the shared foundation is on `main`.
 | A6 | Add terminal-state/cycling objectives and deterministic ordering | Repeated runs agree within tolerance on the pinned environment |
 | A7 | Add meaningful edge-case and accounting tests | T01–T12, T17, and T18 in the acceptance matrix pass |
 
-First handoff: forecast, fixed baseline, and critical-only results for all three presets, callable without FastAPI. Second handoff: full optimized result and structured diagnostic data. Do not return human prose from the numeric solver; give Person 2 facts for templates.
+First handoff: forecast, fixed baseline, and critical-only results for all four presets, callable without FastAPI. Second handoff: full optimized result and structured diagnostic data. Do not return human prose from the numeric solver; give Person 2 facts for templates.
 
 ## Person 2 — API, validation, and integration
 
@@ -54,7 +60,7 @@ Work in `codex/dashboard`.
 |---|---|---|
 | C1 | Scaffold React/Vite/TypeScript and scripts; import shared API types | Typecheck and production build work |
 | C2 | Build main screen, status hierarchy, controls, charts, equipment, assumptions | Complete readable screen using clearly marked development fixtures |
-| C3 | Connect to the local API with cancellation and error handling | All three buttons trigger fresh POSTs; stale responses cannot overwrite selection |
+| C3 | Connect to the local API with cancellation and error handling | All four buttons trigger fresh POSTs; stale responses cannot overwrite selection |
 | C4 | Make controls and chart semantics agree with effective configuration | Units, 25 battery boundaries, reserve line, requested versus served load are clear |
 | C5 | Verify 375 px mobile, 1440 px desktop, keyboard use, contrast, loading and failure states | Screenshots and brief checklist evidence |
 | C6 | Rehearse the 90-second demo against live backend results | Storm's lower starting battery and High Demand's power bottleneck are explained accurately |
@@ -85,6 +91,6 @@ Before merging code: run the relevant checks, verify one matching response again
 
 ## Scope cuts if time is tight
 
-Cut external weather, trained ML, LLM prose, export, custom animations, deployment, and the optional second chart first. Keep all three presets, the battery comparison, fixed/critical load distinction, truthful warnings, physical constraints, tests, and README setup instructions.
+Cut external weather, trained ML, LLM prose, export, custom animations, deployment, and the optional second chart first. Keep all four presets, the battery comparison, fixed/critical load distinction, truthful warnings, physical constraints, tests, and README setup instructions.
 
 If only one scenario is integrated on Friday night, stop adding features and finish real integration. A static mock, an unchecked optimizer, or a UI that hides shortages does not satisfy the MVP.

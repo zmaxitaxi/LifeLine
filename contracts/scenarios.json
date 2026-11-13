@@ -175,6 +175,51 @@
   ],
   "scenarios": [
     {
+      "id": "scheduling",
+      "name": "Scheduling improvement",
+      "description": "Same 2.1 kWh of flexible work, moved from evening battery use into daytime sunshine. Synthetic 1.5 kW PV, 8 kWh battery, and 6 kWh initial energy.",
+      "overrides": {
+        "pv_capacity_kw": 1.5,
+        "battery_capacity_kwh": 8,
+        "initial_battery_kwh": 6,
+        "reserve_kwh": 4.8
+      },
+      "cloud_factors": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "additional_critical_hours": [],
+      "expected_status": "OK",
+      "reference_checks": {
+        "solar_kwh": 9.193557090648468,
+        "critical_kwh": 5.34,
+        "critical_only_min_soc_kwh": 4.9859278217516465,
+        "critical_only_unserved_kwh": 0.0
+      }
+    },
+    {
       "id": "normal",
       "name": "Normal",
       "description": "Strong synthetic sunshine and routine clinic loads.",

@@ -6,7 +6,7 @@ Reviewed November 12, 2026, using the supplied Markdown and `zmaxitaxi/LifeLine`
 
 The concept and proposed stack are suitable for a focused hackathon prototype. The original scope correctly emphasizes physics, synthetic data, operator-defined critical loads, deterministic optimization, and truthful shortage reporting. The additions below make the handoff sufficiently specific for three people to begin in parallel.
 
-**Ready to begin implementation. Demo readiness remains conditional on the uncompleted application checks in [ACCEPTANCE.md](ACCEPTANCE.md).** No production build, browser checks, or optimizer tests have been run because those components do not exist yet.
+**Person 1’s model, MILP, heuristic, and command-line comparison are implemented and tested.** API and dashboard work remain unimplemented; demo readiness is still conditional on the application checks in [ACCEPTANCE.md](ACCEPTANCE.md). See the [current handoff](PERSON_1_HANDOFF.md). The original review below records the planning decisions and initial repository state.
 
 ## Gaps resolved in the detailed specification
 
@@ -57,9 +57,15 @@ Technical choices were checked against [SciPy's MILP documentation](https://docs
 | Actual teammate names and GitHub handles | Team | Replace role labels when known; no need to delay implementation |
 | Event deadline and submission requirements | Person 2 | Verify against the event's actual rules; the supplied brief is the only event source provided |
 | Tested dependency versions and target machine | Person 2 | Scaffold, lock dependencies, install on a clean checkout, and record versions |
-| Solver behavior, numerical tolerances, and response speed | Person 1 | Implement and measure; planning calculations are not solver validation |
+| Solver behavior, numerical tolerances, and response speed | Person 1 | Implemented and numerically tested; local timing evidence recorded; re-measure on demo laptop |
 | Dashboard, API, offline execution, and screenshots | Persons 2 and 3 | Implement and complete the release checklist |
 | Hosting | Team | Local demonstration is the MVP target; a public deployment is optional and outside this review delivery |
 | Licensing and partner access | Repository owner | Choose a license if desired; no license or external endorsement is assumed |
 
 Do not add trained-model claims, API keys, real clinic data, or hardware integration to close these items. They are unnecessary for the specified demo.
+
+## Scheduling-value adjustment and implementation results
+
+The user prioritized a same-work scheduling demonstration. Added `scheduling` with identical inputs across baseline, heuristic, and MILP. Both alternatives serve 2.1 kWh of flexible work and all critical demand. The daily minimum increases by 0.368421 kWh, midnight battery by 2.210526 kWh, and conversion losses decrease by 0.110526 kWh. Sunshine-first matches MILP in this case; constrained-window tests separately establish when optimization can help. These are computed synthetic outcomes, not measured field benefits.
+
+The earlier three presets are retained for behavior and limitations. Storm and High Demand defer work, so their battery gains must not be presented as the primary same-work improvement. The API/dashboard remain future work under the user’s restriction to Person 1.
