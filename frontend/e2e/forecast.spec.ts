@@ -1,12 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { test, expect, type Page } from "@playwright/test";
+import { testPython } from "../test-python";
 
 /** Test fixtures contain injected radiation; every plan is computed by Python. */
 function fixture(path: string, body?: unknown) {
   return JSON.parse(
     execFileSync(
-      resolve("../.venv/bin/python"),
+      testPython,
       ["backend/tests/forecast_browser_fixture.py"],
       {
         cwd: resolve(".."),
