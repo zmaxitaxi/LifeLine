@@ -1,5 +1,5 @@
 {
-  "id": "0177555e-50f8-4e59-91b2-5722370dbc7c",
+  "id": "afb1906e-1cce-40f5-9f03-bc6d6b9aeef0",
   "revision": 1,
   "input_revision": 0,
   "selected_clinic_id": "reviewed-clinic",
@@ -19,7 +19,6 @@
     "discharge_efficiency": 0.9,
     "max_charge_kw": 2.0,
     "max_discharge_kw": 2.0,
-    "additional_critical_kw": null,
     "scenario": "normal",
     "equipment": [
       {
@@ -84,7 +83,6 @@
         "divisible": true
       }
     ],
-    "cloud_factors": null,
     "weather_dataset": "synthetic"
   },
   "equipment_inventory": [
@@ -153,7 +151,7 @@
   "confirmed_activities": [],
   "proposals": [
     {
-      "id": "d6543062-1ca1-47f1-8573-6daa9f276cea",
+      "id": "8382875d-c7ae-4e65-bc59-499f6b921a40",
       "status": "draft",
       "target_activity_id": null,
       "base_activity_version": null,
@@ -174,7 +172,7 @@
       "confirmed_activity_id": null
     }
   ],
-  "active_proposal_id": "d6543062-1ca1-47f1-8573-6daa9f276cea",
+  "active_proposal_id": "8382875d-c7ae-4e65-bc59-499f6b921a40",
   "forecast_reference": null,
   "computed_plan": null,
   "plan_status": "not_computed",

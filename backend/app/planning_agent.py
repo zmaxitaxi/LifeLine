@@ -88,18 +88,31 @@ def definitions(state=None, latest_fields=None):
 
 
 def quoted_hour(quote, hour):
-    for match in re.finditer(r'\b(\d{1,2})(?::00)?\s*(a\.?m\.?|p\.?m\.?)?\b', quote.lower()):
+    text=quote.lower()
+    if re.search(r'\b\d{1,2}:(?!00\b)\d{2}\b',text):
+        return False  # Never round an unsupported sub-hour time.
+    # A rating/duration containing the same number is not clock evidence.
+    clock = r'\b(\d{1,2})(?::00)?\s*(a\.?m\.?|p\.?m\.?)\b'
+    values=[]
+    for match in re.finditer(clock,text):
         value = int(match[1])
         suffix = (match[2] or '').replace('.', '')
         if suffix:
             value = value % 12 + (12 if suffix == 'pm' else 0)
-        if value == hour:
-            return True
-    return (hour == 12 and 'noon' in quote.lower()) or (hour == 0 and 'midnight' in quote.lower())
+        values.append(value)
+    values += [int(m[1]) for m in re.finditer(r'\b(\d{1,2}):00\b(?!\s*[ap]\.?m\.?\b)',text)]
+    prefix=r'(?:from|at|to|until|before|by|starts?(?:\s+at)?|ends?(?:\s+at)?|finishes?(?:\s+at)?|deadline(?:\s+is)?)'
+    for match in re.finditer(r'\b'+prefix+r'\s+(\d{1,2})\b(?!:|\s*(?:[ap]\.?m\.?|kwh|kw|watts?|w|kilowatts?|hours?|hrs?|minutes?|min)\b)',text):
+        values.append(int(match[1]))
+    if re.fullmatch(r'\s*\d{1,2}\s*[.!?]?\s*',text):
+        values.append(int(text.strip().rstrip('.!?')))
+    return hour in values or (hour==12 and 'noon' in text) or (hour==0 and 'midnight' in text)
 
 
 def electrical_hours_match(quote, hours):
     """An explicitly stated whole-hour electrical interval is exact, end-exclusive."""
+    if re.search(r'\b\d{1,2}:(?!00\b)\d{2}\b',quote):
+        return False
     token = r'(\d{1,2})(?::00)?\s*(am|pm)?'
     match = re.search(r'\bfrom\s*' + token + r'\s*(?:to|until|-)\s*' + token, quote, re.I)
     if match:
@@ -152,10 +165,12 @@ def validate_grounding(tool, question, state):
                 for key in ('power_kw', 'max_power_kw'):
                     power = getattr(item, key)
                     if power is not None and (not previous or power != getattr(previous,key)):
-                        ratings = [(float(m[1]) / (1000 if m[2].lower() == 'w' else 1)) for m in re.finditer(r'(\d+(?:\.\d+)?)\s*(kW|W)\b', quote, re.I)]
+                        ratings = [(float(m[1]) / (1 if m[2].lower().startswith(('kw','kilowatt')) else 1000))
+                            for m in re.finditer(r'(\d+(?:\.\d+)?)\s*(kw|kilowatts?|watts?|w)\b(?![\s-]*hours?\b)',quote,re.I)]
                         if not any(abs(power - rating) < 1e-8 for rating in ratings):
                             raise PlanningError('INVALID_ACTIVITY', 'New power ratings must be explicitly supplied in W or kW.')
-                if item.category and (not previous or item.category != previous.category) and item.category not in quote.lower():
+                if item.category and (not previous or item.category != previous.category) and (not re.search(rf'\b{item.category}\b',quote,re.I)
+                    or re.search(rf'\b(?:not|non)[\s-]*{item.category}\b',quote,re.I)):
                     raise PlanningError('INVALID_ACTIVITY', 'New equipment priority must be explicitly designated critical or flexible.')
                 for key in ('required_hours', 'allowed_hours'):
                     hours = getattr(item, key)
@@ -183,21 +198,24 @@ def validate_grounding(tool, question, state):
 def response(state, model, calls, message=None, unavailable=False):
     proposal = next((p for p in state.proposals if p.id == state.active_proposal_id), None)
     missing = proposal.missing_fields if proposal else []
+    calculation_requested = bool(calls) and calls[-1] == 'recompute_clinic_plan'
     if message is None:
-        if state.plan_status == 'failed':
+        if missing and not calculation_requested:
+            labels = {'start_hour':'the local start time', 'end_hour':'the local end time', 'equipment_ids':'which existing equipment is needed, or whether none is needed'}
+            message = 'Please provide ' + labels.get(missing[0], missing[0].replace('_', ' ')) + '.'
+        elif proposal and not calculation_requested:
+            message = 'The activity draft is ready for review. Confirm or reject it using the review controls.'
+        elif state.plan_status == 'failed':
             message = 'Weather or the electricity calculation is unavailable. No new verified plan is available; the confirmed activity is preserved. Retry recompute.'
         elif state.computed_plan and state.computed_plan.recovery:
             message = state.computed_plan.recovery.summary + ' ' + state.computed_plan.recovery.next_action
-        elif missing:
-            labels = {'start_hour':'the local start time', 'end_hour':'the local end time', 'equipment_ids':'which existing equipment is needed, or whether none is needed'}
-            message = 'Please provide ' + labels.get(missing[0], missing[0].replace('_', ' ')) + '.'
-        elif proposal:
-            message = 'The activity draft is ready for review. Confirm or reject it using the review controls.'
         elif state.computed_plan:
             from .forecast_planner import computed_assessment
             message = computed_assessment(state.computed_plan.simulation)
         else:
             message = 'Current clinic planning state is available.'
+        if calculation_requested and proposal:
+            message += ' The unconfirmed activity draft is not included in this calculation; review and confirm it before assessing its requirements.'
     return SessionAgentResponse(mode='local_agent_unavailable' if unavailable else 'local_tool_agent', model=model,
         message=message, needs_clarification=bool(missing) or unavailable,
         clarification_fields=missing, tool_calls=calls, state=state)

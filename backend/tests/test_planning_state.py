@@ -42,6 +42,19 @@ def create(client):
     return post(client,BASE,initial())
 
 
+def test_returned_clinic_configuration_matches_the_strict_public_contract():
+    from app.planning_models import PlanningState
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as c:
+        state=create(c)
+        assert all(value is not None for value in state['clinic'].values())
+        # The same serialized state can be validated and the clinic reused in
+        # another explicitly created session, without invalid null sentinels.
+        PlanningState.model_validate_json(json.dumps(state))
+        fresh=post(c,BASE,initial()|{'clinic':state['clinic']})
+        assert fresh['equipment_inventory']==state['equipment_inventory']
+
+
 def propose(client,state,**changes):
     return post(client,f"{BASE}/{state['id']}/proposals",{'expected_revision':state['revision'],'details':details(**changes)})
 

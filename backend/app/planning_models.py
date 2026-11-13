@@ -1,7 +1,7 @@
 """Revisioned local planning contracts. Drafts are partial; confirmed facts are strict."""
 from datetime import date, datetime
 from typing import Annotated, Literal
-from pydantic import Field, model_validator, field_validator
+from pydantic import Field, model_validator, field_validator, field_serializer
 import re
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from .models import StrictModel, SimulationRequest, Equipment, Hour, Boundary
@@ -100,6 +100,12 @@ class ComputedPlan(StrictModel):
 
 
 class PlanningState(StrictModel):
+    @field_serializer('clinic')
+    def serialize_clinic(self, clinic):
+        # SimulationRequest uses None internally for omitted preset overrides;
+        # explicit null is intentionally invalid in its public request schema.
+        return clinic.model_dump(exclude_none=True)
+
     id: ID
     revision: Revision
     input_revision: Revision

@@ -1,0 +1,44 @@
+{
+  "checked_at": "2026-11-13T23:03:29.334892+00:00",
+  "implementation_commit": "c98d6a76bc6bf5734dd2832a26e60a7c9017bc81",
+  "base_main": "ac3a45e",
+  "scope": "Recovery backend plus unchanged main frontend. Activity-state and separate UI integration have their own subsequent verification.",
+  "environment": {
+    "os": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.5",
+    "node": "v24.15.0"
+  },
+  "backend": {
+    "passed": 326,
+    "command": ".venv/bin/python -m pytest backend/tests -q",
+    "warning": "Upstream Starlette/AnyIO deprecation only."
+  },
+  "frontend": {
+    "build": "passed",
+    "typescript": "passed",
+    "chromium_journeys_passed": 23,
+    "note": "22 initially passed on isolated ports; the static-server test then passed after setting LIFELINE_API_PORT=8069. No app code change was needed."
+  },
+  "ci": {
+    "run_id": 43522478094,
+    "url": "https://github.com/zmaxitaxi/LifeLine/actions/runs/43522478094",
+    "conclusion": "success",
+    "jobs": [
+      "backend (3.11)",
+      "backend (3.12)",
+      "frontend"
+    ]
+  },
+  "native_model": {
+    "model": "llama3.1:8b",
+    "real_tool_questions_passed": 6,
+    "weather_kind": "actual live Open-Meteo snapshot",
+    "evidence": "docs/evidence/recovery-agent-live-smoke.json",
+    "scope": "Targeted integration smoke, not a new comprehensive evaluation score."
+  },
+  "demo_commands": {
+    "historical": "passed via actual API on127.0.0.1:8069",
+    "live": "passed via actual API with fresh Open-Meteo retrieved2026-11-13T22:49:17.918399Z"
+  },
+  "main_worktree": "Uncommitted root UI/backend work preserved. All recovery changes committed on a dedicated branch."
+}

@@ -168,6 +168,65 @@ def test_new_equipment_clarification_preserves_specs_and_accepts_explicit_hour_r
         assert s['computed_plan']['simulation']['optimized']['metrics']['critical_requested_kwh']==pytest.approx(3.4)
 
 
+def test_new_draft_clarification_takes_priority_over_existing_recovery_summary():
+    agent,_=agent_with([
+        native('propose_activity',{'name':'Vaccination campaign'},{'name':'vaccination campaign'}),
+        native('recompute_clinic_plan',include_recovery=True),
+    ])
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        s=create(c)
+        s=post(c,f"{BASE}/{s['id']}/recompute",{'expected_revision':s['revision'],'include_recovery':True})
+        previous=s['computed_plan']
+        d=ask(c,s,'We have a vaccination campaign.');s=d['state']
+        assert d['message']=='Please provide the local start time.'
+        assert s['computed_plan']==previous
+        d=ask(c,s,'Recalculate the confirmed clinic plan with recovery.');s=d['state']
+        assert 'unconfirmed activity draft is not included' in d['message']
+        assert len(s['proposals'])==1 and not s['confirmed_activities']
+        assert s['computed_plan']['simulation']['optimized']['metrics']['critical_requested_kwh']==pytest.approx(2.4)
+
+
+@pytest.mark.parametrize('question',[
+    'Vaccination campaign starts at 9:30 AM.',
+    'Vaccination campaign uses equipment rated 9 watts.',
+])
+def test_native_start_time_cannot_round_minutes_or_reuse_a_power_rating(question):
+    agent,_=agent_with([{'name':'propose_activity','arguments':{'name':'Vaccination campaign','start_hour':9}}])
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=ask(c,create(c),question)
+        assert d['state']['proposals'][0]['details']['start_hour'] is None
+        assert 'start_hour' in d['clarification_fields']
+
+
+def test_source_grounding_accepts_watts_but_rejects_negated_priority():
+    from app.planning_agent import DraftTool,validate_grounding
+    from app.planning_models import ActivityDraft
+    from app.planning_state import PlanningError
+    from app.planning_models import PlanningState
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as c:
+        state=PlanningState.model_validate_json(json.dumps(create(c)))
+    question='The lamp is critical, rated 500 watts, and must operate from 10 AM to 12 PM.'
+    equipment=[{'id':'lamp','name':'lamp','category':'critical','power_kw':.5,'required_hours':[10,11]}]
+    tool=DraftTool(details=ActivityDraft(additional_equipment=equipment),evidence={'additional_equipment':question})
+    validate_grounding(tool,question,state)
+    for negated in ('noncritical','non-critical','not critical'):
+        text=question.replace('is critical',f'is {negated}')
+        with pytest.raises(PlanningError):
+            validate_grounding(tool.model_copy(update={'evidence':{'additional_equipment':text}}),text,state)
+
+
+@pytest.mark.parametrize('text,right,wrong',[
+    ('It starts at 9 PM.',21,9),('Ends at 3:00 PM.',15,3),('From 12 AM.',0,12),
+])
+def test_clock_grounding_retains_am_pm(text,right,wrong):
+    from app.planning_agent import quoted_hour
+    assert quoted_hour(text,right)
+    assert not quoted_hour(text,wrong)
+
+
 def test_native_confirmed_activity_correction_stages_reviewed_version_not_duplicate():
     agent,calls=agent_with([])
     service,_=service_for()

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import sys
+import subprocess
 from time import monotonic
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'backend'))
@@ -29,7 +30,10 @@ def main():
         'timezone':forecast.timezone,'midnight_battery_kwh':2.,'clinic':{'scenario':'normal','battery_capacity_kwh':4.,
         'initial_battery_kwh':2.,'reserve_kwh':.5,'pv_capacity_kw':1.,'max_charge_kw':2.,'max_discharge_kw':2.,
         'equipment':[{'id':'fridge','name':'Vaccine refrigerator','category':'critical','power_kw':.1,'required_hours':list(range(24))}]}}
-    evidence={'started_at':datetime.now(timezone.utc).isoformat(),'scope':'Real native local inference with live Open-Meteo snapshot; illustrative operator-entered appliance, not a clinical assessment.',
+    evidence={'started_at':datetime.now(timezone.utc).isoformat(),
+        'implementation_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        'backend_uncommitted_changes':subprocess.run(['git','diff','--quiet','HEAD','--','backend/app','scripts/check_activity_agent.py'],cwd=ROOT).returncode!=0,
+        'scope':'Real native local inference with live Open-Meteo snapshot; illustrative operator-entered appliance, not a clinical assessment.',
         'forecast':forecast.model_dump(mode='json'),'inputs':body,'turns':[]}
     with TestClient(create_app(forecast_service=SnapshotService(forecast),agent_service=model)) as client:
         assert client.get('/api/agent/status').json()['available'],'Local llama3.1:8b is unavailable.'
