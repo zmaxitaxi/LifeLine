@@ -81,6 +81,8 @@ def test_week_across_dst_preserves_fixed_offset_provider_aggregates_and_dates(no
 
 @pytest.mark.parametrize('mutate',[
     lambda p:p['current_units'].update(temperature_2m='°F'),
+    lambda p:p.update(current_units=None),
+    lambda p:p.update(daily_units=[]),
     lambda p:p['daily_units'].update(precipitation_probability_max='fraction'),
     lambda p:p['current'].update(temperature_2m=float('nan')),
     lambda p:p['current'].update(temperature_2m=True),
@@ -114,6 +116,17 @@ def test_missing_individual_fields_remain_null_without_zero_fills():
     assert result.days[4].weather_code is None
     assert result.days[4].condition=='unavailable'
     assert any('missing' in text for text in result.warnings)
+
+
+def test_conditions_remain_available_when_temperature_fields_are_missing():
+    raw=payload();raw['current']['temperature_2m']=None
+    raw['daily']['temperature_2m_min']=[None]*7
+    raw['daily']['temperature_2m_max']=[None]*7
+    service,_=service_for(raw)
+    result=asyncio.run(service.get(LOCATION))
+    assert result.current.condition=='partly_cloudy'
+    assert all(day.temperature_min_c is None for day in result.days)
+    assert result.days[0].condition=='clear'
 
 
 def test_cache_retry_stale_and_expiry_keep_original_source_time():

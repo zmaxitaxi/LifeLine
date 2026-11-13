@@ -56,6 +56,8 @@ def parse_outlook(payload,location,retrieved_at,source_url,ttl=TTL):
         if type(offset) is not int or not -43200<=offset<=50400 or offset!=int(retrieved_at.astimezone(zone).utcoffset().total_seconds()):
             raise ValueError('Unsupported timezone offset')
         current=payload['current'];cu=payload['current_units'];daily=payload['daily'];du=payload['daily_units']
+        if not all(isinstance(value,dict) for value in (current,cu,daily,du)):
+            raise ValueError('Unsupported weather object')
         if any(cu.get(k)!=v for k,v in {'time':'unixtime','interval':'seconds','temperature_2m':'°C','weather_code':'wmo code','is_day':''}.items()):
             raise ValueError('Unsupported current units')
         if any(du.get(k)!=v for k,v in {'time':'unixtime','weather_code':'wmo code','temperature_2m_max':'°C','temperature_2m_min':'°C','precipitation_probability_max':'%'}.items()):
@@ -94,7 +96,8 @@ def parse_outlook(payload,location,retrieved_at,source_url,ttl=TTL):
             raise ValueError('Invalid model grid location')
         missing=(now.temperature_c is None or now.weather_code is None or now.is_day is None or
             any(d.temperature_min_c is None or d.temperature_max_c is None or d.weather_code is None or d.precipitation_probability_pct is None for d in days))
-        if now.temperature_c is None and all(d.temperature_min_c is None and d.temperature_max_c is None for d in days):
+        if now.temperature_c is None and now.weather_code is None and all(
+            d.temperature_min_c is None and d.temperature_max_c is None and d.weather_code is None and d.precipitation_probability_pct is None for d in days):
             raise ValueError('Weather is unavailable')
         return WeatherOutlook(requested_location=location,
             model_grid_location=ForecastLocation(latitude=payload['latitude'],longitude=payload['longitude']),
