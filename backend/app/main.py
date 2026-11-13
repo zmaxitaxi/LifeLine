@@ -32,6 +32,8 @@ from .simulation import simulate_case
 from .recovery_routes import router as recovery_router
 from .planning_routes import router as planning_router
 from .planning_state import PlanningStore, PlanningError
+from .weather_outlook import WeatherOutlookService
+from .weather_outlook_routes import router as weather_outlook_router
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +49,7 @@ def validation_details(errors, prefix=()):
     return [dict(loc=list(prefix)+list(e['loc']), message=e['msg'], type=e['type']) for e in errors]
 
 
-def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_service=None):
+def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_service=None, outlook_service=None):
     @asynccontextmanager
     async def lifespan(app):
         app.state.catalog = load_catalog(config_path)
@@ -57,6 +59,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
         app.state.forecasts = forecast_service or ForecastService()
         app.state.agent = agent_service or LocalAgent()
         app.state.planning = PlanningStore()
+        app.state.outlooks = outlook_service or WeatherOutlookService()
         yield
 
     app = FastAPI(title='LifeLine API', version='1.0', lifespan=lifespan,
@@ -191,6 +194,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
     app.include_router(agent_router)
     app.include_router(recovery_router)
     app.include_router(planning_router)
+    app.include_router(weather_outlook_router)
 
     @app.api_route('/api/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], include_in_schema=False)
     async def invalid_api_path(path: str, request: Request):

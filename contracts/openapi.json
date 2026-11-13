@@ -1546,6 +1546,68 @@
           }
         }
       }
+    },
+    "/api/weather/outlook": {
+      "get": {
+        "summary": "Weather Outlook",
+        "operationId": "weather_outlook_api_weather_outlook_get",
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Latitude"
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Longitude"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherOutlook"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2536,6 +2598,177 @@
           "required_hours"
         ],
         "title": "CriticalEquipment"
+      },
+      "CurrentWeather": {
+        "properties": {
+          "valid_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Valid At"
+          },
+          "interval_seconds": {
+            "type": "integer",
+            "title": "Interval Seconds"
+          },
+          "temperature_c": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature C"
+          },
+          "weather_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weather Code"
+          },
+          "condition": {
+            "type": "string",
+            "enum": [
+              "clear",
+              "mainly_clear",
+              "partly_cloudy",
+              "overcast",
+              "fog",
+              "drizzle",
+              "freezing_drizzle",
+              "rain",
+              "freezing_rain",
+              "snow",
+              "rain_showers",
+              "snow_showers",
+              "thunderstorm",
+              "unavailable"
+            ],
+            "title": "Condition"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "is_day": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Day"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "valid_at",
+          "interval_seconds",
+          "temperature_c",
+          "weather_code",
+          "condition",
+          "description",
+          "is_day"
+        ],
+        "title": "CurrentWeather"
+      },
+      "DailyWeather": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "weather_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weather Code"
+          },
+          "condition": {
+            "type": "string",
+            "enum": [
+              "clear",
+              "mainly_clear",
+              "partly_cloudy",
+              "overcast",
+              "fog",
+              "drizzle",
+              "freezing_drizzle",
+              "rain",
+              "freezing_rain",
+              "snow",
+              "rain_showers",
+              "snow_showers",
+              "thunderstorm",
+              "unavailable"
+            ],
+            "title": "Condition"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "temperature_min_c": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature Min C"
+          },
+          "temperature_max_c": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature Max C"
+          },
+          "precipitation_probability_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precipitation Probability Pct"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "date",
+          "weather_code",
+          "condition",
+          "description",
+          "temperature_min_c",
+          "temperature_max_c",
+          "precipitation_probability_pct"
+        ],
+        "title": "DailyWeather"
       },
       "Diagnosis": {
         "properties": {
@@ -5319,6 +5552,109 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WeatherOutlook": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "const": "Open-Meteo Forecast API",
+            "title": "Source",
+            "default": "Open-Meteo Forecast API"
+          },
+          "data_kind": {
+            "type": "string",
+            "const": "weather_model_current_and_daily_forecast",
+            "title": "Data Kind",
+            "default": "weather_model_current_and_daily_forecast"
+          },
+          "requested_location": {
+            "$ref": "#/components/schemas/ForecastLocation"
+          },
+          "model_grid_location": {
+            "$ref": "#/components/schemas/ForecastLocation"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone"
+          },
+          "provider_utc_offset_seconds": {
+            "type": "integer",
+            "title": "Provider Utc Offset Seconds"
+          },
+          "retrieved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrieved At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "cache_status": {
+            "type": "string",
+            "enum": [
+              "live",
+              "cached",
+              "stale"
+            ],
+            "title": "Cache Status"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "attribution_url": {
+            "type": "string",
+            "title": "Attribution Url",
+            "default": "https://open-meteo.com/"
+          },
+          "licence_url": {
+            "type": "string",
+            "title": "Licence Url",
+            "default": "https://creativecommons.org/licenses/by/4.0/"
+          },
+          "current": {
+            "$ref": "#/components/schemas/CurrentWeather"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/DailyWeather"
+            },
+            "type": "array",
+            "maxItems": 7,
+            "minItems": 7,
+            "title": "Days"
+          },
+          "daily_period_basis": {
+            "type": "string",
+            "title": "Daily Period Basis"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "requested_location",
+          "model_grid_location",
+          "timezone",
+          "provider_utc_offset_seconds",
+          "retrieved_at",
+          "expires_at",
+          "cache_status",
+          "source_url",
+          "current",
+          "days",
+          "daily_period_basis",
+          "warnings"
+        ],
+        "title": "WeatherOutlook"
       },
       "WorkChange": {
         "properties": {

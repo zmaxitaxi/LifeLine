@@ -1,0 +1,98 @@
+{
+  "source": "Open-Meteo Forecast API",
+  "data_kind": "weather_model_current_and_daily_forecast",
+  "requested_location": {
+    "latitude": -0.0917,
+    "longitude": 34.768
+  },
+  "model_grid_location": {
+    "latitude": -0.10544816,
+    "longitude": 34.793453
+  },
+  "timezone": "Africa/Nairobi",
+  "provider_utc_offset_seconds": 10800,
+  "retrieved_at": "2026-11-13T23:47:39.623499Z",
+  "expires_at": "2026-11-13T23:57:39.623499Z",
+  "cache_status": "live",
+  "source_url": "https://api.open-meteo.com/v1/forecast?latitude=-0.0917&longitude=34.768&timezone=auto&timeformat=unixtime&forecast_days=7&temperature_unit=celsius&current=temperature_2m%2Cweather_code%2Cis_day&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_probability_max",
+  "attribution_url": "https://open-meteo.com/",
+  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+  "current": {
+    "valid_at": "2026-11-13T23:45:00Z",
+    "interval_seconds": 900,
+    "temperature_c": 19.2,
+    "weather_code": 2,
+    "condition": "partly_cloudy",
+    "description": "Partly cloudy",
+    "is_day": false
+  },
+  "days": [
+    {
+      "date": "2026-11-14",
+      "weather_code": 51,
+      "condition": "drizzle",
+      "description": "Drizzle",
+      "temperature_min_c": 17.9,
+      "temperature_max_c": 25.5,
+      "precipitation_probability_pct": 100.0
+    },
+    {
+      "date": "2026-11-15",
+      "weather_code": 53,
+      "condition": "drizzle",
+      "description": "Drizzle",
+      "temperature_min_c": 18.3,
+      "temperature_max_c": 26.3,
+      "precipitation_probability_pct": 100.0
+    },
+    {
+      "date": "2026-11-16",
+      "weather_code": 51,
+      "condition": "drizzle",
+      "description": "Drizzle",
+      "temperature_min_c": 18.1,
+      "temperature_max_c": 27.5,
+      "precipitation_probability_pct": 100.0
+    },
+    {
+      "date": "2026-11-17",
+      "weather_code": 51,
+      "condition": "drizzle",
+      "description": "Drizzle",
+      "temperature_min_c": 19.2,
+      "temperature_max_c": 27.2,
+      "precipitation_probability_pct": 100.0
+    },
+    {
+      "date": "2026-11-18",
+      "weather_code": 3,
+      "condition": "overcast",
+      "description": "Overcast",
+      "temperature_min_c": 18.8,
+      "temperature_max_c": 27.9,
+      "precipitation_probability_pct": 76.0
+    },
+    {
+      "date": "2026-11-19",
+      "weather_code": 51,
+      "condition": "drizzle",
+      "description": "Drizzle",
+      "temperature_min_c": 18.8,
+      "temperature_max_c": 28.6,
+      "precipitation_probability_pct": 82.0
+    },
+    {
+      "date": "2026-11-20",
+      "weather_code": 2,
+      "condition": "partly_cloudy",
+      "description": "Partly cloudy",
+      "temperature_min_c": 18.6,
+      "temperature_max_c": 29.0,
+      "precipitation_probability_pct": 70.0
+    }
+  ],
+  "daily_period_basis": "Daily weather aggregates use the provider UTC offset fixed at retrieval. Their calendar labels are preserved; boundaries can differ by one hour across daylight-saving changes. They are an outlook, not seven-day clinic energy simulations.",
+  "warnings": [
+    "Current conditions and the weekly outlook are weather-model output, not station observations or measured clinic generation."
+  ]
+}
