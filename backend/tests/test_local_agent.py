@@ -240,3 +240,64 @@ def test_malformed_provider_message_preserves_guided_fallback(message):
     assert response.status_code==200
     assert response.json()['mode']=='deterministic_guided_fallback'
     assert response.json()['result'] is not None
+
+
+def test_earlier_questions_are_one_labeled_context_message_not_separate_turns():
+    # Regression for docs/AGENT_EVALUATION_REVIEW.md finding 1: separate user turns
+    # made the real model answer every earlier question and fail validation.
+    service,_=service_for()
+    agent,requests=agent_with([{'name':'plan_forecast','arguments':{'day':'tomorrow','reduced_sunshine_factors':[.5]}}])
+    earlier=['We expect cloudy weather tomorrow. Will we have enough electricity?',
+             'Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.']
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=c.post('/api/agent/ask',json=body('What happens if we receive 50% less sunlight?',previous_questions=earlier)).json()
+    assert d['mode']=='local_tool_agent'
+    sent=json.loads(next(r for r in requests if r.url.path=='/api/chat').content)['messages']
+    users=[m['content'] for m in sent if m['role']=='user']
+    assert len(users)==3  # operator context, labeled history, current request
+    assert users[1].startswith('Earlier operator messages') and json.loads(users[1][users[1].index('['):])==earlier
+    assert users[2]=='Current request. Call exactly one tool for this request only: What happens if we receive 50% less sunlight?'
+    assert not any(m['content'] in earlier for m in sent)
+
+
+def test_single_turn_question_is_sent_unchanged():
+    service,_=service_for()
+    agent,requests=agent_with([{'name':'plan_forecast','arguments':{'day':'tomorrow'}}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        c.post('/api/agent/ask',json=body())
+    sent=json.loads(next(r for r in requests if r.url.path=='/api/chat').content)['messages']
+    assert sent[-1]=={'role':'user','content':body()['question']}
+
+
+@pytest.mark.parametrize('question,factor',[('What if sunshine drops by 30% tomorrow?',.7),
+                                            ('What if we only get half the expected sun?',.5)])
+def test_reduced_case_chosen_by_model_is_the_answer_when_wording_is_unparsed(question,factor):
+    # Regression for finding 2: the message described the unreduced forecast.
+    service,_=service_for()
+    agent,_=agent_with([{'name':'plan_forecast','arguments':{'day':'tomorrow','reduced_sunshine_factors':[factor]}}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=c.post('/api/agent/ask',json=body(question)).json()
+    assert d['selected_sunshine_factor']==pytest.approx(factor)
+    assert d['message'].startswith(f'With {(1-factor)*100:g}% lower forecast sunshine')
+    reduced=d['result']['uncertainty_cases'][0]['plan']['optimized']['metrics']['total_solar_kwh']
+    assert f'{reduced:.3f} kWh versus' in d['message']
+
+
+def test_generic_question_with_default_factors_keeps_the_forecast_focus():
+    service,_=service_for()
+    agent,_=agent_with([{'name':'plan_forecast','arguments':{'day':'tomorrow','reduced_sunshine_factors':[.75,.5]}}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=c.post('/api/agent/ask',json=body()).json()
+    assert d['selected_sunshine_factor']==1
+    assert not d['message'].startswith('With ')
+
+
+def test_unrequested_reduced_factor_does_not_replace_the_forecast_answer():
+    # The real model adds [0.5] to "cloudy weather" questions on its own; the
+    # answer must still describe the actual forecast, not an invented case.
+    service,_=service_for()
+    agent,_=agent_with([{'name':'plan_forecast','arguments':{'day':'tomorrow','reduced_sunshine_factors':'[0.5]'}}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=c.post('/api/agent/ask',json=body('We expect cloudy weather tomorrow. Will we have enough electricity?')).json()
+    assert d['selected_sunshine_factor']==1
+    assert not d['message'].startswith('With ')

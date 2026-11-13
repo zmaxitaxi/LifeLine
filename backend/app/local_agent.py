@@ -67,6 +67,12 @@ def requested_sunshine_factor(question):
     return 1-float(match[1])/100 if match and 0<=float(match[1])<=100 else None
 
 
+def asks_reduced_sunshine(question):
+    text=question.lower()
+    return bool(re.search(r'\b(sun\w*|solar)\b',text) and
+                re.search(r'\b(less|lower|drops?|half|reduc\w*|cut|falls?|decreas\w*|only)\b',text))
+
+
 def definitions():
     original = tool_definitions()
     extra = [dict(name=name,description=description,parameters=model.model_json_schema()) for name,description,model in (
@@ -157,8 +163,9 @@ async def fallback(context,catalog,service,lock,reason,traces):
         selected_sunshine_factor=requested_sunshine_factor(context.question) if requested_sunshine_factor(context.question) is not None else 1.)
 
 
-def computed_message(question,result):
-    focus = requested_sunshine_factor(question)
+def computed_message(question,result,focus=None):
+    if focus is None:
+        focus = requested_sunshine_factor(question)
     reduced=next((c.plan for c in result.uncertainty_cases if focus is not None and abs(c.sunshine_factor-focus)<1e-6),None)
     if focus is not None and focus!=1 and reduced is not None:
         return (f'With {(1-focus)*100:g}% lower forecast sunshine: '+computed_assessment(reduced)+
@@ -201,8 +208,16 @@ async def ask_agent(context,catalog,service,lock,agent):
         if sum(map(len,history))+len(q)>3000:
             break
         history.append(q)
-    messages += [{'role':'user','content':q} for q in reversed(history)]
-    messages.append({'role':'user','content':context.question})
+    # Earlier questions go in ONE labeled context message. Sent as separate user
+    # turns, llama3.1:8b tries to answer every one (prose or several calls), which
+    # fails single-call validation. See docs/AGENT_EVALUATION_REVIEW.md finding 1.
+    if history:
+        messages.append({'role':'user','content':'Earlier operator messages in this conversation, oldest first. They were already handled. '
+            'Use them only to resolve references and stated values in the current request; do not answer them again: '
+            +json.dumps(list(reversed(history)),ensure_ascii=False)})
+        messages.append({'role':'user','content':'Current request. Call exactly one tool for this request only: '+context.question})
+    else:
+        messages.append({'role':'user','content':context.question})
     for attempt in range(3):
         try:
             call=await agent.decide(messages)
@@ -234,16 +249,24 @@ async def ask_agent(context,catalog,service,lock,agent):
             if name not in ('plan_forecast','get_solar_forecast','get_clinic_configuration'):
                 raise ValueError('Unknown tool')
             validated=(PlanForecastArguments if name=='plan_forecast' else EmptyArguments).model_validate(args)
+            focus=None
             if name=='plan_forecast':
-                factor=requested_sunshine_factor(context.question)
-                if factor is not None and factor < 1 and factor not in validated.reduced_sunshine_factors:
-                    validated=PlanForecastArguments(day=validated.day,reduced_sunshine_factors=[factor])
+                focus=requested_sunshine_factor(context.question)
+                if focus is not None and focus < 1 and focus not in validated.reduced_sunshine_factors:
+                    validated=PlanForecastArguments(day=validated.day,reduced_sunshine_factors=[focus])
+                elif (focus is None and len(validated.reduced_sunshine_factors)==1 and validated.reduced_sunshine_factors[0]>0
+                      and asks_reduced_sunshine(context.question)):
+                    # Phrasings the regex misses ("drops by 30%", "half the sun"): answer
+                    # the single reduced case the model chose, not the unreduced forecast.
+                    # Only when the operator asked about less sun; the model also adds a
+                    # factor unprompted for "cloudy weather", which stays forecast-focused.
+                    focus=validated.reduced_sunshine_factors[0]
             value=await execute_tool(context,PlannerToolCall(name=name,arguments=validated.model_dump()),catalog,service,lock)
             traces.append(ToolTrace(name=name,status='completed'))
             if name=='plan_forecast':
-                return answer(context,model=agent.model,message=computed_message(context.question,value),
+                return answer(context,model=agent.model,message=computed_message(context.question,value,focus),
                     needs_clarification=False,tool_calls=traces,result=value,
-                    selected_sunshine_factor=requested_sunshine_factor(context.question) if requested_sunshine_factor(context.question) is not None else 1.)
+                    selected_sunshine_factor=focus if focus is not None else 1.)
             # Feed actual read-only tool output back so the agent can choose a planning tool.
             payload=value.model_dump(mode='json') if hasattr(value,'model_dump') else value
             # Full forecasts are available through a separate endpoint; keep context bounded.

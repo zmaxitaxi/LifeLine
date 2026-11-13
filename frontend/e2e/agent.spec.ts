@@ -216,3 +216,65 @@ test("competing-window example calculates an actual unequal-work comparison", as
     page.getByLabel("Weather for this plan", { exact: true }),
   ).toHaveValue("kisumu-2025-01-14");
 });
+
+test("a failed re-run does not leave the previous answer or adopt button on screen", async ({
+  page,
+}) => {
+  let calls = 0;
+  await page.route("**/api/agent/ask", async (route) => {
+    calls += 1;
+    if (calls === 1) {
+      const result = JSON.parse(
+        execFileSync(testPython, ["backend/tests/agent_browser_fixture.py"], {
+          cwd: resolve(".."),
+          input: JSON.stringify({
+            body: route.request().postDataJSON(),
+            tool: "evaluate_fixed_requirement",
+            arguments: {
+              name: "Sterilizer",
+              power_kw: 1,
+              duration_hours: 2,
+              earliest_start: 8,
+              deadline: 12,
+            },
+          }),
+          encoding: "utf8",
+        }),
+      );
+      return route.fulfill({ status: result.status, json: result.body });
+    }
+    await new Promise((r) => setTimeout(r, 800));
+    return route.fulfill({
+      status: 503,
+      json: {
+        error: {
+          code: "FORECAST_UNAVAILABLE",
+          message: "Weather provider unavailable.",
+          details: [],
+        },
+      },
+    });
+  });
+  const p = await panel(page);
+  await p
+    .locator("#forecast-question")
+    .fill(
+      "Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.",
+    );
+  const calculate = p.getByRole("button", {
+    name: "Calculate forecast-backed plan",
+    exact: true,
+  });
+  await calculate.click();
+  await expect(p.getByTestId("agent-answer")).toContainText(
+    "evaluate_fixed_requirement (completed)",
+  );
+  await calculate.click();
+  await expect(p.getByText("Working on your request…")).toBeVisible();
+  await expect(p.getByTestId("agent-answer")).toHaveCount(0);
+  await expect(p.getByText("Forecast plan unavailable")).toBeVisible();
+  await expect(p.getByTestId("agent-answer")).toHaveCount(0);
+  await expect(
+    p.getByRole("button", { name: "Add fixed requirement to inventory" }),
+  ).toHaveCount(0);
+});

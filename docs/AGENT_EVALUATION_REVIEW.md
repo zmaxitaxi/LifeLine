@@ -13,6 +13,26 @@ Scope: the "other teammate" part of [the evaluation handoff](../LLM_EVALUATION_H
 
 Nothing here is a score, and it is not the 12-scenario evaluation.
 
+## Fixes applied (branch `codex/agent-history-fix`)
+
+Findings 1, 2 and 4 are fixed. Finding 3 and the smaller items in finding 5 remain open.
+
+- **Finding 1.** `ask_agent` now sends earlier questions as one labeled context message and marks the current request. A question with no history is sent unchanged.
+- **Finding 2.** When the question asks about less sun and the model chose exactly one reduced factor, the answer describes that case. "Cloudy weather" questions stay focused on the actual forecast; the real model adds a 0.5 factor to those unprompted.
+- **Finding 4.** The previous assistant answer is cleared when a new forecast plan run starts.
+
+Verification:
+
+| Check | Result |
+|---|---|
+| Backend tests | 280 passed (274 existing + 6 new regressions) |
+| Browser journeys | 23 passed (22 existing + 1 new regression) |
+| Real model, live weather: 8 sequences × 3 repetitions | Every turn 3 of 3 `local_tool_agent`, no fallback, at most 2.5 s. Demo storyline, brief test 4, deadline revision, specification follow-up, both reduced-sunshine phrasings, prompt injection and battery capacity. [Evidence](evidence/agent-review-real-model-after-fix.json) |
+
+The demo workaround below is no longer needed once this branch is merged.
+
+An earlier after-fix run hit 25 `FORECAST_UNAVAILABLE` responses while Open-Meteo was briefly unreachable. The model chose the correct single tool on every one of those turns. That run was discarded and repeated once weather recovered.
+
 ## What was run
 
 | Check | Result |

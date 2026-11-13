@@ -391,6 +391,9 @@ export function LiveForecastPlanner({
     setError("");
     setMessage("");
     setResult(null);
+    // Hide the previous answer, tool trace and adopt button while this run is
+    // pending or if it fails; they described a different request.
+    if (plan) setAgentAnswer(null);
     try {
       if (!plan) {
         const f = await api<SolarForecast>(
