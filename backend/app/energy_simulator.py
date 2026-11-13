@@ -56,6 +56,7 @@ def build_result(inputs: ModelInput, energy, charge, discharge, curtail, unmet,
                            discharge_output_kwh=float(d), curtailed_kwh=float(w),
                            soc_start_kwh=float(energy[h]), soc_end_kwh=float(energy[h+1])))
     critical_total, shortfall = sum(inputs.critical_kwh), float(sum(unmet))
+    check(-TOL <= shortfall <= critical_total+TOL, "Aggregate critical shortage bounds")
     flex_requested = sum(t.required_energy_kwh for t in inputs.tasks)
     flex_served = sum(t["served_kwh"] for t in task_results)
     losses = float((1-b.charge_efficiency)*sum(charge) + (1/b.discharge_efficiency-1)*sum(discharge))
@@ -66,7 +67,9 @@ def build_result(inputs: ModelInput, energy, charge, discharge, curtail, unmet,
               "RESERVE_AT_RISK" if minimum < b.reserve_kwh-TOL else "OK")
     metrics = dict(total_solar_kwh=float(sum(inputs.pv_kwh)), critical_requested_kwh=float(critical_total),
                    critical_unserved_kwh=shortfall,
-                   critical_coverage_pct=100*(critical_total-shortfall)/critical_total if critical_total else None,
+                   # Ratio first yields exactly 100 for zero shortfall. Bound
+                   # only reporting residue after validating raw energy flows.
+                   critical_coverage_pct=min(100., max(0., 100*(1-shortfall/critical_total))) if critical_total else None,
                    min_soc_kwh=minimum, final_soc_kwh=float(energy[-1]),
                    flexible_requested_kwh=float(flex_requested), flexible_served_kwh=float(flex_served),
                    flexible_deferred_kwh=float(flex_requested-flex_served), curtailed_kwh=float(sum(curtail)),

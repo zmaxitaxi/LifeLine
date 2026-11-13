@@ -36,6 +36,8 @@ def assert_physics(inputs, result):
     assert b.initial_battery_kwh+sum(inputs.pv_kwh) == pytest.approx(
         states[-1]+sum(r['critical_served_kwh']+r['flexible_served_kwh']+r['curtailed_kwh'] for r in hourly)+loss, abs=1e-6)
     metrics = result['metrics']
+    coverage = metrics['critical_coverage_pct']
+    assert coverage is None or 0 <= coverage <= 100
     assert metrics['conversion_loss_kwh'] == pytest.approx(loss, abs=1e-6)
     assert metrics['min_soc_kwh'] == pytest.approx(min(states), abs=1e-6)
     assert metrics['critical_unserved_kwh'] == pytest.approx(sum(r['critical_unserved_kwh'] for r in hourly), abs=1e-6)

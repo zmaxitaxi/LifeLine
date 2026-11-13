@@ -108,3 +108,5 @@ Python 3.12.5; NumPy 2.2.6; SciPy 1.15.3; Pytest 8.3.5. **62 numerical tests pas
 177 tests pass in the workspace and a clean source copy/new environment; `pip check` succeeds. Live Uvicorn health, scenario listing, OpenAPI, all four simulations, and a 422 validation response verified. Tests also block outbound socket connections while exercising all four calculations. Full-application offline/browser checks remain uncompleted.
 
 Versions: Python 3.12.5, FastAPI 0.115.12, Pydantic 2.14.3, Uvicorn 0.34.2, NumPy 2.2.6, SciPy 1.15.3, Pytest 8.3.5. One dependency-level Starlette/AnyIO deprecation warning is present. Backend CI is configured for Python 3.11 and 3.12; actual remote status is available in GitHub Actions. See [API handoff](PERSON_2_HANDOFF.md) and [HTTP evidence](evidence/person-2-http-results.json).
+
+Cross-platform verification caught floating-point residue slightly above 100% in coverage reporting. Coverage now uses stable ratio arithmetic and stays within 0–100 only after raw flow/aggregate shortage validation. Independent accounting assertions also check the percentage range; energy dispatch and solver priorities are unchanged.
