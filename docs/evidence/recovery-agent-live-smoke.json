@@ -1,0 +1,2779 @@
+{
+  "implementation_commit": "f5b663d68065db5fb676960d3accffe55d2a32fa",
+  "weather_mode": "live_forecast",
+  "started_at": "2026-11-13T22:42:17.295805+00:00",
+  "scope": "Integration smoke with real local inference and existing numerical tools; not a comprehensive model evaluation or clinic validation.",
+  "forecast": {
+    "source": "Open-Meteo Forecast API",
+    "data_kind": "weather_model_forecast",
+    "requested_location": {
+      "latitude": -0.0917,
+      "longitude": 34.768
+    },
+    "model_grid_location": {
+      "latitude": -0.10544816,
+      "longitude": 34.793453
+    },
+    "timezone": "Africa/Nairobi",
+    "retrieved_at": "2026-11-13T22:42:17.292942Z",
+    "expires_at": "2026-11-13T22:57:17.292942Z",
+    "cache_status": "live",
+    "source_url": "https://api.open-meteo.com/v1/forecast?latitude=-0.0917&longitude=34.768&hourly=shortwave_radiation%2Cterrestrial_radiation&timezone=auto&timeformat=unixtime&forecast_days=3",
+    "attribution_url": "https://open-meteo.com/",
+    "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+    "interval_convention": "Open-Meteo preceding-hour mean, aligned to local interval starts by overlap integration.",
+    "days": [
+      {
+        "date": "2026-11-14",
+        "hours": [
+          {
+            "start": "2026-11-14T00:00:00+03:00",
+            "end": "2026-11-14T01:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T01:00:00+03:00",
+            "end": "2026-11-14T02:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T02:00:00+03:00",
+            "end": "2026-11-14T03:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T03:00:00+03:00",
+            "end": "2026-11-14T04:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T04:00:00+03:00",
+            "end": "2026-11-14T05:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T05:00:00+03:00",
+            "end": "2026-11-14T06:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T06:00:00+03:00",
+            "end": "2026-11-14T07:00:00+03:00",
+            "shortwave_radiation_w_m2": 19.0,
+            "irradiance_kwh_m2": 0.019
+          },
+          {
+            "start": "2026-11-14T07:00:00+03:00",
+            "end": "2026-11-14T08:00:00+03:00",
+            "shortwave_radiation_w_m2": 186.0,
+            "irradiance_kwh_m2": 0.186
+          },
+          {
+            "start": "2026-11-14T08:00:00+03:00",
+            "end": "2026-11-14T09:00:00+03:00",
+            "shortwave_radiation_w_m2": 428.0,
+            "irradiance_kwh_m2": 0.428
+          },
+          {
+            "start": "2026-11-14T09:00:00+03:00",
+            "end": "2026-11-14T10:00:00+03:00",
+            "shortwave_radiation_w_m2": 642.0,
+            "irradiance_kwh_m2": 0.642
+          },
+          {
+            "start": "2026-11-14T10:00:00+03:00",
+            "end": "2026-11-14T11:00:00+03:00",
+            "shortwave_radiation_w_m2": 760.0,
+            "irradiance_kwh_m2": 0.76
+          },
+          {
+            "start": "2026-11-14T11:00:00+03:00",
+            "end": "2026-11-14T12:00:00+03:00",
+            "shortwave_radiation_w_m2": 932.0,
+            "irradiance_kwh_m2": 0.932
+          },
+          {
+            "start": "2026-11-14T12:00:00+03:00",
+            "end": "2026-11-14T13:00:00+03:00",
+            "shortwave_radiation_w_m2": 964.0,
+            "irradiance_kwh_m2": 0.964
+          },
+          {
+            "start": "2026-11-14T13:00:00+03:00",
+            "end": "2026-11-14T14:00:00+03:00",
+            "shortwave_radiation_w_m2": 858.0,
+            "irradiance_kwh_m2": 0.858
+          },
+          {
+            "start": "2026-11-14T14:00:00+03:00",
+            "end": "2026-11-14T15:00:00+03:00",
+            "shortwave_radiation_w_m2": 578.0,
+            "irradiance_kwh_m2": 0.578
+          },
+          {
+            "start": "2026-11-14T15:00:00+03:00",
+            "end": "2026-11-14T16:00:00+03:00",
+            "shortwave_radiation_w_m2": 421.0,
+            "irradiance_kwh_m2": 0.421
+          },
+          {
+            "start": "2026-11-14T16:00:00+03:00",
+            "end": "2026-11-14T17:00:00+03:00",
+            "shortwave_radiation_w_m2": 252.0,
+            "irradiance_kwh_m2": 0.252
+          },
+          {
+            "start": "2026-11-14T17:00:00+03:00",
+            "end": "2026-11-14T18:00:00+03:00",
+            "shortwave_radiation_w_m2": 118.0,
+            "irradiance_kwh_m2": 0.118
+          },
+          {
+            "start": "2026-11-14T18:00:00+03:00",
+            "end": "2026-11-14T19:00:00+03:00",
+            "shortwave_radiation_w_m2": 9.0,
+            "irradiance_kwh_m2": 0.009
+          },
+          {
+            "start": "2026-11-14T19:00:00+03:00",
+            "end": "2026-11-14T20:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T20:00:00+03:00",
+            "end": "2026-11-14T21:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T21:00:00+03:00",
+            "end": "2026-11-14T22:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T22:00:00+03:00",
+            "end": "2026-11-14T23:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T23:00:00+03:00",
+            "end": "2026-11-15T00:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          }
+        ],
+        "simulation_supported": true,
+        "warnings": []
+      },
+      {
+        "date": "2026-11-15",
+        "hours": [
+          {
+            "start": "2026-11-15T00:00:00+03:00",
+            "end": "2026-11-15T01:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T01:00:00+03:00",
+            "end": "2026-11-15T02:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T02:00:00+03:00",
+            "end": "2026-11-15T03:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T03:00:00+03:00",
+            "end": "2026-11-15T04:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T04:00:00+03:00",
+            "end": "2026-11-15T05:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T05:00:00+03:00",
+            "end": "2026-11-15T06:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T06:00:00+03:00",
+            "end": "2026-11-15T07:00:00+03:00",
+            "shortwave_radiation_w_m2": 19.0,
+            "irradiance_kwh_m2": 0.019
+          },
+          {
+            "start": "2026-11-15T07:00:00+03:00",
+            "end": "2026-11-15T08:00:00+03:00",
+            "shortwave_radiation_w_m2": 137.0,
+            "irradiance_kwh_m2": 0.137
+          },
+          {
+            "start": "2026-11-15T08:00:00+03:00",
+            "end": "2026-11-15T09:00:00+03:00",
+            "shortwave_radiation_w_m2": 420.0,
+            "irradiance_kwh_m2": 0.42
+          },
+          {
+            "start": "2026-11-15T09:00:00+03:00",
+            "end": "2026-11-15T10:00:00+03:00",
+            "shortwave_radiation_w_m2": 659.0,
+            "irradiance_kwh_m2": 0.659
+          },
+          {
+            "start": "2026-11-15T10:00:00+03:00",
+            "end": "2026-11-15T11:00:00+03:00",
+            "shortwave_radiation_w_m2": 837.0,
+            "irradiance_kwh_m2": 0.837
+          },
+          {
+            "start": "2026-11-15T11:00:00+03:00",
+            "end": "2026-11-15T12:00:00+03:00",
+            "shortwave_radiation_w_m2": 953.0,
+            "irradiance_kwh_m2": 0.953
+          },
+          {
+            "start": "2026-11-15T12:00:00+03:00",
+            "end": "2026-11-15T13:00:00+03:00",
+            "shortwave_radiation_w_m2": 965.0,
+            "irradiance_kwh_m2": 0.965
+          },
+          {
+            "start": "2026-11-15T13:00:00+03:00",
+            "end": "2026-11-15T14:00:00+03:00",
+            "shortwave_radiation_w_m2": 883.0,
+            "irradiance_kwh_m2": 0.883
+          },
+          {
+            "start": "2026-11-15T14:00:00+03:00",
+            "end": "2026-11-15T15:00:00+03:00",
+            "shortwave_radiation_w_m2": 779.0,
+            "irradiance_kwh_m2": 0.779
+          },
+          {
+            "start": "2026-11-15T15:00:00+03:00",
+            "end": "2026-11-15T16:00:00+03:00",
+            "shortwave_radiation_w_m2": 616.0,
+            "irradiance_kwh_m2": 0.616
+          },
+          {
+            "start": "2026-11-15T16:00:00+03:00",
+            "end": "2026-11-15T17:00:00+03:00",
+            "shortwave_radiation_w_m2": 364.0,
+            "irradiance_kwh_m2": 0.364
+          },
+          {
+            "start": "2026-11-15T17:00:00+03:00",
+            "end": "2026-11-15T18:00:00+03:00",
+            "shortwave_radiation_w_m2": 144.0,
+            "irradiance_kwh_m2": 0.144
+          },
+          {
+            "start": "2026-11-15T18:00:00+03:00",
+            "end": "2026-11-15T19:00:00+03:00",
+            "shortwave_radiation_w_m2": 9.0,
+            "irradiance_kwh_m2": 0.009
+          },
+          {
+            "start": "2026-11-15T19:00:00+03:00",
+            "end": "2026-11-15T20:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T20:00:00+03:00",
+            "end": "2026-11-15T21:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T21:00:00+03:00",
+            "end": "2026-11-15T22:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T22:00:00+03:00",
+            "end": "2026-11-15T23:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-15T23:00:00+03:00",
+            "end": "2026-11-16T00:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          }
+        ],
+        "simulation_supported": true,
+        "warnings": []
+      }
+    ],
+    "warnings": [
+      "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+      "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+    ]
+  },
+  "inputs": {
+    "latitude": -0.0917,
+    "longitude": 34.768,
+    "day": "tomorrow",
+    "use_configured_context": true,
+    "input_basis": "synthetic_example",
+    "clinic": {
+      "scenario": "normal",
+      "pv_capacity_kw": 1.5,
+      "battery_capacity_kwh": 8.0,
+      "initial_battery_kwh": 6.0,
+      "reserve_kwh": 1.0,
+      "max_discharge_kw": 0.4,
+      "equipment": [
+        {
+          "id": "evening",
+          "name": "Illustrative protected evening requirement",
+          "category": "critical",
+          "power_kw": 1.0,
+          "required_hours": [
+            19,
+            20
+          ]
+        },
+        {
+          "id": "charging",
+          "name": "Optional device charging",
+          "category": "flexible",
+          "max_power_kw": 0.3,
+          "required_energy_kwh": 0.6,
+          "allowed_hours": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "baseline_allocations": [
+            {
+              "hour": 16,
+              "requested_kwh": 0.3
+            },
+            {
+              "hour": 17,
+              "requested_kwh": 0.3
+            }
+          ],
+          "divisible": true
+        }
+      ]
+    }
+  },
+  "status": {
+    "mode": "local_tool_agent",
+    "available": true,
+    "model": "llama3.1:8b",
+    "provider": "Ollama on localhost",
+    "cloud_ai": false,
+    "note": "Local AI selects validated tools; Python computes figures and assessments. Live weather still needs internet. No patient information is needed."
+  },
+  "passed": true,
+  "cases": [
+    {
+      "question": "We expect very little sunshine tomorrow. How can we keep our clinic running?",
+      "seconds": 10.158958249725401,
+      "native_model_calls": [
+        {
+          "call": {
+            "index": 0,
+            "name": "generate_recovery_plan",
+            "arguments": {
+              "day": "tomorrow",
+              "focus": "solar",
+              "sunshine_factor": 0.5
+            }
+          },
+          "seconds": 10.112606916110963
+        }
+      ],
+      "passed": true,
+      "http_status": 200,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "needs_clarification": false,
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "generate_recovery_plan",
+          "status": "completed"
+        }
+      ],
+      "message": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee. Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+      "selected_sunshine_factor": 1.0,
+      "recovery": {
+        "weather_mode": "live_forecast",
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "sunshine_factor": 1.0,
+        "problem_detected": true,
+        "triggers": [
+          "ESSENTIAL_SHORTAGE"
+        ],
+        "recommended_option_id": "reschedule",
+        "smallest_tested_resolving_option_id": null,
+        "summary": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee.",
+        "next_action": "Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+        "assumptions": [
+          "Each option uses the same weather snapshot, essential equipment, efficiencies, absolute initial stored kWh and reserve target.",
+          "Only explicitly listed capacity, output or optional-work changes differ. More battery capacity begins with the same stored energy, not a full charge.",
+          "Solar and storage/output candidates are bounded sensitivity sizes, not real products; unchanged charge limits may still constrain them.",
+          "Rank: essential shortage, reserve shortfall and breaches, original flexible work unfinished, then normalized modeled change. This is not a cost ranking.",
+          "Normalized change sums fractional capacity increases and changed/postponed work divided by original flexible energy (denominators at least 1).",
+          "Smallest means smallest among tested candidates under this score, not a global minimum or a hardware sizing recommendation."
+        ],
+        "limitations": [
+          "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+          "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
+          "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+          "PV energy = rated kW \u00d7 hourly horizontal irradiation (kWh/m\u00b2) \u00f7 1 kW/m\u00b2 \u00d7 existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+          "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+          "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+          "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included.",
+          "Only individual interventions are tested; combinations, site installation feasibility, staffing, clinical acceptability and costs require human review.",
+          "Postponed optional work remains reported against the original workload; it is not counted as completed or as a full-work success.",
+          "Backup values are unmet delivered electrical kWh per hourly slot, not generator ratings, fuel quantities or purchase recommendations.",
+          "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+          "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+        ],
+        "existing": {
+          "essential_requested_kwh": 2.0,
+          "essential_served_kwh": 0.8,
+          "essential_unserved_kwh": 1.2,
+          "original_flexible_required_kwh": 0.6,
+          "tested_flexible_required_kwh": 0.6,
+          "flexible_completed_kwh": 0.6,
+          "flexible_unfinished_kwh": 0.0,
+          "explicitly_postponed_kwh": 0.0,
+          "minimum_battery_kwh": 6.0,
+          "reserve_shortfall_kwh": 0.0,
+          "reserve_breach_boundaries": [],
+          "conversion_losses_kwh": 0.15460315789473691
+        },
+        "options": [
+          {
+            "id": "reschedule",
+            "rank": 1,
+            "label": "Reschedule within allowed hours",
+            "kind": "scheduling",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263168
+            },
+            "infrastructure_changes": [],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2",
+            "rank": 2,
+            "label": "Test solar: 2 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.0,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263162
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.0,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2.5",
+            "rank": 3,
+            "label": "Test solar: 2.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.1473684210526315
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-3.5",
+            "rank": 4,
+            "label": "Test solar: 3.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 3.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263154
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 3.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          }
+        ]
+      }
+    },
+    {
+      "question": "Would another battery help?",
+      "seconds": 2.6760053751058877,
+      "native_model_calls": [
+        {
+          "call": {
+            "index": 0,
+            "name": "generate_recovery_plan",
+            "arguments": {
+              "focus": "battery",
+              "sunshine_factor": 0.5,
+              "day": "tomorrow"
+            }
+          },
+          "seconds": 2.60554362507537
+        }
+      ],
+      "passed": true,
+      "http_status": 200,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "needs_clarification": false,
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "generate_recovery_plan",
+          "status": "completed"
+        }
+      ],
+      "message": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. Additional empty battery capacity did not remove the essential deficit; check generation, timing and output power. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee. Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+      "selected_sunshine_factor": 1.0,
+      "recovery": {
+        "weather_mode": "live_forecast",
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "sunshine_factor": 1.0,
+        "problem_detected": true,
+        "triggers": [
+          "ESSENTIAL_SHORTAGE"
+        ],
+        "recommended_option_id": "reschedule",
+        "smallest_tested_resolving_option_id": null,
+        "summary": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. Additional empty battery capacity did not remove the essential deficit; check generation, timing and output power. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee.",
+        "next_action": "Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+        "assumptions": [
+          "Each option uses the same weather snapshot, essential equipment, efficiencies, absolute initial stored kWh and reserve target.",
+          "Only explicitly listed capacity, output or optional-work changes differ. More battery capacity begins with the same stored energy, not a full charge.",
+          "Solar and storage/output candidates are bounded sensitivity sizes, not real products; unchanged charge limits may still constrain them.",
+          "Rank: essential shortage, reserve shortfall and breaches, original flexible work unfinished, then normalized modeled change. This is not a cost ranking.",
+          "Normalized change sums fractional capacity increases and changed/postponed work divided by original flexible energy (denominators at least 1).",
+          "Smallest means smallest among tested candidates under this score, not a global minimum or a hardware sizing recommendation."
+        ],
+        "limitations": [
+          "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+          "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
+          "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+          "PV energy = rated kW \u00d7 hourly horizontal irradiation (kWh/m\u00b2) \u00f7 1 kW/m\u00b2 \u00d7 existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+          "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+          "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+          "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included.",
+          "Only individual interventions are tested; combinations, site installation feasibility, staffing, clinical acceptability and costs require human review.",
+          "Postponed optional work remains reported against the original workload; it is not counted as completed or as a full-work success.",
+          "Backup values are unmet delivered electrical kWh per hourly slot, not generator ratings, fuel quantities or purchase recommendations.",
+          "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+          "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+        ],
+        "existing": {
+          "essential_requested_kwh": 2.0,
+          "essential_served_kwh": 0.8,
+          "essential_unserved_kwh": 1.2,
+          "original_flexible_required_kwh": 0.6,
+          "tested_flexible_required_kwh": 0.6,
+          "flexible_completed_kwh": 0.6,
+          "flexible_unfinished_kwh": 0.0,
+          "explicitly_postponed_kwh": 0.0,
+          "minimum_battery_kwh": 6.0,
+          "reserve_shortfall_kwh": 0.0,
+          "reserve_breach_boundaries": [],
+          "conversion_losses_kwh": 0.15460315789473691
+        },
+        "options": [
+          {
+            "id": "reschedule",
+            "rank": 1,
+            "label": "Reschedule within allowed hours",
+            "kind": "scheduling",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263168
+            },
+            "infrastructure_changes": [],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-10",
+            "rank": 2,
+            "label": "Test battery: 10 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 10.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.2526315789473685
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 10.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-12",
+            "rank": 3,
+            "label": "Test battery: 12 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 12.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.999999999999999,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.3578947368421056
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 12.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": -8.881784197001252e-16,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-16",
+            "rank": 4,
+            "label": "Test battery: 16 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 16.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.4492052631578951
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 16.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          }
+        ]
+      }
+    },
+    {
+      "question": "What about more solar panels?",
+      "seconds": 2.3799260412342846,
+      "native_model_calls": [
+        {
+          "call": {
+            "index": 0,
+            "name": "generate_recovery_plan",
+            "arguments": {
+              "focus": "solar",
+              "sunshine_factor": 1,
+              "day": "tomorrow"
+            }
+          },
+          "seconds": 2.349176292307675
+        }
+      ],
+      "passed": true,
+      "http_status": 200,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "needs_clarification": false,
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "generate_recovery_plan",
+          "status": "completed"
+        }
+      ],
+      "message": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee. Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+      "selected_sunshine_factor": 1.0,
+      "recovery": {
+        "weather_mode": "live_forecast",
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "sunshine_factor": 1.0,
+        "problem_detected": true,
+        "triggers": [
+          "ESSENTIAL_SHORTAGE"
+        ],
+        "recommended_option_id": "reschedule",
+        "smallest_tested_resolving_option_id": null,
+        "summary": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee.",
+        "next_action": "Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+        "assumptions": [
+          "Each option uses the same weather snapshot, essential equipment, efficiencies, absolute initial stored kWh and reserve target.",
+          "Only explicitly listed capacity, output or optional-work changes differ. More battery capacity begins with the same stored energy, not a full charge.",
+          "Solar and storage/output candidates are bounded sensitivity sizes, not real products; unchanged charge limits may still constrain them.",
+          "Rank: essential shortage, reserve shortfall and breaches, original flexible work unfinished, then normalized modeled change. This is not a cost ranking.",
+          "Normalized change sums fractional capacity increases and changed/postponed work divided by original flexible energy (denominators at least 1).",
+          "Smallest means smallest among tested candidates under this score, not a global minimum or a hardware sizing recommendation."
+        ],
+        "limitations": [
+          "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+          "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
+          "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+          "PV energy = rated kW \u00d7 hourly horizontal irradiation (kWh/m\u00b2) \u00f7 1 kW/m\u00b2 \u00d7 existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+          "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+          "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+          "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included.",
+          "Only individual interventions are tested; combinations, site installation feasibility, staffing, clinical acceptability and costs require human review.",
+          "Postponed optional work remains reported against the original workload; it is not counted as completed or as a full-work success.",
+          "Backup values are unmet delivered electrical kWh per hourly slot, not generator ratings, fuel quantities or purchase recommendations.",
+          "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+          "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+        ],
+        "existing": {
+          "essential_requested_kwh": 2.0,
+          "essential_served_kwh": 0.8,
+          "essential_unserved_kwh": 1.2,
+          "original_flexible_required_kwh": 0.6,
+          "tested_flexible_required_kwh": 0.6,
+          "flexible_completed_kwh": 0.6,
+          "flexible_unfinished_kwh": 0.0,
+          "explicitly_postponed_kwh": 0.0,
+          "minimum_battery_kwh": 6.0,
+          "reserve_shortfall_kwh": 0.0,
+          "reserve_breach_boundaries": [],
+          "conversion_losses_kwh": 0.15460315789473691
+        },
+        "options": [
+          {
+            "id": "reschedule",
+            "rank": 1,
+            "label": "Reschedule within allowed hours",
+            "kind": "scheduling",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263168
+            },
+            "infrastructure_changes": [],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2",
+            "rank": 2,
+            "label": "Test solar: 2 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.0,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263162
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.0,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2.5",
+            "rank": 3,
+            "label": "Test solar: 2.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.1473684210526315
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-3.5",
+            "rank": 4,
+            "label": "Test solar: 3.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 3.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263154
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 3.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          }
+        ]
+      }
+    },
+    {
+      "question": "Can we move flexible equipment to the afternoon within its allowed hours?",
+      "seconds": 2.5558289159089327,
+      "native_model_calls": [
+        {
+          "call": {
+            "index": 0,
+            "name": "generate_recovery_plan",
+            "arguments": {
+              "focus": "scheduling",
+              "sunshine_factor": 1,
+              "day": "tomorrow"
+            }
+          },
+          "seconds": 2.5133134578354657
+        }
+      ],
+      "passed": true,
+      "http_status": 200,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "needs_clarification": false,
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "generate_recovery_plan",
+          "status": "completed"
+        }
+      ],
+      "message": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee. Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+      "selected_sunshine_factor": 1.0,
+      "recovery": {
+        "weather_mode": "live_forecast",
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "sunshine_factor": 1.0,
+        "problem_detected": true,
+        "triggers": [
+          "ESSENTIAL_SHORTAGE"
+        ],
+        "recommended_option_id": "reschedule",
+        "smallest_tested_resolving_option_id": null,
+        "summary": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Reschedule within allowed hours. Essential shortage becomes 1.200 kWh; minimum battery is 6.000 kWh; original flexible work unfinished is 0.600 kWh. No tested option meets all original work and reserve requirements. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee.",
+        "next_action": "Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+        "assumptions": [
+          "Each option uses the same weather snapshot, essential equipment, efficiencies, absolute initial stored kWh and reserve target.",
+          "Only explicitly listed capacity, output or optional-work changes differ. More battery capacity begins with the same stored energy, not a full charge.",
+          "Solar and storage/output candidates are bounded sensitivity sizes, not real products; unchanged charge limits may still constrain them.",
+          "Rank: essential shortage, reserve shortfall and breaches, original flexible work unfinished, then normalized modeled change. This is not a cost ranking.",
+          "Normalized change sums fractional capacity increases and changed/postponed work divided by original flexible energy (denominators at least 1).",
+          "Smallest means smallest among tested candidates under this score, not a global minimum or a hardware sizing recommendation."
+        ],
+        "limitations": [
+          "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+          "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
+          "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+          "PV energy = rated kW \u00d7 hourly horizontal irradiation (kWh/m\u00b2) \u00f7 1 kW/m\u00b2 \u00d7 existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+          "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+          "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+          "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included.",
+          "Only individual interventions are tested; combinations, site installation feasibility, staffing, clinical acceptability and costs require human review.",
+          "Postponed optional work remains reported against the original workload; it is not counted as completed or as a full-work success.",
+          "Backup values are unmet delivered electrical kWh per hourly slot, not generator ratings, fuel quantities or purchase recommendations.",
+          "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+          "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+        ],
+        "existing": {
+          "essential_requested_kwh": 2.0,
+          "essential_served_kwh": 0.8,
+          "essential_unserved_kwh": 1.2,
+          "original_flexible_required_kwh": 0.6,
+          "tested_flexible_required_kwh": 0.6,
+          "flexible_completed_kwh": 0.6,
+          "flexible_unfinished_kwh": 0.0,
+          "explicitly_postponed_kwh": 0.0,
+          "minimum_battery_kwh": 6.0,
+          "reserve_shortfall_kwh": 0.0,
+          "reserve_breach_boundaries": [],
+          "conversion_losses_kwh": 0.15460315789473691
+        },
+        "options": [
+          {
+            "id": "reschedule",
+            "rank": 1,
+            "label": "Reschedule within allowed hours",
+            "kind": "scheduling",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263168
+            },
+            "infrastructure_changes": [],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          }
+        ]
+      }
+    },
+    {
+      "question": "What's the smallest modeled change that eliminates the shortage?",
+      "seconds": 2.5949053750373423,
+      "native_model_calls": [
+        {
+          "call": {
+            "index": 0,
+            "name": "generate_recovery_plan",
+            "arguments": {
+              "day": "tomorrow",
+              "focus": "all",
+              "sunshine_factor": 1
+            }
+          },
+          "seconds": 2.4164753342047334
+        }
+      ],
+      "passed": true,
+      "http_status": 200,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "needs_clarification": false,
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "generate_recovery_plan",
+          "status": "completed"
+        }
+      ],
+      "message": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Test output: 1.4 kW. Essential shortage becomes 0.000 kWh; minimum battery is 5.895 kWh; original flexible work unfinished is 0.000 kWh. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee. Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+      "selected_sunshine_factor": 1.0,
+      "recovery": {
+        "weather_mode": "live_forecast",
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "sunshine_factor": 1.0,
+        "problem_detected": true,
+        "triggers": [
+          "ESSENTIAL_SHORTAGE"
+        ],
+        "recommended_option_id": "output-1.4",
+        "smallest_tested_resolving_option_id": "output-1.4",
+        "summary": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Test output: 1.4 kW. Essential shortage becomes 0.000 kWh; minimum battery is 5.895 kWh; original flexible work unfinished is 0.000 kWh. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee.",
+        "next_action": "Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+        "assumptions": [
+          "Each option uses the same weather snapshot, essential equipment, efficiencies, absolute initial stored kWh and reserve target.",
+          "Only explicitly listed capacity, output or optional-work changes differ. More battery capacity begins with the same stored energy, not a full charge.",
+          "Solar and storage/output candidates are bounded sensitivity sizes, not real products; unchanged charge limits may still constrain them.",
+          "Rank: essential shortage, reserve shortfall and breaches, original flexible work unfinished, then normalized modeled change. This is not a cost ranking.",
+          "Normalized change sums fractional capacity increases and changed/postponed work divided by original flexible energy (denominators at least 1).",
+          "Smallest means smallest among tested candidates under this score, not a global minimum or a hardware sizing recommendation."
+        ],
+        "limitations": [
+          "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+          "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
+          "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+          "PV energy = rated kW \u00d7 hourly horizontal irradiation (kWh/m\u00b2) \u00f7 1 kW/m\u00b2 \u00d7 existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+          "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+          "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+          "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included.",
+          "Only individual interventions are tested; combinations, site installation feasibility, staffing, clinical acceptability and costs require human review.",
+          "Postponed optional work remains reported against the original workload; it is not counted as completed or as a full-work success.",
+          "Backup values are unmet delivered electrical kWh per hourly slot, not generator ratings, fuel quantities or purchase recommendations.",
+          "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+          "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+        ],
+        "existing": {
+          "essential_requested_kwh": 2.0,
+          "essential_served_kwh": 0.8,
+          "essential_unserved_kwh": 1.2,
+          "original_flexible_required_kwh": 0.6,
+          "tested_flexible_required_kwh": 0.6,
+          "flexible_completed_kwh": 0.6,
+          "flexible_unfinished_kwh": 0.0,
+          "explicitly_postponed_kwh": 0.0,
+          "minimum_battery_kwh": 6.0,
+          "reserve_shortfall_kwh": 0.0,
+          "reserve_breach_boundaries": [],
+          "conversion_losses_kwh": 0.15460315789473691
+        },
+        "options": [
+          {
+            "id": "output-1.4",
+            "rank": 1,
+            "label": "Test output: 1.4 kW",
+            "kind": "output",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 1.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 2.0,
+              "essential_unserved_kwh": 0.0,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.599999999999999,
+              "flexible_unfinished_kwh": 9.992007221626409e-16,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.894736842105264,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.21052631578947373
+            },
+            "infrastructure_changes": [
+              {
+                "field": "max_discharge_kw",
+                "before": 0.4,
+                "after": 1.4,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [],
+            "remaining_constraints": [],
+            "modeled_all_requirements_met": true,
+            "essential_shortage_reduction_kwh": 1.2,
+            "minimum_battery_improvement_kwh": -0.10526315789473628,
+            "flexible_completion_improvement_kwh": -9.992007221626409e-16
+          },
+          {
+            "id": "output-2.4",
+            "rank": 2,
+            "label": "Test output: 2.4 kW",
+            "kind": "output",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 2.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 2.0,
+              "essential_unserved_kwh": 0.0,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.5999999999999999,
+              "flexible_unfinished_kwh": 1.1102230246251565e-16,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.894736842105264,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.21052631578947373
+            },
+            "infrastructure_changes": [
+              {
+                "field": "max_discharge_kw",
+                "before": 0.4,
+                "after": 2.4,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [],
+            "remaining_constraints": [],
+            "modeled_all_requirements_met": true,
+            "essential_shortage_reduction_kwh": 1.2,
+            "minimum_battery_improvement_kwh": -0.10526315789473628,
+            "flexible_completion_improvement_kwh": -1.1102230246251565e-16
+          },
+          {
+            "id": "output-0.9",
+            "rank": 3,
+            "label": "Test output: 0.9 kW",
+            "kind": "output",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.9,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 1.8,
+              "essential_unserved_kwh": 0.19999999999999996,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.2
+            },
+            "infrastructure_changes": [
+              {
+                "field": "max_discharge_kw",
+                "before": 0.4,
+                "after": 0.9,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.09999999999999998
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.09999999999999998
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 1.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "reschedule",
+            "rank": 4,
+            "label": "Reschedule within allowed hours",
+            "kind": "scheduling",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263168
+            },
+            "infrastructure_changes": [],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-10",
+            "rank": 5,
+            "label": "Test battery: 10 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 10.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.2526315789473685
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 10.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2",
+            "rank": 6,
+            "label": "Test solar: 2 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.0,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263162
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.0,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-12",
+            "rank": 7,
+            "label": "Test battery: 12 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 12.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.999999999999999,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.3578947368421056
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 12.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": -8.881784197001252e-16,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2.5",
+            "rank": 8,
+            "label": "Test solar: 2.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.1473684210526315
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-16",
+            "rank": 9,
+            "label": "Test battery: 16 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 16.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.4492052631578951
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 16.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-3.5",
+            "rank": 10,
+            "label": "Test solar: 3.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 3.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263154
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 3.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          }
+        ]
+      }
+    },
+    {
+      "question": "What about 50% less sunshine?",
+      "seconds": 2.4784005410037935,
+      "native_model_calls": [
+        {
+          "call": {
+            "index": 0,
+            "name": "plan_forecast",
+            "arguments": {
+              "day": "tomorrow",
+              "reduced_sunshine_factors": "[0.5]"
+            }
+          },
+          "seconds": 2.3516367091797292
+        }
+      ],
+      "passed": true,
+      "http_status": 200,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "needs_clarification": false,
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "plan_forecast",
+          "status": "completed"
+        },
+        {
+          "name": "generate_recovery_plan",
+          "status": "completed"
+        }
+      ],
+      "message": "With 50% lower forecast sunshine: The model cannot supply all essential equipment: 1.200 kWh is unserved. Scheduling alone cannot resolve this modeled shortage. Solar generation is 4.071 kWh versus 8.142 kWh for the forecast. Each case has its own computed schedule. Compared with the existing schedule, the recommended schedule ends the day with 0.306 kWh more stored in the battery and 0.016 kWh less lost in battery conversion. These are separate figures, not a total energy saving. The two schedules complete different amounts of flexible work, so this is not a like-for-like comparison.",
+      "selected_sunshine_factor": 0.5,
+      "recovery": {
+        "weather_mode": "live_forecast",
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "sunshine_factor": 0.5,
+        "problem_detected": true,
+        "triggers": [
+          "ESSENTIAL_SHORTAGE"
+        ],
+        "recommended_option_id": "output-1.4",
+        "smallest_tested_resolving_option_id": "output-1.4",
+        "summary": "Existing schedule: 1.200 kWh essential energy unserved; 0.000 kWh flexible work unfinished. Rescheduling leaves 1.200 kWh essential energy unserved and 0.600 kWh flexible work unfinished. Best ranked tested option: Test output: 1.4 kW. Essential shortage becomes 0.000 kWh; minimum battery is 5.895 kWh; original flexible work unfinished is 0.000 kWh. After scheduling, additional delivered electrical energy of 1.200 kWh is still needed during local hourly slots 19:00, 20:00. Electrical feasibility only; no clinical safety or availability guarantee.",
+        "next_action": "Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; this comparison does not authorize purchases or equipment control.",
+        "assumptions": [
+          "Each option uses the same weather snapshot, essential equipment, efficiencies, absolute initial stored kWh and reserve target.",
+          "Only explicitly listed capacity, output or optional-work changes differ. More battery capacity begins with the same stored energy, not a full charge.",
+          "Solar and storage/output candidates are bounded sensitivity sizes, not real products; unchanged charge limits may still constrain them.",
+          "Rank: essential shortage, reserve shortfall and breaches, original flexible work unfinished, then normalized modeled change. This is not a cost ranking.",
+          "Normalized change sums fractional capacity increases and changed/postponed work divided by original flexible energy (denominators at least 1).",
+          "Smallest means smallest among tested candidates under this score, not a global minimum or a hardware sizing recommendation."
+        ],
+        "limitations": [
+          "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+          "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
+          "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+          "PV energy = rated kW \u00d7 hourly horizontal irradiation (kWh/m\u00b2) \u00f7 1 kW/m\u00b2 \u00d7 existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+          "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+          "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+          "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included.",
+          "Only individual interventions are tested; combinations, site installation feasibility, staffing, clinical acceptability and costs require human review.",
+          "Postponed optional work remains reported against the original workload; it is not counted as completed or as a full-work success.",
+          "Backup values are unmet delivered electrical kWh per hourly slot, not generator ratings, fuel quantities or purchase recommendations.",
+          "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+          "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+        ],
+        "existing": {
+          "essential_requested_kwh": 2.0,
+          "essential_served_kwh": 0.8,
+          "essential_unserved_kwh": 1.2,
+          "original_flexible_required_kwh": 0.6,
+          "tested_flexible_required_kwh": 0.6,
+          "flexible_completed_kwh": 0.6,
+          "flexible_unfinished_kwh": 0.0,
+          "explicitly_postponed_kwh": 0.0,
+          "minimum_battery_kwh": 6.0,
+          "reserve_shortfall_kwh": 0.0,
+          "reserve_breach_boundaries": [],
+          "conversion_losses_kwh": 0.1631752631578947
+        },
+        "options": [
+          {
+            "id": "output-1.4",
+            "rank": 1,
+            "label": "Test output: 1.4 kW",
+            "kind": "output",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 1.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 2.0,
+              "essential_unserved_kwh": 0.0,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.6,
+              "flexible_unfinished_kwh": 0.0,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.894736842105264,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.21052631578947362
+            },
+            "infrastructure_changes": [
+              {
+                "field": "max_discharge_kw",
+                "before": 0.4,
+                "after": 1.4,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [],
+            "remaining_constraints": [],
+            "modeled_all_requirements_met": true,
+            "essential_shortage_reduction_kwh": 1.2,
+            "minimum_battery_improvement_kwh": -0.10526315789473628,
+            "flexible_completion_improvement_kwh": 0.0
+          },
+          {
+            "id": "output-2.4",
+            "rank": 2,
+            "label": "Test output: 2.4 kW",
+            "kind": "output",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 2.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 2.0,
+              "essential_unserved_kwh": 0.0,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.5999999999999999,
+              "flexible_unfinished_kwh": 1.1102230246251565e-16,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.894736842105264,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.21052631578947367
+            },
+            "infrastructure_changes": [
+              {
+                "field": "max_discharge_kw",
+                "before": 0.4,
+                "after": 2.4,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [],
+            "remaining_constraints": [],
+            "modeled_all_requirements_met": true,
+            "essential_shortage_reduction_kwh": 1.2,
+            "minimum_battery_improvement_kwh": -0.10526315789473628,
+            "flexible_completion_improvement_kwh": -1.1102230246251565e-16
+          },
+          {
+            "id": "output-0.9",
+            "rank": 3,
+            "label": "Test output: 0.9 kW",
+            "kind": "output",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.9,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 1.8,
+              "essential_unserved_kwh": 0.19999999999999996,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.19999999999999987
+            },
+            "infrastructure_changes": [
+              {
+                "field": "max_discharge_kw",
+                "before": 0.4,
+                "after": 0.9,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.09999999999999998
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.09999999999999998
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 1.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "reschedule",
+            "rank": 4,
+            "label": "Reschedule within allowed hours",
+            "kind": "scheduling",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.1473684210526315
+            },
+            "infrastructure_changes": [],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-10",
+            "rank": 5,
+            "label": "Test battery: 10 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 10.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.2456552631578949
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 10.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2",
+            "rank": 6,
+            "label": "Test solar: 2 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.0,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.999999999999998,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263176
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.0,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": -1.7763568394002505e-15,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-12",
+            "rank": 7,
+            "label": "Test battery: 12 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 12.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.2456552631578949
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 12.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-2.5",
+            "rank": 8,
+            "label": "Test solar: 2.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 2.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263168
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 2.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "battery-16",
+            "rank": 9,
+            "label": "Test battery: 16 kWh",
+            "kind": "battery",
+            "config": {
+              "battery_capacity_kwh": 16.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 6.0,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.2456552631578949
+            },
+            "infrastructure_changes": [
+              {
+                "field": "battery_capacity_kwh",
+                "before": 8.0,
+                "after": 16.0,
+                "unit": "kWh"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": 0.0,
+            "flexible_completion_improvement_kwh": -0.6
+          },
+          {
+            "id": "solar-3.5",
+            "rank": 10,
+            "label": "Test solar: 3.5 kW",
+            "kind": "solar",
+            "config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 3.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "metrics": {
+              "essential_requested_kwh": 2.0,
+              "essential_served_kwh": 0.8,
+              "essential_unserved_kwh": 1.2,
+              "original_flexible_required_kwh": 0.6,
+              "tested_flexible_required_kwh": 0.6,
+              "flexible_completed_kwh": 0.0,
+              "flexible_unfinished_kwh": 0.6,
+              "explicitly_postponed_kwh": 0.0,
+              "minimum_battery_kwh": 5.999999999999998,
+              "reserve_shortfall_kwh": 0.0,
+              "reserve_breach_boundaries": [],
+              "conversion_losses_kwh": 0.14736842105263176
+            },
+            "infrastructure_changes": [
+              {
+                "field": "pv_capacity_kw",
+                "before": 1.5,
+                "after": 3.5,
+                "unit": "kW"
+              }
+            ],
+            "work_changes": [],
+            "backup_deficits": [
+              {
+                "hour": 19,
+                "electrical_energy_kwh": 0.6
+              },
+              {
+                "hour": 20,
+                "electrical_energy_kwh": 0.6
+              }
+            ],
+            "remaining_constraints": [
+              "DISCHARGE_POWER_LIMIT",
+              "ESSENTIAL_ENERGY_UNSERVED",
+              "ORIGINAL_FLEXIBLE_WORK_UNFINISHED"
+            ],
+            "modeled_all_requirements_met": false,
+            "essential_shortage_reduction_kwh": 0.0,
+            "minimum_battery_improvement_kwh": -1.7763568394002505e-15,
+            "flexible_completion_improvement_kwh": -0.6
+          }
+        ]
+      }
+    }
+  ]
+}

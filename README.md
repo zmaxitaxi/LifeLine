@@ -1,5 +1,7 @@
 # LifeLine
 
+**Recovery backend:** the [Energy Recovery Planner](RECOVERY_PLANNER.md) investigates scheduling, solar, storage and output limits against the same actual forecast, with explicit hourly deficits and human-review boundaries. It is available through `/api/recovery/plan` and local agent tools. [Recovery demo commands](DEMO.md#energy-recovery-backend-demonstration) and [typed contracts](contracts/recovery.ts) are ready for the separate UI integration branch. Existing frontend navigation is preserved on this backend branch.
+
 **Weather investigation, November 13:** the Mac's normal Open-Meteo route recovered without a code, DNS or TLS-setting change. Fresh forecast-to-model execution passed. The earlier failure was traced to a TLS-handshake stall before HTTP, also reproduced outside Python. See [Mac/Windows diagnosis and recovery evidence](WEATHER_NETWORK.md); continue checking live availability before the demo.
 
 **Local AI is implemented:** Llama 3.1 8B through Ollama understands questions and selects LifeLine's validated tools. Python computes all schedules, energy figures and assessments. No cloud AI key is required. See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).

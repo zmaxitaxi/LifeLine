@@ -232,3 +232,45 @@ def test_historical_recovery_demo_computes_every_result_and_never_calls_weather(
     assert d['reference']['weather_dataset']=='kisumu-2025-01-14'
     assert d['existing']['metrics']['essential_unserved_kwh']==pytest.approx(1.32)
     assert any(o['kind']=='output' and o['modeled_all_requirements_met'] for o in d['options'])
+
+
+def test_failed_candidate_never_publishes_a_partial_success(monkeypatch):
+    from app import recovery_planner
+    from app.optimizer import SolverError
+    original=recovery_planner.forecast_case
+    invocations=[]
+    def failing(*args):
+        invocations.append(True)
+        if len(invocations)>1:
+            raise SolverError('SOLVER_TIME_LIMIT','private solver output')
+        return original(*args)
+    monkeypatch.setattr(recovery_planner,'forecast_case',failing)
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as client:
+        r=client.post('/api/recovery/plan',json=case()|{'weather_mode':'live_forecast'})
+    assert r.status_code==503
+    assert r.json()['error']['code']=='SOLVER_TIME_LIMIT'
+    assert 'private solver output' not in r.text
+    assert 'options' not in r.json()
+
+
+def test_model_limit_saturation_and_zero_demand_do_not_claim_reliability():
+    d=evaluate(case(battery_capacity_kwh=200.,pv_capacity_kw=100.,max_discharge_kw=100.,equipment=[]))
+    assert len(d['options'])==1
+    assert not d['options'][0]['modeled_essential_and_reserve_met']
+    assert d['smallest_tested_resolving_option_id'] is None
+    assert 'NO_ESSENTIAL_REQUIREMENTS_CONFIGURED' in d['options'][0]['remaining_constraints']
+
+
+def test_streamed_recovery_reports_completed_calculations_and_verified_result():
+    service,_=service_for()
+    agent,_=agent_with([{'name':'generate_recovery_plan','arguments':{'focus':'output'}}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        response=client.post('/api/agent/stream',json=request_body()|{'question':'Would higher output fix the shortage?','inputs_confirmed':True})
+    events=[json.loads(line[6:]) for line in response.text.splitlines() if line.startswith('data: ')]
+    assert events[-1]['type']=='answer'
+    assert events[-1]['response']['recovery']
+    activities=[e for e in events if e['type']=='activity']
+    assert any(e['id']=='recovery-weather' and e['status']=='completed' for e in activities)
+    outputs=[e for e in activities if e['id'].startswith('output-')]
+    assert len([e for e in outputs if e['status']=='running'])==len([e for e in outputs if e['status']=='completed'])==3

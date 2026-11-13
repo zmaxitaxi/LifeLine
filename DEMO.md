@@ -1,5 +1,27 @@
 # Two-minute LifeLine demonstration
 
+## Energy recovery backend demonstration
+
+The dedicated backend branch adds calculated recovery comparisons. The separate UI chat owns their chat-first presentation; no frontend navigation is redesigned here.
+
+Start the existing backend as below, then run:
+
+```bash
+.venv/bin/python scripts/run_recovery_demo.py
+.venv/bin/python scripts/run_recovery_demo.py --live
+.venv/bin/python scripts/check_recovery_agent.py --output /private/tmp/lifeline-recovery-agent-check.json
+```
+
+The first command explicitly uses bundled NASA POWER Kisumu weather for **14 January 2025**, with illustrative equipment requirements. It calculates the existing schedule and every intervention on demand. The second replaces that historical profile with an actual Open-Meteo forecast; results vary with the date and weather. The third verifies six questions through real installed Llama native tool calls and numerical tools; Ollama must be running. It is an integration smoke, not a comprehensive evaluation score.
+
+In the recorded historical run, protected demand is 14.340 kWh. The existing schedule leaves **1.320 kWh essential energy unserved** and **0.300 kWh flexible work unfinished**. Its 4 kW battery output cannot supply the 4.66 kW protected requirement during two evening hours. The smallest tested resolving output is **5 kW**, with the same 14 kWh initial energy, solar profile, 20 kWh storage and protected requirements. Essential shortage becomes **0**, all **2.100 kWh** flexible work completes, and minimum battery energy is **9.684 kWh**. Extra battery capacity alone leaves the output shortage unchanged. [Computed evidence](docs/evidence/recovery-historical-demo.json).
+
+Show why the bottleneck matters, then review allowed operating times and the hypothetical output change. This does not establish an inverter product rating, installability or clinical safety. The backend cannot install hardware, authorize purchases or control equipment. The 5 kW result is the smallest **tested** candidate, not certified sizing or a cost optimum. Scheduling-only results follow the existing policy that optional work is disabled when protected demand remains unserved; unfinished work is reported honestly.
+
+The real-model smoke also asks about another battery, more panels, moving flexible equipment inside allowed hours, the smallest tested resolving change and 50% lower sunshine. A preferred afternoon time is not promised unless the computed schedule actually uses it. [Native calls, actual forecast and metrics](docs/evidence/recovery-agent-live-smoke.json).
+
+Windows: replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`. Temporary output paths can be changed to a local writable file.
+
 **Current assistant: Llama 3.1 8B running locally through Ollama.** It understands questions and chooses validated tools. Python computes energy figures, schedules, assessments and explanations. Deterministic offline/guided modes remain as explicit fallbacks; they are not the primary local AI.
 
 ## Start and check
