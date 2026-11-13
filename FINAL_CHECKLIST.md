@@ -2,7 +2,15 @@
 
 Updated November 13, 2026. This is the status of the final brief, not a claim of clinical deployment. The user's later instruction selected local AI instead of Claude.
 
-The user subsequently assigned the comprehensive 12-scenario local-LLM evaluation to the two teammates; this chat owns integration and fixes. See [the handoff](LLM_EVALUATION_HANDOFF.md) and [draft team update](TEAM_UPDATE.md). The five-question smoke test below is not that evaluation, and no comprehensive score is claimed.
+The teammates' comprehensive evaluation is now merged on `main` at `ac3a45e`: their [report](LLM_EVALUATION.md) records 87.5/100 with zero critical failures and explicit remaining limitations. The new recovery/activity functionality has separate targeted integration checks; that earlier score does not evaluate the newly added tools.
+
+## Current backend delivery
+
+- Recovery comparisons, known configured context, actual weather input, essential protection, fixed starting energy, hourly backup deficits and honest tested-candidate ranking are implemented on `codex/energy-recovery`. See [contracts and limitations](RECOVERY_PLANNER.md).
+- Recovery verification: 326 backend tests, production build/TypeScript and all 23 existing Chromium journeys passed. [GitHub CI](https://github.com/zmaxitaxi/LifeLine/actions/runs/43522478094) passed on commit `c98d6a7`, including Python 3.11/3.12.
+- Six real local Llama questions passed with a fresh Open-Meteo snapshot retrieved at 22:42 UTC November 13. [Native tool calls and results](docs/evidence/recovery-agent-live-smoke.json). The historical and live API demo commands both ran successfully.
+- The [historical recovery example](docs/evidence/recovery-historical-demo.json) reduces essential deficit from 1.320 to 0 kWh with a hypothetical 4 → 5 kW output limit, while completing all 2.100 kWh flexible work. Extra empty storage alone does not solve its output bottleneck. This is a modeled sensitivity, not equipment sizing or clinical validation.
+- The separate UI chat owns the two-page activity interface. Backend shared-state/activity integration has an explicit proposal/review/confirm contract and is undergoing its own real-model verification. No UI work or uncommitted root files are overwritten by this backend branch.
 
 | Brief objective | Status | Evidence / remaining limit |
 |---|---|---|
@@ -18,8 +26,7 @@ The user subsequently assigned the comprehensive 12-scenario local-LLM evaluatio
 
 ## Verification evidence
 
-- Backend: **266 tests passed** with Python 3.12; one upstream Starlette/AnyIO deprecation warning. CI also targets Python 3.11.
-- Frontend: production build and TypeScript pass; **22 Chromium journeys passed** in the final complete run, including explicit adoption and selected lower-sunshine schedules.
+- Earlier integrated release: **266 backend tests** and **22 Chromium journeys** passed. The newer recovery checks are recorded above; these earlier figures are retained as dated history.
 - Real local model: all five targeted questions completed through actual local Llama inference and real numerical calculations in [recorded-weather replay evidence](docs/evidence/local-agent-recorded-weather-run.json). A small integration sample, not a general language-model benchmark.
 - Live weather: [earlier successful retrieval](docs/evidence/live-forecast-run.json); [latest failed availability check](docs/evidence/current-live-weather-check.json). No invented or unlabeled substitute weather.
 - Later recovery: [fresh normal-route Mac retrieval and physical-model checks](docs/evidence/mac-weather-live-recovery.json), at 12:35 PM Pacific November 13. The failed check above is preserved as history, not the current availability claim. [Network investigation](WEATHER_NETWORK.md).
@@ -34,7 +41,7 @@ Caden’s commits through `edcea98` were merged with the local-agent work. The c
 
 ## What remains before presentation/submission
 
-1. Recheck fresh Open-Meteo retrieval on the presentation network, despite the Mac's later recovery. Use `scripts/diagnose_weather.py` if it fails and `scripts/check_live_forecast.py` for numerical verification. The teammates separately own the comprehensive local-LLM evaluation. Recorded tests are never described as current live weather.
+1. Recheck fresh Open-Meteo retrieval on the presentation network, despite the Mac's later recovery. Use `scripts/diagnose_weather.py` if it fails and `scripts/check_live_forecast.py` for numerical verification. The teammates' completed comprehensive evaluation has documented limits; targeted new-tool checks are separate. Recorded tests are never described as current live weather.
 2. Warm the local model, rehearse the two-minute demo on the final build, and keep the original heuristic tie plus unavoidable-shortage explanation ready.
 3. Confirm official rules, eligibility, team registration, exact deadline/timezone, submission URL, required video/hosting and AI/data-source attribution. The user-supplied deadline is November 14, 2026, 11:59 PM Pacific; public organization pages did not verify event-specific rules.
 4. Submit through the official form and retain confirmation. Nothing has been submitted automatically. Choose a project license if required; shadcn component licensing is already retained, but a repository-wide license has not been selected by the user.

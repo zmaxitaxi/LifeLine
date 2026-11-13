@@ -2,6 +2,9 @@
 
 ## Verified
 
+- Recovery backend comparisons run the existing simulator/MILP with identical weather and absolute initial stored energy. Tests distinguish scheduling, generation, storage and output limits; original work remains in the completion denominator after optional postponement. [Contract and test scope](RECOVERY_PLANNER.md).
+- Fresh forecast-backed local Llama recovery tool execution passed six targeted questions on November 13. [Actual native calls, source timestamps and numerical results](docs/evidence/recovery-agent-live-smoke.json). The team's earlier [87.5/100 report](LLM_EVALUATION.md) is a separate evaluation of the previous tool set, with multi-turn and coverage limitations stated.
+
 - Existing model conservation, battery bounds/rates/efficiencies, no simultaneous charge/discharge, fixed essential hours, flexible windows, fair comparisons, infeasible conditions and strict API validation.
 - Forecast adapter tests: Open-Meteo's preceding-hour W/m² convention, overlap conversion, local dates, fractional-hour time zones, explicit rejection of 23/25-hour simulation days, missing values/units, night handling, cache/failure behavior and typed tool arguments.
 - Actual live forecast retrieval and browser-to-API-to-model execution, with a recorded dated snapshot in [live weather documentation](LIVE_WEATHER.md). This verifies the integration, not forecast accuracy or clinical suitability.
@@ -10,6 +13,8 @@
 - Wajo authentication, schemas and isolated no-action greeting succeeded. Wajo is not a production dependency; no custom planning connector was validated.
 
 ## Assumed or unvalidated
+
+- Recovery ranking compares a bounded set of individual sensitivities. It does not establish the globally smallest system, lowest cost, availability of hardware, clinical acceptability or installation feasibility. A recommended tested alternative can still leave deficits; its explicit unresolved requirements must be shown.
 
 - Clinic equipment/duty cycles are illustrative or unverified operator inputs. Published ratings are not measured hourly clinic consumption.
 - Enough discretionary load can actually move within staffing and clinical requirements. Divisible hourly energy can be unrealistic for consecutive/noninterruptible appliance cycles.
