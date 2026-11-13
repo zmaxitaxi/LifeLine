@@ -9,6 +9,7 @@ from .forecast_models import ForecastLocation, ForecastPlanResponse, ForecastStr
 from .models import SimulationRequest, SimulationResponse
 from .solar_forecast import pv_from_irradiance
 from .weather_forecast import ForecastError
+from .activity import report
 
 
 LIMITATIONS = [
@@ -74,20 +75,24 @@ def computed_actions(plan):
     return actions
 
 
-async def plan_forecast(body, catalog, service, solve_lock):
+async def plan_forecast(body, catalog, service, solve_lock, progress=None):
     # Validate cross-field hardware bounds before making any external request.
     catalog.resolve(SimulationRequest.model_validate(body.clinic.model_dump(exclude_unset=True) | {'initial_battery_kwh':body.midnight_battery_kwh}))
+    await report(progress, 'forecast', 'Retrieving the Open-Meteo forecast')
     forecast = await service.get(ForecastLocation(latitude=body.latitude, longitude=body.longitude))
+    await report(progress, 'forecast', f'Weather forecast retrieved ({forecast.cache_status})', 'completed')
     day = forecast.days[0 if body.day == 'today' else 1]
     if not day.simulation_supported:
         raise ForecastError('UNSUPPORTED_FORECAST_DAY', day.warnings[0], 422)
     factors = [1.] + body.reduced_sunshine_factors
+    await report(progress, 'simulation', 'Running the electricity model and checking equipment needs')
     async with solve_lock:
         # Same forecast snapshot, physical constraints, equipment and initial
         # energy for every case; only the explicitly named factor differs.
         plans = []
         for factor in factors:
             plans.append(await run_in_threadpool(forecast_case, catalog, body, day, forecast, factor))
+    await report(progress, 'simulation', 'Energy calculations and schedules verified', 'completed')
     return ForecastPlanResponse(forecast=forecast, planning_date=day.date, midnight_battery_kwh=body.midnight_battery_kwh,
         initial_battery_basis=LIMITATIONS[1], plan=plans[0],
         uncertainty_cases=[ForecastStressCase(sunshine_factor=f, plan=p) for f,p in zip(factors[1:],plans[1:])],

@@ -94,7 +94,7 @@ async def evaluate_fixed_requirement(context, args: FixedRequirementArguments, c
         message += ' No tested start supplies all essential requirements. Do not treat the added cycle as completed; additional resources or explicit operator review are needed.'
     return RequirementResult(name=args.name,start_hour=start,end_hour=start+args.duration_hours,
         candidates_evaluated=len(candidates),essential_requirements_fully_supplied=supplied,
-        original=original,proposed=proposed,explanation=message)
+        original=original,proposed=proposed,explanation=message,arguments=args)
 
 
 async def explore_capacity(context, args: CapacityArguments, catalog, service, lock):

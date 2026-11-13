@@ -3,6 +3,7 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 from .forecast_models import PlannerContext, PlanForecastArguments, ForecastPlanResponse
 from .models import StrictModel
+from .recovery_models import RecoveryResponse
 
 
 class AgentRequest(PlannerContext):
@@ -11,6 +12,14 @@ class AgentRequest(PlannerContext):
     inputs_confirmed: bool = False
     input_basis: Literal['synthetic_example', 'operator_entered_unverified'] = 'synthetic_example'
     day: Literal['today', 'tomorrow'] = 'tomorrow'
+    use_configured_context: bool = False
+    optional_load_ids: Annotated[list[str], Field(max_length=20)] = []
+    context_sunshine_factor: Annotated[float, Field(ge=0, le=1)] = 1.
+    active_requirement: 'FixedRequirementArguments | None' = None
+    weather_mode: Literal['live_forecast', 'existing_scenario'] = 'live_forecast'
+    current_battery_pct: Annotated[float, Field(ge=0, le=100)] | None = None
+    starting_battery_pct: Annotated[float, Field(ge=0, le=100)] | None = None
+    starting_charge_confirmed: bool = False
 
 
 class FixedRequirementArguments(StrictModel):
@@ -36,7 +45,7 @@ class CapacityArguments(StrictModel):
 
 
 class ClarifyArguments(StrictModel):
-    field: Literal['power', 'duration', 'earliest_start', 'deadline', 'equipment', 'midnight_battery', 'intent', 'cycle_constraints', 'day', 'protected_equipment']
+    field: Literal['power', 'duration', 'earliest_start', 'deadline', 'equipment', 'midnight_battery', 'current_battery', 'starting_battery', 'intent', 'cycle_constraints', 'day', 'protected_equipment']
 
 
 class ToolTrace(StrictModel):
@@ -75,6 +84,7 @@ class RequirementResult(StrictModel):
     original: ForecastPlanResponse
     proposed: ForecastPlanResponse
     explanation: str
+    arguments: FixedRequirementArguments | None = None
 
 
 class AgentResponse(StrictModel):
@@ -90,3 +100,5 @@ class AgentResponse(StrictModel):
     fallback_reason: str | None = None
     input_basis: Literal['synthetic_example', 'operator_entered_unverified']
     selected_sunshine_factor: float = 1.
+    recovery: RecoveryResponse | None = None
+    suggested_starting_battery_pct: float | None = None

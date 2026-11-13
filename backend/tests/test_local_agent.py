@@ -356,10 +356,10 @@ def test_plan_answer_states_grounded_comparison_with_existing_schedule():
     assert 'not a total energy saving' in d['message']
 
 
-def test_solar_expansion_question_discloses_missing_tool():
+def test_battery_only_answer_discloses_solar_is_a_separate_recovery_comparison():
     d,_=ask('Would adding solar panels, adding battery capacity, or changing our equipment schedule help more?',
             [{'name':'explore_battery_capacity','arguments':{'day':'tomorrow','sunshine_factor':1,'target':'all_work'}}])
-    assert 'no tool to calculate added solar panels' in d['message']
+    assert 'battery-only result does not evaluate them' in d['message']
     d,_=ask('Will our clinic have enough electricity tomorrow?',[{'name':'plan_forecast','arguments':{'day':'tomorrow'}}])
     assert 'solar panels' not in d['message']
 

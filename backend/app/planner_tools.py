@@ -3,6 +3,7 @@ from .forecast_models import (EmptyArguments, ForecastLocation, ForecastPlanRequ
                               PlanForecastArguments)
 from .forecast_planner import plan_forecast
 from .weather_forecast import ForecastError
+from .activity import report
 
 
 def tool_definitions():
@@ -12,7 +13,7 @@ def tool_definitions():
         ('plan_forecast', 'Fetch real forecast and run baseline, sunshine-first and MILP with the operator’s midnight battery assumption; compare reduced-sunshine cases. Cannot edit equipment or physical limits.', PlanForecastArguments))]
 
 
-async def execute_tool(context, call, catalog, service, solve_lock):
+async def execute_tool(context, call, catalog, service, solve_lock, progress=None):
     if call.name == 'get_clinic_configuration':
         EmptyArguments.model_validate(call.arguments)
         return {'clinic': context.clinic.model_dump(exclude_unset=True),
@@ -21,14 +22,17 @@ async def execute_tool(context, call, catalog, service, solve_lock):
                 'midnight_battery_assumption_kwh':context.midnight_battery_kwh}
     if call.name == 'get_solar_forecast':
         EmptyArguments.model_validate(call.arguments)
-        return await service.get(ForecastLocation(latitude=context.latitude, longitude=context.longitude))
+        await report(progress, 'forecast', 'Retrieving the Open-Meteo forecast')
+        result=await service.get(ForecastLocation(latitude=context.latitude, longitude=context.longitude))
+        await report(progress, 'forecast', 'Weather forecast retrieved', 'completed')
+        return result
     args = PlanForecastArguments.model_validate(call.arguments)
     if context.midnight_battery_kwh is None:
         raise ForecastError('INVALID_REQUEST', 'What stored battery energy should be assumed at the selected day’s local midnight? Provide and review this assumption before running the forecast simulation.', 422)
     request = ForecastPlanRequest.model_validate({
         'clinic':context.clinic, 'latitude':context.latitude, 'longitude':context.longitude,
         'midnight_battery_kwh':context.midnight_battery_kwh, **args.model_dump()})
-    return await plan_forecast(request, catalog, service, solve_lock)
+    return await plan_forecast(request, catalog, service, solve_lock, progress=progress)
 
 
 def guided_intent(question):

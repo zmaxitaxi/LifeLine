@@ -20,3 +20,14 @@ def competing_windows(catalog):
                        'The sunshine-first benchmark is input-order-sensitive. More sophisticated deadline-aware rules may close the gap.',
                        'This complements the original equal-work battery-reserve demo; unequal work completion must not be presented as an equal-work battery saving.'],
         'request':request.model_dump(exclude_unset=True)}
+
+
+def recovery_demo(catalog):
+    """Input-only output bottleneck; NASA weather is explicitly historical."""
+    return {'name':'Evening output bottleneck',
+        'description':'Illustrative protected evening demand with NASA POWER Kisumu irradiance from 14 January 2025. These are not measured clinic requirements.',
+        'request':{'latitude':-.0917,'longitude':34.768,'day':'tomorrow','weather_mode':'existing_scenario',
+            'midnight_battery_kwh':14.,'clinic':{'scenario':'high_demand','weather_dataset':'kisumu-2025-01-14',
+                'cloud_factors':[1.]*24,'initial_battery_kwh':14.}},
+        'limitations':['Electrical model only. Additional protected demand is a synthetic aggregate, not a verified medical appliance.',
+            'Historical weather is a reliable demonstration fallback, not tomorrow’s forecast. Every result is computed on demand.']}

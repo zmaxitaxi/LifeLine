@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 import scipy.optimize
 from fastapi.testclient import TestClient
-from app import main
+from app import main, simulation
 from app.energy_simulator import NumericalError
 from app.model_demo import load_inputs
 from app.models import SimulationRequest, SimulationResponse
@@ -132,12 +132,12 @@ def test_reset_requests_do_not_retain_previous_overrides(client):
 
 
 def test_each_request_runs_fresh_model_calculations(client, monkeypatch):
-    real = main.compare_schedules
+    real = simulation.compare_schedules
     calls = []
     def counted(inputs):
         calls.append(inputs)
         return real(inputs)
-    monkeypatch.setattr(main, 'compare_schedules', counted)
+    monkeypatch.setattr(simulation, 'compare_schedules', counted)
     for _ in range(2):
         assert client.post('/api/simulate', json={'scenario':'normal'}).status_code == 200
     assert len(calls) == 2
@@ -151,7 +151,7 @@ def test_each_request_runs_fresh_model_calculations(client, monkeypatch):
 def test_technical_failures_are_not_physical_shortages(client, monkeypatch, exception, status, code):
     def fail(_):
         raise exception
-    monkeypatch.setattr(main, 'compare_schedules', fail)
+    monkeypatch.setattr(simulation, 'compare_schedules', fail)
     response = client.post('/api/simulate', json={'scenario':'normal'})
     assert_error(response,status,code)
     assert 'private solver log' not in response.text
@@ -163,12 +163,12 @@ def test_actual_solver_timeout_maps_to_503(client, monkeypatch):
 
 
 def test_invalid_response_is_not_published_as_healthy(client, monkeypatch):
-    real = main.compare_schedules
+    real = simulation.compare_schedules
     def corrupt(inputs):
         result = real(inputs)
         result['optimized']['metrics']['final_soc_kwh'] = float('nan')
         return result
-    monkeypatch.setattr(main,'compare_schedules',corrupt)
+    monkeypatch.setattr(simulation,'compare_schedules',corrupt)
     assert_error(client.post('/api/simulate',json={'scenario':'normal'}),500,'INTERNAL_ERROR')
 
 

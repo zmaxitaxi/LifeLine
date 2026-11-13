@@ -74,6 +74,22 @@
         }
       }
     },
+    "/api/demos/recovery": {
+      "get": {
+        "summary": "Recovery Example",
+        "operationId": "recovery_example_api_demos_recovery_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/planning-status": {
       "get": {
         "summary": "Planning Status",
@@ -242,14 +258,14 @@
             }
           },
           "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
-            },
-            "description": "Unprocessable Entity"
+            }
           },
           "503": {
             "content": {
@@ -531,6 +547,82 @@
           }
         }
       }
+    },
+    "/api/agent/stream": {
+      "post": {
+        "summary": "Stream",
+        "operationId": "stream_api_agent_stream_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Public execution activity followed by a verified answer or error. Raw model reasoning is never streamed.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/recovery/plan": {
+      "post": {
+        "summary": "Recovery",
+        "operationId": "recovery_api_recovery_plan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -603,6 +695,77 @@
             ],
             "title": "Day",
             "default": "tomorrow"
+          },
+          "use_configured_context": {
+            "type": "boolean",
+            "title": "Use Configured Context",
+            "default": false
+          },
+          "optional_load_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Optional Load Ids",
+            "default": []
+          },
+          "context_sunshine_factor": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Context Sunshine Factor",
+            "default": 1.0
+          },
+          "active_requirement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FixedRequirementArguments"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "weather_mode": {
+            "type": "string",
+            "enum": [
+              "live_forecast",
+              "existing_scenario"
+            ],
+            "title": "Weather Mode",
+            "default": "live_forecast"
+          },
+          "current_battery_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Battery Pct"
+          },
+          "starting_battery_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Starting Battery Pct"
+          },
+          "starting_charge_confirmed": {
+            "type": "boolean",
+            "title": "Starting Charge Confirmed",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -715,6 +878,27 @@
             "type": "number",
             "title": "Selected Sunshine Factor",
             "default": 1.0
+          },
+          "recovery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecoveryResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "suggested_starting_battery_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Starting Battery Pct"
           }
         },
         "additionalProperties": false,
@@ -828,6 +1012,25 @@
           "message"
         ],
         "title": "AssistantResponse"
+      },
+      "BackupDeficit": {
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "electrical_energy_kwh": {
+            "type": "number",
+            "title": "Electrical Energy Kwh"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hour",
+          "electrical_energy_kwh"
+        ],
+        "title": "BackupDeficit"
       },
       "CapacityResult": {
         "properties": {
@@ -1224,6 +1427,66 @@
           "type"
         ],
         "title": "ErrorDetail"
+      },
+      "FixedRequirementArguments": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "enum": [
+              "today",
+              "tomorrow"
+            ],
+            "title": "Day",
+            "default": "tomorrow"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "power_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Power Kw"
+          },
+          "duration_hours": {
+            "type": "integer",
+            "maximum": 24.0,
+            "minimum": 1.0,
+            "title": "Duration Hours"
+          },
+          "earliest_start": {
+            "type": "integer",
+            "maximum": 23.0,
+            "minimum": 0.0,
+            "title": "Earliest Start"
+          },
+          "deadline": {
+            "type": "integer",
+            "maximum": 24.0,
+            "minimum": 1.0,
+            "title": "Deadline"
+          },
+          "sunshine_factor": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Sunshine Factor",
+            "default": 1.0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "power_kw",
+          "duration_hours",
+          "earliest_start",
+          "deadline"
+        ],
+        "title": "FixedRequirementArguments"
       },
       "FlexibleEquipment": {
         "properties": {
@@ -1773,6 +2036,44 @@
         ],
         "title": "HourlyResult"
       },
+      "InfrastructureChange": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "enum": [
+              "pv_capacity_kw",
+              "battery_capacity_kwh",
+              "max_discharge_kw"
+            ],
+            "title": "Field"
+          },
+          "before": {
+            "type": "number",
+            "title": "Before"
+          },
+          "after": {
+            "type": "number",
+            "title": "After"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "kW",
+              "kWh"
+            ],
+            "title": "Unit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "field",
+          "before",
+          "after",
+          "unit"
+        ],
+        "title": "InfrastructureChange"
+      },
       "PlanMetrics": {
         "properties": {
           "total_solar_kwh": {
@@ -2106,6 +2407,413 @@
         ],
         "title": "Recommendation"
       },
+      "RecoveryMetrics": {
+        "properties": {
+          "essential_requested_kwh": {
+            "type": "number",
+            "title": "Essential Requested Kwh"
+          },
+          "essential_served_kwh": {
+            "type": "number",
+            "title": "Essential Served Kwh"
+          },
+          "essential_unserved_kwh": {
+            "type": "number",
+            "title": "Essential Unserved Kwh"
+          },
+          "original_flexible_required_kwh": {
+            "type": "number",
+            "title": "Original Flexible Required Kwh"
+          },
+          "tested_flexible_required_kwh": {
+            "type": "number",
+            "title": "Tested Flexible Required Kwh"
+          },
+          "flexible_completed_kwh": {
+            "type": "number",
+            "title": "Flexible Completed Kwh"
+          },
+          "flexible_unfinished_kwh": {
+            "type": "number",
+            "title": "Flexible Unfinished Kwh"
+          },
+          "explicitly_postponed_kwh": {
+            "type": "number",
+            "title": "Explicitly Postponed Kwh"
+          },
+          "minimum_battery_kwh": {
+            "type": "number",
+            "title": "Minimum Battery Kwh"
+          },
+          "reserve_shortfall_kwh": {
+            "type": "number",
+            "title": "Reserve Shortfall Kwh"
+          },
+          "reserve_breach_boundaries": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Reserve Breach Boundaries"
+          },
+          "conversion_losses_kwh": {
+            "type": "number",
+            "title": "Conversion Losses Kwh"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "essential_requested_kwh",
+          "essential_served_kwh",
+          "essential_unserved_kwh",
+          "original_flexible_required_kwh",
+          "tested_flexible_required_kwh",
+          "flexible_completed_kwh",
+          "flexible_unfinished_kwh",
+          "explicitly_postponed_kwh",
+          "minimum_battery_kwh",
+          "reserve_shortfall_kwh",
+          "reserve_breach_boundaries",
+          "conversion_losses_kwh"
+        ],
+        "title": "RecoveryMetrics"
+      },
+      "RecoveryOption": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "existing",
+              "scheduling",
+              "solar",
+              "battery",
+              "output",
+              "optional"
+            ],
+            "title": "Kind"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "config": {
+            "$ref": "#/components/schemas/EffectiveConfig"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/PlanResult"
+          },
+          "simulation": {
+            "$ref": "#/components/schemas/SimulationResponse"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/RecoveryMetrics"
+          },
+          "infrastructure_changes": {
+            "items": {
+              "$ref": "#/components/schemas/InfrastructureChange"
+            },
+            "type": "array",
+            "title": "Infrastructure Changes"
+          },
+          "work_changes": {
+            "items": {
+              "$ref": "#/components/schemas/WorkChange"
+            },
+            "type": "array",
+            "title": "Work Changes"
+          },
+          "essential_shortage_reduction_kwh": {
+            "type": "number",
+            "title": "Essential Shortage Reduction Kwh"
+          },
+          "minimum_battery_improvement_kwh": {
+            "type": "number",
+            "title": "Minimum Battery Improvement Kwh"
+          },
+          "flexible_completion_improvement_kwh": {
+            "type": "number",
+            "title": "Flexible Completion Improvement Kwh"
+          },
+          "normalized_change_magnitude": {
+            "type": "number",
+            "title": "Normalized Change Magnitude"
+          },
+          "modeled_essential_and_reserve_met": {
+            "type": "boolean",
+            "title": "Modeled Essential And Reserve Met"
+          },
+          "modeled_all_requirements_met": {
+            "type": "boolean",
+            "title": "Modeled All Requirements Met"
+          },
+          "backup_deficits": {
+            "items": {
+              "$ref": "#/components/schemas/BackupDeficit"
+            },
+            "type": "array",
+            "title": "Backup Deficits"
+          },
+          "remaining_constraints": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Remaining Constraints"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "kind",
+          "config",
+          "plan",
+          "simulation",
+          "metrics",
+          "infrastructure_changes",
+          "work_changes",
+          "essential_shortage_reduction_kwh",
+          "minimum_battery_improvement_kwh",
+          "flexible_completion_improvement_kwh",
+          "normalized_change_magnitude",
+          "modeled_essential_and_reserve_met",
+          "modeled_all_requirements_met",
+          "backup_deficits",
+          "remaining_constraints"
+        ],
+        "title": "RecoveryOption"
+      },
+      "RecoveryRequest": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "enum": [
+              "today",
+              "tomorrow"
+            ],
+            "title": "Day",
+            "default": "tomorrow"
+          },
+          "focus": {
+            "type": "string",
+            "enum": [
+              "all",
+              "scheduling",
+              "solar",
+              "battery",
+              "output",
+              "optional",
+              "backup"
+            ],
+            "title": "Focus",
+            "default": "all"
+          },
+          "sunshine_factor": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Sunshine Factor",
+            "default": 1.0
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "clinic": {
+            "$ref": "#/components/schemas/SimulationRequest"
+          },
+          "midnight_battery_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Midnight Battery Kwh"
+          },
+          "weather_mode": {
+            "type": "string",
+            "enum": [
+              "live_forecast",
+              "existing_scenario"
+            ],
+            "title": "Weather Mode",
+            "default": "live_forecast"
+          },
+          "optional_load_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Optional Load Ids",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "clinic"
+        ],
+        "title": "RecoveryRequest"
+      },
+      "RecoveryResponse": {
+        "properties": {
+          "weather_mode": {
+            "type": "string",
+            "enum": [
+              "live_forecast",
+              "existing_scenario"
+            ],
+            "title": "Weather Mode"
+          },
+          "forecast": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SolarForecast"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "planning_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planning Date"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone"
+          },
+          "sunshine_factor": {
+            "type": "number",
+            "title": "Sunshine Factor"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/SimulationResponse"
+          },
+          "existing": {
+            "$ref": "#/components/schemas/RecoveryOption"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/RecoveryOption"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "problem_detected": {
+            "type": "boolean",
+            "title": "Problem Detected"
+          },
+          "triggers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Triggers"
+          },
+          "recommended_option_id": {
+            "type": "string",
+            "title": "Recommended Option Id"
+          },
+          "operational_option_id": {
+            "type": "string",
+            "title": "Operational Option Id",
+            "default": "reschedule"
+          },
+          "smallest_tested_resolving_option_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Smallest Tested Resolving Option Id"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "next_action": {
+            "type": "string",
+            "title": "Next Action"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assumptions"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "weather_mode",
+          "timezone",
+          "sunshine_factor",
+          "reference",
+          "existing",
+          "options",
+          "problem_detected",
+          "triggers",
+          "recommended_option_id",
+          "smallest_tested_resolving_option_id",
+          "summary",
+          "next_action",
+          "assumptions",
+          "limitations"
+        ],
+        "title": "RecoveryResponse"
+      },
       "RequestedTaskAllocation": {
         "properties": {
           "hour": {
@@ -2159,6 +2867,16 @@
           "explanation": {
             "type": "string",
             "title": "Explanation"
+          },
+          "arguments": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FixedRequirementArguments"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -2767,6 +3485,40 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WorkChange": {
+        "properties": {
+          "equipment_id": {
+            "type": "string",
+            "title": "Equipment Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "original_required_kwh": {
+            "type": "number",
+            "title": "Original Required Kwh"
+          },
+          "tested_required_kwh": {
+            "type": "number",
+            "title": "Tested Required Kwh"
+          },
+          "explicitly_postponed_kwh": {
+            "type": "number",
+            "title": "Explicitly Postponed Kwh"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "equipment_id",
+          "name",
+          "original_required_kwh",
+          "tested_required_kwh",
+          "explicitly_postponed_kwh"
+        ],
+        "title": "WorkChange"
       }
     }
   }

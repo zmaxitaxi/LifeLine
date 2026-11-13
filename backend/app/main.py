@@ -27,7 +27,9 @@ from .forecast_routes import router as forecast_router
 from .weather_forecast import ForecastError, ForecastService
 from .local_agent import LocalAgent
 from .agent_routes import router as agent_router
-from .demos import competing_windows
+from .demos import competing_windows, recovery_demo
+from .simulation import simulate_case
+from .recovery_routes import router as recovery_router
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +108,10 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
     async def competing_demo(request:Request):
         return competing_windows(request.app.state.catalog)
 
+    @app.get('/api/demos/recovery')
+    async def recovery_example(request:Request):
+        return recovery_demo(request.app.state.catalog)
+
     @app.get('/api/planning-status')
     async def planning_status():
         # This describes the offline assistant's default example context. No
@@ -127,35 +133,8 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
         except ValidationError as exc:
             return error_response(422, 'INVALID_REQUEST', 'Resolved battery configuration is invalid.',
                                   validation_details(exc.errors(), ('body',)))
-        inputs = catalog.build_inputs(body, config)
-        # Keep health/catalog responsive during CPU work; one solve at a time
-        # per worker avoids competing HiGHS solves exhausting local resources.
         async with request.app.state.solve_lock:
-            results = await run_in_threadpool(compare_schedules, inputs)
-        equipment = catalog.equipment_for(body, config)
-        warnings, recommendations = explain(results, inputs, equipment)
-        return SimulationResponse(scenario=body.scenario, scenario_name=catalog.preset(body.scenario).name,
-            data_source="mixed" if body.weather_dataset != "synthetic" else ("user_defined" if body.equipment is not None else "synthetic"),
-            cloud_factors=body.cloud_factors if body.cloud_factors is not None else catalog.preset(body.scenario).cloud_factors,
-            weather_dataset=body.weather_dataset, diagnosis=diagnose(inputs, results),
-            input_provenance={"equipment": "user_entered_unverified" if body.equipment is not None else "synthetic",
-                              "weather": "NASA_POWER_historical_satellite_derived" if body.weather_dataset != "synthetic" else ("user_entered_scenario_factors" if body.cloud_factors is not None else "synthetic_scenario"),
-                              "model": "Horizontal irradiance approximation; not a forecast" if body.weather_dataset != "synthetic" else "Fixed daylight curve; not measured irradiance or an operational weather forecast"},
-            pv_performance_ratio=catalog.pv_model.performance_ratio, effective_config=config,
-            equipment=equipment, assumptions=[
-                'Equipment values are user-entered and unverified.' if body.equipment is not None else catalog.provenance,
-                ('Weather is historical satellite-derived irradiance, not a clinic measurement or current forecast.' if body.weather_dataset != 'synthetic' else 'Weather is a synthetic/user-adjusted scenario forecast, not measured or trained-model output.'),
-                'Fixed 24 hourly slots in Africa/Nairobi; battery chart boundaries run from 0 through 24.',
-                ('NASA POWER historical satellite-derived irradiance; horizontal input is an approximation, not a clinic measurement or forecast.' if body.weather_dataset != 'synthetic' else 'PV uses a synthetic 06:00–18:00 sine curve and the returned performance ratio/cloud profile.'),
-                'Critical loads are operator-defined and never rescheduled; flexible tasks are divisible energy approximations.',
-                'Reserve is a target above physical zero; losses, rate limits, and capacity are modeled on one idealized energy bus.',
-                'Storm starts depleted after hypothetical earlier cloudy days; those days are not simulated.',
-                'No thermal dynamics, sub-hour surges, degradation, uncertainty, grid, or generator are modeled.',
-                'All three schedules use identical inputs. Same-work comparisons must check completion; heuristic ties are explicit.',
-                'Illustrative simulation; not for clinical or operational use.'],
-            status=results['optimized']['status'], baseline=results['baseline'], heuristic=results['heuristic'],
-            optimized=results['optimized'], comparison=results['comparison'], warnings=warnings,
-            recommendations=recommendations)
+            return await run_in_threadpool(simulate_case, catalog, body)
 
     @app.post('/api/assistant', response_model=AssistantResponse)
     async def assistant(body: AssistantRequest, request: Request):
@@ -202,6 +181,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
 
     app.include_router(forecast_router)
     app.include_router(agent_router)
+    app.include_router(recovery_router)
 
     @app.api_route('/api/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], include_in_schema=False)
     async def invalid_api_path(path: str, request: Request):
