@@ -1,6 +1,13 @@
 # LifeLine — detailed implementation specification
 
-Version 1.0, November 12, 2026. This refines the [supplied brief](source/LifeLine_Codex_Build_Brief.md). If this handoff and the source differ, use the decisions here and in the committed contracts for the planned implementation. The numerical model and Person 2’s FastAPI integration are implemented. Dashboard sections remain build targets. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) and [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md) for executed checks and integration interfaces.
+## Current interactive MVP status
+
+The configurable application is now implemented on the existing architecture. See [README](../README.md), [research](../RESEARCH.md), [data provenance](../DATA_SOURCES.md), [product validation](../PRODUCT_VALIDATION.md), [computed benchmarks](../BENCHMARK.md), [demo script](../DEMO.md), and [browser verification](FRONTEND_VALIDATION.md).
+
+Working features: editable infrastructure/equipment and hours, automatic valid-input recalculation, three fair schedule comparisons, computed reliability diagnosis, historical NASA weather, adverse-condition testing, Capacity Explorer, and built frontend served with the API. Validation: 194 backend tests, 7 Chromium tests, TypeScript/build, mobile/desktop checks, and offline external-request blocking. No field/clinical outcome or guaranteed availability is established.
+
+
+Version 1.0, November 12, 2026. This refines the [supplied brief](source/LifeLine_Codex_Build_Brief.md). If this handoff and the source differ, use the decisions here and in the committed contracts for the planned implementation. The numerical model and Person 2’s FastAPI integration are implemented. The dashboard is now implemented; remaining operational validation is documented above. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) and [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md) for executed checks and integration interfaces.
 
 ## 1. Outcome and limits
 

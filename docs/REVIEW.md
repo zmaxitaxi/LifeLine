@@ -1,12 +1,19 @@
 # Review of the supplied build brief
 
+## Current interactive MVP status
+
+The configurable application is now implemented on the existing architecture. See [README](../README.md), [research](../RESEARCH.md), [data provenance](../DATA_SOURCES.md), [product validation](../PRODUCT_VALIDATION.md), [computed benchmarks](../BENCHMARK.md), [demo script](../DEMO.md), and [browser verification](FRONTEND_VALIDATION.md).
+
+Working features: editable infrastructure/equipment and hours, automatic valid-input recalculation, three fair schedule comparisons, computed reliability diagnosis, historical NASA weather, adverse-condition testing, Capacity Explorer, and built frontend served with the API. Validation: 194 backend tests, 7 Chromium tests, TypeScript/build, mobile/desktop checks, and offline external-request blocking. No field/clinical outcome or guaranteed availability is established.
+
+
 Reviewed November 12, 2026, using the supplied Markdown and `zmaxitaxi/LifeLine`. Both the local workspace and the GitHub repository were empty at the start of review; there was no application to inspect or preserve.
 
 ## Verdict
 
 The concept and proposed stack are suitable for a focused hackathon prototype. The original scope correctly emphasizes physics, synthetic data, operator-defined critical loads, deterministic optimization, and truthful shortage reporting. The additions below make the handoff sufficiently specific for three people to begin in parallel.
 
-**Person 1’s model, MILP, heuristic, and command-line comparison are implemented and tested.** The API is now implemented and tested too; the dashboard remains unimplemented. Full demo readiness is still conditional on the application checks in [ACCEPTANCE.md](ACCEPTANCE.md). See the [current handoff](PERSON_1_HANDOFF.md). The original review below records the planning decisions and initial repository state.
+**Person 1’s model, MILP, heuristic, and command-line comparison are implemented and tested.** The API is now implemented and tested too; the dashboard is now implemented (see current status above). Full demo readiness is still conditional on the application checks in [ACCEPTANCE.md](ACCEPTANCE.md). See the [current handoff](PERSON_1_HANDOFF.md). The original review below records the planning decisions and initial repository state.
 
 ## Gaps resolved in the detailed specification
 
@@ -72,4 +79,4 @@ The earlier three presets are retained for behavior and limitations. Storm and H
 
 ## Person 2 verification update
 
-The API returns live baseline/heuristic/optimized results, effective inputs, computed comparisons, per-plan warnings, and templated explanations. Strict requests and startup configuration checks reject malformed data; verified solver failures map to 503 instead of risk results. 177 backend tests pass in the workspace and an isolated source copy with a new pinned environment. Live HTTP results are in [the evidence](evidence/person-2-http-results.json). The OpenAPI/schema example handoff is ready for Person 3. Frontend, screenshots, built preview, and submission verification remain outstanding.
+The API returns live baseline/heuristic/optimized results, effective inputs, computed comparisons, per-plan warnings, and templated explanations. Strict requests and startup configuration checks reject malformed data; verified solver failures map to 503 instead of risk results. 177 backend tests pass in the workspace and an isolated source copy with a new pinned environment. Live HTTP results are in [the evidence](evidence/person-2-http-results.json). The OpenAPI/schema example handoff is ready for Person 3. Frontend, screenshot inspection, built serving, and offline checks are now verified; event-specific submission verification remains outstanding.

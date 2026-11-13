@@ -1,12 +1,19 @@
 # Three-person implementation plan
 
+## Current interactive MVP status
+
+The configurable application is now implemented on the existing architecture. See [README](../README.md), [research](../RESEARCH.md), [data provenance](../DATA_SOURCES.md), [product validation](../PRODUCT_VALIDATION.md), [computed benchmarks](../BENCHMARK.md), [demo script](../DEMO.md), and [browser verification](FRONTEND_VALIDATION.md).
+
+Working features: editable infrastructure/equipment and hours, automatic valid-input recalculation, three fair schedule comparisons, computed reliability diagnosis, historical NASA weather, adverse-condition testing, Capacity Explorer, and built frontend served with the API. Validation: 194 backend tests, 7 Chromium tests, TypeScript/build, mobile/desktop checks, and offline external-request blocking. No field/clinical outcome or guaranteed availability is established.
+
+
 The roles below are ready to assign to actual teammates. Each person owns a bounded part of the repository and reviews another person's work. The three people are human implementation owners; these labels do not imply that three separate contributors have joined or that frontend integration is complete.
 
 The supplied deadline is **Saturday, November 14, 2026, 11:59 PM America/Los_Angeles (PST)**. All times in this plan use that timezone. Person 2 must verify event rules. Target a completed demo at 8:00 PM Saturday and submission by 10:30 PM, leaving 89 minutes before the stated deadline.
 
 ## Current progress
 
-Person 1’s numerical modules, sunshine-first heuristic, scheduling-improvement preset, CLI, comparison metrics, and model tests are implemented on `codex/energy-model`. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md). A2–A7 have implementation/test evidence; A1’s units and interfaces are documented for Person 2 review. Person 2’s backend integration is now implemented and checked against Person 1’s outputs. See [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md). Person 3’s dashboard and frontend integration remain pending.
+Person 1’s numerical modules, sunshine-first heuristic, scheduling-improvement preset, CLI, comparison metrics, and model tests are implemented on `codex/energy-model`. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md). A2–A7 have implementation/test evidence; A1’s units and interfaces are documented for Person 2 review. Person 2’s backend integration is now implemented and checked against Person 1’s outputs. See [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md). Person 3’s dashboard and frontend integration are now implemented and verified; see current status above.
 
 B1–B7 backend deliverables are implemented: endpoints, strict validation, real model orchestration, computed examples, explanations, pinned dependencies, backend CI, clean-install checks, and live HTTP evidence. Frontend version coordination, browser/built-preview checks, and complete release rehearsal await Person 3. Event rules still need an authoritative source.
 

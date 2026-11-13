@@ -21,6 +21,9 @@ export interface EffectiveConfig {
 /** Omitted properties use preset defaults; explicit null is invalid. */
 export interface SimulationRequest {
   scenario: ScenarioId;
+  equipment?: Equipment[];
+  cloud_factors?: number[];
+  weather_dataset?: "synthetic" | "kisumu-2025-01-14";
   battery_capacity_kwh?: number;
   initial_battery_kwh?: number;
   reserve_kwh?: number;
@@ -46,6 +49,8 @@ export interface ScenarioSummary {
   defaults: EffectiveConfig;
   /** Describes defaults only; never a substitute for computed status. */
   expected_status: RiskStatus;
+  equipment: Equipment[];
+  cloud_factors: number[];
 }
 
 export interface ScenarioListResponse {
@@ -170,7 +175,11 @@ export interface SimulationResponse {
   model_version: string;
   scenario: ScenarioId;
   scenario_name: string;
-  data_source: "synthetic";
+  data_source: "synthetic" | "user_defined" | "mixed";
+  cloud_factors: number[];
+  input_provenance: Record<string, string>;
+  weather_dataset: string;
+  diagnosis: {assessment: string; explanation: string; constraints: string[]; discharge_limited_hours: number[]; optimistic_energy_deficit_kwh: number; window_limited_tasks: string[]};
   timezone: "Africa/Nairobi";
   horizon_hours: 24;
   dt_hours: 1;

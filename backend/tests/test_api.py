@@ -179,7 +179,7 @@ def test_openapi_documents_custom_errors_and_three_way_comparison(client):
         assert endpoint['responses'][status]['content']['application/json']['schema']['$ref'].endswith('/ApiErrorResponse')
     assert {'heuristic','comparison'} <= set(schema['components']['schemas']['SimulationResponse']['properties'])
     for field, prop in schema['components']['schemas']['SimulationRequest']['properties'].items():
-        if field != 'scenario':
+        if field not in {'scenario', 'equipment', 'cloud_factors', 'weather_dataset'}:
             assert prop['type'] == 'number'  # optional but never nullable
             assert 'default' not in prop
     assert_error(client.get('/api/missing'),404,'INVALID_REQUEST')

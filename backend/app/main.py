@@ -8,16 +8,18 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 from .comparison import compare_schedules
+from .diagnosis import diagnose
 from .energy_simulator import NumericalError
 from .explanations import explain
 from .models import (ApiErrorResponse, HealthResponse, ScenarioListResponse,
                      SimulationRequest, SimulationResponse)
 from .optimizer import SolverError
-from .scenarios import CONFIG_PATH, load_catalog
+from .scenarios import CONFIG_PATH, load_catalog, load_weather
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +39,7 @@ def create_app(config_path: Path = CONFIG_PATH):
     @asynccontextmanager
     async def lifespan(app):
         app.state.catalog = load_catalog(config_path)
+        load_weather()
         importlib.import_module('scipy.optimize')  # preload before accepting requests
         app.state.solve_lock = asyncio.Lock()
         yield
@@ -76,8 +79,14 @@ def create_app(config_path: Path = CONFIG_PATH):
     async def scenarios(request: Request):
         catalog = request.app.state.catalog
         return ScenarioListResponse(scenarios=[dict(id=p.id, name=p.name, description=p.description,
-            defaults=catalog.resolve(SimulationRequest(scenario=p.id)), expected_status=p.expected_status)
+            defaults=catalog.resolve(SimulationRequest(scenario=p.id)), expected_status=p.expected_status,
+            equipment=catalog.equipment_for(SimulationRequest(scenario=p.id), catalog.resolve(SimulationRequest(scenario=p.id))),
+            cloud_factors=p.cloud_factors)
             for p in catalog.scenarios])
+
+    @app.get('/api/weather')
+    async def weather_datasets():
+        return {'datasets': [load_weather()]}
 
     @app.post('/api/simulate', response_model=SimulationResponse, responses={
         422: {'model': ApiErrorResponse}, 503: {'model': ApiErrorResponse}, 500: {'model': ApiErrorResponse}})
@@ -96,11 +105,18 @@ def create_app(config_path: Path = CONFIG_PATH):
         equipment = catalog.equipment_for(body, config)
         warnings, recommendations = explain(results, inputs, equipment)
         return SimulationResponse(scenario=body.scenario, scenario_name=catalog.preset(body.scenario).name,
+            data_source="mixed" if body.weather_dataset != "synthetic" else ("user_defined" if body.equipment is not None else "synthetic"),
+            cloud_factors=body.cloud_factors if body.cloud_factors is not None else catalog.preset(body.scenario).cloud_factors,
+            weather_dataset=body.weather_dataset, diagnosis=diagnose(inputs, results),
+            input_provenance={"equipment": "user_entered_unverified" if body.equipment is not None else "synthetic",
+                              "weather": "NASA_POWER_historical_satellite_derived" if body.weather_dataset != "synthetic" else ("user_entered_scenario_factors" if body.cloud_factors is not None else "synthetic_scenario"),
+                              "model": "Horizontal irradiance approximation; not a forecast" if body.weather_dataset != "synthetic" else "Fixed daylight curve; not measured irradiance or an operational weather forecast"},
             pv_performance_ratio=catalog.pv_model.performance_ratio, effective_config=config,
-            equipment=equipment, assumptions=[catalog.provenance,
-                'All clinic and weather values are synthetic; this is a scenario forecast, not measured or trained-model output.',
+            equipment=equipment, assumptions=[
+                'Equipment values are user-entered and unverified.' if body.equipment is not None else catalog.provenance,
+                ('Weather is historical satellite-derived irradiance, not a clinic measurement or current forecast.' if body.weather_dataset != 'synthetic' else 'Weather is a synthetic/user-adjusted scenario forecast, not measured or trained-model output.'),
                 'Fixed 24 hourly slots in Africa/Nairobi; battery chart boundaries run from 0 through 24.',
-                'PV uses a synthetic 06:00–18:00 sine curve and the returned performance ratio/cloud profile.',
+                ('NASA POWER historical satellite-derived irradiance; horizontal input is an approximation, not a clinic measurement or forecast.' if body.weather_dataset != 'synthetic' else 'PV uses a synthetic 06:00–18:00 sine curve and the returned performance ratio/cloud profile.'),
                 'Critical loads are operator-defined and never rescheduled; flexible tasks are divisible energy approximations.',
                 'Reserve is a target above physical zero; losses, rate limits, and capacity are modeled on one idealized energy bus.',
                 'Storm starts depleted after hypothetical earlier cloudy days; those days are not simulated.',
@@ -111,6 +127,21 @@ def create_app(config_path: Path = CONFIG_PATH):
             optimized=results['optimized'], comparison=results['comparison'], warnings=warnings,
             recommendations=recommendations)
 
+    @app.api_route('/api/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], include_in_schema=False)
+    async def invalid_api_path(path: str, request: Request):
+        # Do not let the dashboard's static catch-all turn known API method
+        # errors into asset 404s. API errors keep their existing envelope.
+        methods = set().union(*(getattr(route, 'methods', set()) for route in app.routes
+                                if getattr(route, 'path', None) == request.url.path))
+        response = error_response(405 if methods else 404, 'INVALID_REQUEST',
+                                  'Method Not Allowed' if methods else 'Not Found')
+        if methods:
+            response.headers['Allow'] = ', '.join(sorted(methods))
+        return response
+
+    static_path = Path(__file__).resolve().parents[2] / "frontend/dist"
+    if static_path.is_dir():
+        app.mount("/", StaticFiles(directory=static_path, html=True), name="dashboard")
     return app
 
 

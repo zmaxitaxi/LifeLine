@@ -1,5 +1,12 @@
 # Person 2 — API and backend integration
 
+## Current interactive MVP status
+
+The configurable application is now implemented on the existing architecture. See [README](../README.md), [research](../RESEARCH.md), [data provenance](../DATA_SOURCES.md), [product validation](../PRODUCT_VALIDATION.md), [computed benchmarks](../BENCHMARK.md), [demo script](../DEMO.md), and [browser verification](FRONTEND_VALIDATION.md).
+
+Working features: editable infrastructure/equipment and hours, automatic valid-input recalculation, three fair schedule comparisons, computed reliability diagnosis, historical NASA weather, adverse-condition testing, Capacity Explorer, and built frontend served with the API. Validation: 194 backend tests, 7 Chromium tests, TypeScript/build, mobile/desktop checks, and offline external-request blocking. No field/clinical outcome or guaranteed availability is established.
+
+
 The FastAPI backend now wraps the existing numerical model without changing its physics, solver priorities, or scenario values. All routes use fresh computed results. The dashboard, frontend dependency setup, frontend CI, and browser/release checks remain Person 3 work.
 
 ## Implemented interfaces

@@ -10,6 +10,9 @@ from .models import (ConfigOverrides, CriticalEquipment, EffectiveConfig, Flexib
                      Hour, RiskStatus, ScenarioId, SimulationRequest, StrictModel)
 from .solar_forecast import forecast_solar
 
+WEATHER_PATH = Path(__file__).resolve().parents[2] / 'data/kisumu_weather.json'
+
+
 CONFIG_PATH = Path(__file__).resolve().parents[2] / 'contracts/scenarios.json'
 
 
@@ -87,11 +90,15 @@ class ScenarioCatalog(StrictModel):
 
     def resolve(self, request: SimulationRequest) -> EffectiveConfig:
         preset = self.preset(request.scenario)
-        overrides = request.model_dump(exclude_unset=True, exclude={'scenario'})
-        return EffectiveConfig.model_validate(self.defaults.model_dump()
-            | preset.overrides.model_dump(exclude_unset=True) | overrides)
+        overrides = request.model_dump(exclude_unset=True, exclude={'scenario', 'equipment', 'cloud_factors', 'weather_dataset'})
+        merged = self.defaults.model_dump() | preset.overrides.model_dump(exclude_unset=True) | overrides
+        if request.equipment is not None:
+            merged['additional_critical_kw'] = 0.
+        return EffectiveConfig.model_validate(merged)
 
     def equipment_for(self, request, config):
+        if request.equipment is not None:
+            return list(request.equipment)
         equipment = list(self.critical_equipment) + list(self.flexible_equipment)
         if request.scenario == 'high_demand':
             equipment.append(CriticalEquipment(id='additional_protected_load',
@@ -103,7 +110,11 @@ class ScenarioCatalog(StrictModel):
     def build_inputs(self, request, config):
         preset = self.preset(request.scenario)
         battery = BatteryConfig(**{f.name: getattr(config, f.name) for f in fields(BatteryConfig)})
-        pv = forecast_solar(config.pv_capacity_kw, preset.cloud_factors, self.pv_model.performance_ratio)
+        pv = forecast_solar(config.pv_capacity_kw, request.cloud_factors if request.cloud_factors is not None else preset.cloud_factors, self.pv_model.performance_ratio)
+        if request.weather_dataset != "synthetic":
+            weather = load_weather()
+            factors = request.cloud_factors if request.cloud_factors is not None else preset.cloud_factors
+            pv = tuple(config.pv_capacity_kw*self.pv_model.performance_ratio*v*f for v,f in zip(weather["irradiance_kwh_m2"],factors))
         critical = [0.] * 24
         tasks = []
         for equipment in self.equipment_for(request, config):
@@ -122,3 +133,12 @@ class ScenarioCatalog(StrictModel):
 def load_catalog(path: Path = CONFIG_PATH) -> ScenarioCatalog:
     # Python-mode validation deliberately rejects numeric strings and booleans.
     return ScenarioCatalog.model_validate(json.loads(path.read_text(encoding='utf-8')))
+
+
+def load_weather():
+    import math
+    weather = json.loads(WEATHER_PATH.read_text())
+    values = weather['irradiance_kwh_m2']
+    if len(values) != 24 or any(type(v) not in (int,float) or not math.isfinite(v) or not 0 <= v <= 2 for v in values):
+        raise ValueError('Bundled irradiance must have 24 valid kWh/m² hourly values')
+    return weather

@@ -1,6 +1,13 @@
 # Validation and release checklist
 
-The numerical model and API are implemented and tested; dashboard and full-application checks remain uncompleted. Checked model gates do not imply a working web application. See [PERSON_1_HANDOFF.md](PERSON_1_HANDOFF.md) and the [calculated evidence](evidence/person-1-results.json).
+## Current interactive MVP status
+
+The configurable application is now implemented on the existing architecture. See [README](../README.md), [research](../RESEARCH.md), [data provenance](../DATA_SOURCES.md), [product validation](../PRODUCT_VALIDATION.md), [computed benchmarks](../BENCHMARK.md), [demo script](../DEMO.md), and [browser verification](FRONTEND_VALIDATION.md).
+
+Working features: editable infrastructure/equipment and hours, automatic valid-input recalculation, three fair schedule comparisons, computed reliability diagnosis, historical NASA weather, adverse-condition testing, Capacity Explorer, and built frontend served with the API. Validation: 194 backend tests, 7 Chromium tests, TypeScript/build, mobile/desktop checks, and offline external-request blocking. No field/clinical outcome or guaranteed availability is established.
+
+
+The numerical model, API, and interactive dashboard are implemented and tested. The earlier role-specific verification records below are historical; the current application evidence is in [frontend verification](FRONTEND_VALIDATION.md) and the [computed benchmark](../BENCHMARK.md). Hackathon submission and practitioner/clinical validation are separate remaining activities.
 
 ## Planning verification
 
@@ -13,7 +20,7 @@ The numerical model and API are implemented and tested; dashboard and full-appli
 
 ## Current numerical verification
 
-Model tests cover T01–T12 and T17, plus the numerical portion of T18. T13–T16 and the API portion of T18 now pass in the API/configuration tests, including strict validation, solver failures, response schemas, fresh computations, and zero critical demand. The full suite has 177 passing tests (62 numerical plus 115 API/configuration/contract checks). Tests additionally verify the primary same-work scheduling gain, an honest heuristic tie, a constrained-window advantage for MILP, corrupt output rejection, and a shared solve budget. See test count below.
+Model tests cover T01–T12 and T17, plus the numerical portion of T18. T13–T16 and the API portion of T18 pass in the API/configuration tests, including strict validation, solver failures, response schemas, fresh computations, and zero critical demand. The current suite has 194 backend tests (62 numerical, 115 API/configuration/contract, and 17 custom-clinic checks), plus seven browser tests. Tests additionally verify the primary same-work scheduling gain, an honest heuristic tie, a constrained-window advantage for MILP, corrupt output rejection, and a shared solve budget.
 
 ## Automated check matrix
 
@@ -44,29 +51,31 @@ Randomized small valid inputs are useful as an additional accounting check if ti
 
 ## End-to-end gates
 
-- [x] Backend pinned install, tests, and `pip check` verified in an isolated clean source copy/new virtual environment. Full frontend installation remains pending.
-- [x] README backend commands verified locally, including real Uvicorn HTTP calls. Frontend/demo-laptop setup remains pending.
-- [x] `.venv/bin/python -m pytest backend/tests -q`: 177 model/API/configuration/contract tests pass.
-- [ ] `npm --prefix frontend run typecheck` passes.
-- [ ] `npm --prefix frontend run build` passes.
-- [ ] Built frontend can reach the API using the documented local preview configuration.
-- [x] All four scenarios calculate fresh API results matching numerical expectations (HTTP and TestClient). UI interaction remains pending.
-- [ ] Editable controls change the effective inputs and results; Reset restores the preset.
-- [ ] Rapid scenario switching cannot display a late result under the wrong scenario label.
-- [ ] Loading, validation errors, offline backend, timeout, and retry are understandable.
-- [ ] At 375 px and 1440 px widths, cards, charts, labels, and equipment remain legible without page overflow.
-- [ ] Scenario buttons and controls work with keyboard navigation; focus is visible; status is not conveyed by color alone.
-- [ ] Battery chart includes boundary 0 and boundary 24, units in kWh, and reserve reference line.
-- [ ] Requested energy, served energy, deferred tasks, and unmet critical energy are distinguishable.
-- [ ] Baseline warnings remain visible independently of optimized status.
-- [ ] Storm visibly discloses its lower starting battery; no misleading cloud-only comparison.
-- [ ] Disconnect external internet after installing dependencies and run all four presets, charts, and local assets successfully.
+- [x] Backend pinned install, tests, and `pip check` verified in an isolated clean source copy/new virtual environment. Frontend pinned installation and build also verified locally.
+- [x] README backend/frontend commands verified locally, including real Uvicorn HTTP calls and built-dashboard navigation. Rehearse on the final presentation laptop.
+- [x] `.venv/bin/python -m pytest backend/tests -q`: 194 backend tests pass.
+- [x] TypeScript check passes (also included in production build).
+- [x] `npm --prefix frontend run build` passes.
+- [x] Built frontend reaches the API from the same local server; Vite development/preview proxies are configured.
+- [x] All four scenarios calculate fresh API results matching numerical expectations (HTTP and TestClient); UI scenario switching also verified.
+- [x] Editable infrastructure/equipment/weather changes recalculate; Reset restores quick-start inputs.
+- [x] Rapid switching and request sequence/abort handling verified.
+- [x] Loading, validation, unavailable-backend/retry UI verified; backend timeout error mapping tested.
+- [x] 375 px and 1440 px layouts inspected without page overflow; wide timeline/table scroll internally.
+- [x] Keyboard controls, focus styling, and textual status labels verified; no formal accessibility audit.
+- [x] Battery chart shows 25 boundaries, kWh, and reserve reference.
+- [x] Served/deferred/unmet metrics and actual task allocations are visible.
+- [x] Per-plan warning disclosure remains available independently of optimized status.
+- [x] Storm starts with visibly depleted Current charge; the assumptions disclose that prior cloudy days are hypothetical and not simulated. The separate 25% sunshine control changes weather only.
+- [x] Browser test blocks external requests while app assets and bundled historical weather calculations run; no physical network-disconnect test claimed.
 - [x] Warm local HTTP responses measured at approximately 0.011–0.029 seconds; shared solve-budget failures verified as 503. Re-measure the complete app on the demo laptop.
 - [ ] Rehearse against the release commit; confirm no development fixtures are used in the live path.
-- [ ] Keep the illustrative-use disclaimer and synthetic-input labeling visible.
+- [x] Disclaimer, input provenance, and modeling limitations are visible.
 - [ ] Verify event requirements and submit the repository/demo materials before the stated deadline.
 
-## Ninety-second demonstration
+## Historical ninety-second demonstration
+
+The current recommended walkthrough is the [two-minute interactive demo](../DEMO.md), including the primary battery result, Before → After schedule, expandable detail, and Capacity Explorer.
 
 | Time | Action | Evidence and wording |
 |---|---|---|
@@ -101,12 +110,16 @@ Only call the MVP demo-ready after the required gates have evidence. Operational
 
 ## Person 1 verification record
 
-Python 3.12.5; NumPy 2.2.6; SciPy 1.15.3; Pytest 8.3.5. **62 numerical tests passed** (`.venv/bin/python -m pytest backend/tests -q`, 0.68 seconds); independent reference calibration also passes. At the original Person 1 handoff, no HTTP/frontend checks were complete; see the Person 2 update below for current API verification. Frontend, browser, full-application offline, and deployment checks remain pending. Original supplied brief remains byte-for-byte intact.
+Python 3.12.5; NumPy 2.2.6; SciPy 1.15.3; Pytest 8.3.5. **62 numerical tests passed** (`.venv/bin/python -m pytest backend/tests -q`, 0.68 seconds); independent reference calibration also passes. At the original Person 1 handoff, HTTP/frontend checks were not complete. Those later API and dashboard checks are recorded above. Original supplied brief remains byte-for-byte intact.
 
 ## Person 2 verification record
 
-177 tests pass in the workspace and a clean source copy/new environment; `pip check` succeeds. Live Uvicorn health, scenario listing, OpenAPI, all four simulations, and a 422 validation response verified. Tests also block outbound socket connections while exercising all four calculations. Full-application offline/browser checks remain uncompleted.
+At this milestone, 177 tests passed in the workspace and a clean source copy/new environment; `pip check` succeeded. Live Uvicorn health, scenario listing, OpenAPI, all four simulations, and a 422 validation response were verified. Tests also blocked outbound socket connections while exercising all four calculations. Full-application offline/browser checks were completed in the later MVP work documented above.
 
 Versions: Python 3.12.5, FastAPI 0.115.12, Pydantic 2.14.3, Uvicorn 0.34.2, NumPy 2.2.6, SciPy 1.15.3, Pytest 8.3.5. One dependency-level Starlette/AnyIO deprecation warning is present. Backend CI is configured for Python 3.11 and 3.12; actual remote status is available in GitHub Actions. See [API handoff](PERSON_2_HANDOFF.md) and [HTTP evidence](evidence/person-2-http-results.json).
 
 Cross-platform verification caught floating-point residue slightly above 100% in coverage reporting. Coverage now uses stable ratio arithmetic and stays within 0–100 only after raw flow/aggregate shortage validation. Independent accounting assertions also check the percentage range; energy dispatch and solver priorities are unchanged.
+
+## Final MVP additions
+
+Tests now cover unfamiliar equipment, empty/edited equipment lists, custom cloud profiles, NASA unit/time conversion, storage insufficiency, power-limited essential demand, total energy deficit, constrained task windows, and full Capacity Explorer recalculation. Final tests/build commands and observed results are recorded in [frontend verification](FRONTEND_VALIDATION.md) and [benchmark](../BENCHMARK.md). Earlier 62/177-test counts are historical milestones, not the current total.

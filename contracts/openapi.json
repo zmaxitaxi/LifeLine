@@ -42,6 +42,22 @@
         }
       }
     },
+    "/api/weather": {
+      "get": {
+        "summary": "Weather Datasets",
+        "operationId": "weather_datasets_api_weather_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/simulate": {
       "post": {
         "summary": "Simulate",
@@ -174,6 +190,7 @@
           },
           "power_kw": {
             "type": "number",
+            "maximum": 100.0,
             "minimum": 0.0,
             "title": "Power Kw"
           },
@@ -197,6 +214,56 @@
           "required_hours"
         ],
         "title": "CriticalEquipment"
+      },
+      "Diagnosis": {
+        "properties": {
+          "assessment": {
+            "type": "string",
+            "title": "Assessment"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "constraints": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Constraints"
+          },
+          "discharge_limited_hours": {
+            "items": {
+              "type": "integer",
+              "maximum": 23.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "title": "Discharge Limited Hours"
+          },
+          "optimistic_energy_deficit_kwh": {
+            "type": "number",
+            "title": "Optimistic Energy Deficit Kwh"
+          },
+          "window_limited_tasks": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Window Limited Tasks"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "assessment",
+          "explanation",
+          "constraints",
+          "discharge_limited_hours",
+          "optimistic_energy_deficit_kwh",
+          "window_limited_tasks"
+        ],
+        "title": "Diagnosis"
       },
       "EffectiveConfig": {
         "properties": {
@@ -354,6 +421,7 @@
           },
           "max_power_kw": {
             "type": "number",
+            "maximum": 100.0,
             "exclusiveMinimum": 0.0,
             "title": "Max Power Kw"
           },
@@ -801,6 +869,34 @@
               "CRITICAL_SHORTAGE"
             ],
             "title": "Expected Status"
+          },
+          "equipment": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CriticalEquipment"
+                },
+                {
+                  "$ref": "#/components/schemas/FlexibleEquipment"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "category",
+                "mapping": {
+                  "critical": "#/components/schemas/CriticalEquipment",
+                  "flexible": "#/components/schemas/FlexibleEquipment"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Equipment"
+          },
+          "cloud_factors": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Cloud Factors"
           }
         },
         "additionalProperties": false,
@@ -810,7 +906,9 @@
           "name",
           "description",
           "defaults",
-          "expected_status"
+          "expected_status",
+          "equipment",
+          "cloud_factors"
         ],
         "title": "ScenarioSummary"
       },
@@ -877,6 +975,48 @@
               "high_demand"
             ],
             "title": "Scenario"
+          },
+          "equipment": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CriticalEquipment"
+                },
+                {
+                  "$ref": "#/components/schemas/FlexibleEquipment"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "category",
+                "mapping": {
+                  "critical": "#/components/schemas/CriticalEquipment",
+                  "flexible": "#/components/schemas/FlexibleEquipment"
+                }
+              }
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Equipment"
+          },
+          "cloud_factors": {
+            "items": {
+              "type": "number",
+              "maximum": 1.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "maxItems": 24,
+            "minItems": 24,
+            "title": "Cloud Factors"
+          },
+          "weather_dataset": {
+            "type": "string",
+            "enum": [
+              "synthetic",
+              "kisumu-2025-01-14"
+            ],
+            "title": "Weather Dataset",
+            "default": "synthetic"
           }
         },
         "additionalProperties": false,
@@ -916,9 +1056,34 @@
           },
           "data_source": {
             "type": "string",
-            "const": "synthetic",
+            "enum": [
+              "synthetic",
+              "user_defined",
+              "mixed"
+            ],
             "title": "Data Source",
             "default": "synthetic"
+          },
+          "cloud_factors": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Cloud Factors"
+          },
+          "input_provenance": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Input Provenance"
+          },
+          "weather_dataset": {
+            "type": "string",
+            "title": "Weather Dataset"
+          },
+          "diagnosis": {
+            "$ref": "#/components/schemas/Diagnosis"
           },
           "timezone": {
             "type": "string",
@@ -1016,6 +1181,10 @@
         "required": [
           "scenario",
           "scenario_name",
+          "cloud_factors",
+          "input_provenance",
+          "weather_dataset",
+          "diagnosis",
           "pv_performance_ratio",
           "effective_config",
           "equipment",

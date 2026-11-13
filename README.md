@@ -1,8 +1,52 @@
 # LifeLine
 
-Energy scheduling for a fictional solar-powered clinic. LifeLine compares an existing equipment schedule, a sunshine-first heuristic, and a constrained MILP schedule using identical physical inputs.
+LifeLine is an offline-capable energy reliability planning prototype for technicians and managers supporting resource-constrained healthcare facilities. It helps assess configured requirements and compare scheduling and infrastructure alternatives; it does not guarantee power or control medical devices.
 
-**Persons 1 and 2 are implemented: numerical model, FastAPI endpoints, validation, and explanations. Person 3's dashboard remains to be built.**
+**The interactive application is implemented:** editable clinic/equipment, computed reliability assessment, three operating schedules, battery charts, adverse-weather testing, and Capacity Explorer. It reuses the original simulator, MILP, and FastAPI architecture.
+
+The shadcn/ui + Tailwind interface leads with measured stored-energy improvement and a simple **Before → After** equipment schedule. Coverage, completed work, and conversion losses are smaller supporting metrics. Expand **Detailed analysis** for the 24-hour timeline, battery forecasts, and full sunshine-first comparison. Advanced power/efficiency settings start collapsed; mobile clinic configuration is collapsible so the result appears immediately. Shortages and unequal work completion receive explicit warnings rather than a success claim.
+
+## Run the complete demo
+
+From the repository root, install dependencies and build the dashboard:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r backend/requirements-dev.txt
+npm --prefix frontend ci
+npm --prefix frontend run build
+python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+```
+
+Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it serves `frontend/dist` and the API from one local origin. No internet is needed for the application after dependencies/datasets are installed. The optional Swagger API explorer uses external assets.
+
+For development, run the backend as above and `npm --prefix frontend run dev` in another terminal; open [localhost:5173](http://127.0.0.1:5173/). `npm --prefix frontend run preview` serves the build on port 4173 with an API proxy.
+
+Workflow: configure infrastructure and equipment → assess reliability → compare actual hourly equipment schedules → test adverse weather → explore a proposed system. Valid changes recalculate after a short debounce; the Generate button recalculates immediately. Existing results are marked stale while inputs differ. Equipment is capped at 20 rows to bound the local prototype's solve size.
+
+Critical hours stay fixed. Flexible duration × power defines energy; the selected existing start fills subsequent allowed slots, with partial-hour energy supported. Flexible work is divisible/interruptible, **not a validated appliance cycle**. Users supply critical/flexible classification; the app does not make medical priorities.
+
+Select synthetic weather or the bundled NASA POWER historical day for Kisumu. The latter is satellite-derived irradiance, not measured clinic production or a live forecast. Demand remains synthetic/user-entered. See [data provenance](DATA_SOURCES.md).
+
+Capacity Explorer runs a new complete calculation with proposed solar, battery, initial energy, and output limit, holding equipment/weather fixed. It reports remaining critical deficits and constraints. It does not provide certified sizing, costs, or installation instructions.
+
+## Tests and evidence
+
+```bash
+python -m pytest backend/tests -q
+python scripts/check_plan.py
+python scripts/prepare_weather.py
+python scripts/benchmark.py
+npm --prefix frontend run build
+cd frontend
+npx playwright install chromium
+npm run test:e2e
+```
+
+Verified locally: **194 backend tests**, **7 Chromium end-to-end tests**, TypeScript/production build, and built-dashboard/API integration. Browser tests include unfamiliar equipment, adding/removing loads, power/duration editing, preset switching, validation/reset, capacity bottlenecks, mobile layout, failure recovery, and bundled historical data with external requests blocked. Backend CI covers Python 3.11/3.12; frontend CI builds and exercises Chromium. Current remote results are available in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
+
+Read [RESEARCH.md](RESEARCH.md), [DATA_SOURCES.md](DATA_SOURCES.md), [PRODUCT_VALIDATION.md](PRODUCT_VALIDATION.md), [computed benchmark](BENCHMARK.md), [demo script](DEMO.md), and [UI verification](docs/FRONTEND_VALIDATION.md). No user interviews, deployment partnerships, measured clinic savings, health outcomes, or guaranteed availability are claimed.
 
 ## Run the API
 
@@ -90,10 +134,12 @@ This checks reference dispatch and inputs, separately from the optimizer's tests
 
 ## Remaining work
 
-Person 3 should build the interactive equipment schedule comparison using the real API, with cancellation/loading/error states, editable inputs, all four presets, and responsive charts. Use a Vite `/api` proxy to `http://127.0.0.1:8000`; direct cross-origin requests are not enabled. Frontend build/browser/full-application release checks remain pending.
+The dashboard now consumes the actual API with request cancellation/stale guards, configurable equipment, all four examples, historical weather, responsive charts, and a Capacity Explorer. Further work is practitioner validation, measured facility inputs, multi-day/uncertainty evaluation, and electrical/clinical review. Drafts are held in browser memory; export computed results as JSON. There is no saved account or device integration.
 
-The current suite has **177 passing tests** (62 model tests plus 115 API/configuration/contract checks), verified in the workspace and a clean source copy with a fresh virtual environment. Live localhost requests confirm all four statuses and the primary improvement. See [HTTP evidence](docs/evidence/person-2-http-results.json).
+The earlier Person 2 milestone had 177 passing tests; the current suite has 194 backend tests plus 7 browser tests. See the current evidence above; [Person 2 HTTP evidence](docs/evidence/person-2-http-results.json) remains a historical record.
 
 The supplied hackathon deadline is Saturday, November 14, 2026, 11:59 PM America/Los_Angeles; event rules have not been independently verified. The prototype supports investigation of SDG 7 and SDG 3; it does not demonstrate measured health outcomes.
 
-All clinic inputs are synthetic. Illustrative simulation; not for clinical or operational use. No medical equipment control, hardware integration, or real-world certification.
+Demo equipment requirements are illustrative; custom requirements are user-entered. The historical weather option uses documented satellite-derived inputs. Illustrative simulation; not for clinical or operational use. No medical equipment control, hardware integration, or real-world certification.
+
+Frontend implementation uses official shadcn/ui source components (Base UI primitives), Tailwind CSS, Recharts, and Lucide React. Cards, buttons, fields, numeric inputs, native selects, hour checkboxes, sunshine slider, disclosures, status badges, and the comparison table share this foundation. The energy model, API, and computed scheduling workflow remain intact. See [hackathon submission checklist](HACKATHON_CHECKLIST.md) for the remaining eligibility/submission questions from the user-supplied event slide.

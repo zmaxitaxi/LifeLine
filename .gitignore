@@ -12,3 +12,7 @@ coverage/
 .env
 .env.*
 !.env.example
+
+.playwright-mcp/
+frontend/test-results/
+frontend/playwright-report/

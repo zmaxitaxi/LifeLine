@@ -1,6 +1,13 @@
 # Person 1 — implemented energy model and scheduling comparison
 
-Scope: pure Python forecast, physical baseline, sunshine-first heuristic, MILP, complete plan results, and automated numerical tests. The original Person 1 delivery did not include API endpoints or a dashboard. The API is now implemented separately; see [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md). The dashboard remains pending. The supplied brief is preserved unchanged.
+## Current interactive MVP status
+
+The configurable application is now implemented on the existing architecture. See [README](../README.md), [research](../RESEARCH.md), [data provenance](../DATA_SOURCES.md), [product validation](../PRODUCT_VALIDATION.md), [computed benchmarks](../BENCHMARK.md), [demo script](../DEMO.md), and [browser verification](FRONTEND_VALIDATION.md).
+
+Working features: editable infrastructure/equipment and hours, automatic valid-input recalculation, three fair schedule comparisons, computed reliability diagnosis, historical NASA weather, adverse-condition testing, Capacity Explorer, and built frontend served with the API. Validation: 194 backend tests, 7 Chromium tests, TypeScript/build, mobile/desktop checks, and offline external-request blocking. No field/clinical outcome or guaranteed availability is established.
+
+
+Scope: pure Python forecast, physical baseline, sunshine-first heuristic, MILP, complete plan results, and automated numerical tests. The original Person 1 delivery did not include API endpoints or a dashboard. The API is now implemented separately; see [PERSON_2_HANDOFF.md](PERSON_2_HANDOFF.md). The original handoff preceded the dashboard; see current status above. The supplied brief is preserved unchanged.
 
 ## What works
 

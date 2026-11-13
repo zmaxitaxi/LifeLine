@@ -68,16 +68,6 @@ class ConfigOverrides(StrictModel):
         return value
 
 
-class SimulationRequest(ConfigOverrides):
-    scenario: ScenarioId
-
-    @model_validator(mode='after')
-    def extra_load_scope(self):
-        if 'additional_critical_kw' in self.model_fields_set and self.scenario != 'high_demand':
-            raise ValueError('additional_critical_kw can only be overridden for high_demand')
-        return self
-
-
 class HealthResponse(StrictModel):
     status: Literal['ok'] = 'ok'
     api_version: Literal['1.0'] = '1.0'
@@ -90,6 +80,8 @@ class ScenarioSummary(StrictModel):
     data_source: Literal['synthetic'] = 'synthetic'
     defaults: EffectiveConfig
     expected_status: RiskStatus
+    equipment: list['Equipment']
+    cloud_factors: list[float]
 
 
 class ScenarioListResponse(StrictModel):
@@ -106,7 +98,7 @@ class CriticalEquipment(StrictModel):
     id: Annotated[str, Field(min_length=1)]
     name: Annotated[str, Field(min_length=1)]
     category: Literal['critical']
-    power_kw: Energy
+    power_kw: Power
     required_hours: list[Hour]
 
     @field_validator('required_hours')
@@ -121,7 +113,7 @@ class FlexibleEquipment(StrictModel):
     id: Annotated[str, Field(min_length=1)]
     name: Annotated[str, Field(min_length=1)]
     category: Literal['flexible']
-    max_power_kw: Annotated[float, Field(gt=0)]
+    max_power_kw: Annotated[float, Field(gt=0, le=100)]
     required_energy_kwh: Energy
     allowed_hours: Annotated[list[Hour], Field(min_length=1)]
     baseline_allocations: list[RequestedTaskAllocation]
@@ -150,6 +142,25 @@ class FlexibleEquipment(StrictModel):
 
 
 Equipment = Annotated[CriticalEquipment | FlexibleEquipment, Field(discriminator='category')]
+
+
+class SimulationRequest(ConfigOverrides):
+    scenario: ScenarioId
+    equipment: Annotated[list[Equipment], Field(max_length=20)] | SkipJsonSchema[None] = None
+    cloud_factors: Annotated[list[Annotated[float, Field(ge=0, le=1)]], Field(min_length=24, max_length=24)] | SkipJsonSchema[None] = None
+    weather_dataset: Literal["synthetic", "kisumu-2025-01-14"] = "synthetic"
+
+    @model_validator(mode='after')
+    def clinic_overrides(self):
+        if 'additional_critical_kw' in self.model_fields_set and self.scenario != 'high_demand':
+            raise ValueError('additional_critical_kw can only be overridden for high_demand')
+        if self.equipment is not None:
+            ids = [item.id for item in self.equipment]
+            if len(set(ids)) != len(ids):
+                raise ValueError('Equipment IDs must be unique')
+            if self.additional_critical_kw not in (None, 0):
+                raise ValueError('With custom equipment, define additional loads explicitly in the equipment list')
+        return self
 
 
 class TaskAllocation(StrictModel):
@@ -234,12 +245,25 @@ class Recommendation(StrictModel):
     hours: list[Hour] | None = None
 
 
+class Diagnosis(StrictModel):
+    assessment: str
+    explanation: str
+    constraints: list[str]
+    discharge_limited_hours: list[Hour]
+    optimistic_energy_deficit_kwh: float
+    window_limited_tasks: list[str]
+
+
 class SimulationResponse(StrictModel):
     api_version: Literal['1.0'] = '1.0'
     model_version: Literal['energy-1.0'] = 'energy-1.0'
     scenario: ScenarioId
     scenario_name: str
-    data_source: Literal['synthetic'] = 'synthetic'
+    data_source: Literal['synthetic', 'user_defined', 'mixed'] = 'synthetic'
+    cloud_factors: list[float]
+    input_provenance: dict[str, str]
+    weather_dataset: str
+    diagnosis: Diagnosis
     timezone: Literal['Africa/Nairobi'] = 'Africa/Nairobi'
     horizon_hours: Literal[24] = 24
     dt_hours: Literal[1] = 1
@@ -276,3 +300,5 @@ class ErrorBody(StrictModel):
 
 class ApiErrorResponse(StrictModel):
     error: ErrorBody
+
+ScenarioSummary.model_rebuild()

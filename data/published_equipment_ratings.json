@@ -1,0 +1,24 @@
+{
+  "source_url": "https://www.seforall.org/system/files/2025-07/SEforALL%20report-medical-appliances-resource-constrained-settings.pdf",
+  "source_page_printed": 13,
+  "kind": "published_manufacturer_ratings_as_reported",
+  "not_measured_clinic_profile": true,
+  "usage": "Reference facts only. No clinical operating hours or scheduling flexibility inferred.",
+  "items": [
+    {
+      "name": "J-10 oxygen concentrator",
+      "rated_w": 880,
+      "power_kw": 0.88
+    },
+    {
+      "name": "Okuman OKM 730 infant warmer",
+      "rated_w": 700,
+      "power_kw": 0.7
+    },
+    {
+      "name": "All American X75 autoclave",
+      "rated_w": 1650,
+      "power_kw": 1.65
+    }
+  ]
+}
