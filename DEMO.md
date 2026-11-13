@@ -27,7 +27,7 @@ Before presenting, verify fresh weather and the agent:
 .venv/bin/python scripts/check_local_agent.py --midnight-battery-kwh 6
 ```
 
-**Current verification limitation:** the final November 13 check could not connect to Open-Meteo's API hostname. Earlier actual retrieval is recorded, and the final five-question real-LLM test passed with an explicitly replayed actual forecast. That replay does not establish current live availability and is never silently used by the app. Recheck before presenting; do not call a recording or replay “live.”
+**Live-weather update, November 13:** the Mac's normal connection recovered without code or network-setting changes. Fresh actual weather and the complete forecast-to-model calculation passed at **12:35 PM Pacific**. [Diagnosis and recovery](WEATHER_NETWORK.md). Earlier failures were TLS-handshake stalls before HTTP, not an established Mac/Windows application defect. Check the presentation network again; no uptime guarantee is implied. The separate five-question local-LLM replay remains a replay, not a fresh-weather or comprehensive LLM evaluation.
 
 ## Live storyline
 
@@ -57,4 +57,4 @@ To repeat the explicitly labeled recorded-forecast local-AI verification:
   --recorded-forecast docs/evidence/live-forecast-run.json
 ```
 
-This runs the actual local LLM and numerical model using a dated forecast snapshot. It does not configure the running application to use a stale forecast. Evidence: [local-agent replay](docs/evidence/local-agent-recorded-weather-run.json), [earlier actual retrieval](docs/evidence/live-forecast-run.json), [current availability check](docs/evidence/current-live-weather-check.json). No presentation video has been recorded by this task.
+This runs the actual local LLM and numerical model using a dated forecast snapshot. It does not configure the running application to use a stale forecast. Evidence: [local-agent replay](docs/evidence/local-agent-recorded-weather-run.json), [earlier actual retrieval](docs/evidence/live-forecast-run.json), [earlier failed connection](docs/evidence/current-live-weather-check.json), [fresh Mac recovery](docs/evidence/mac-weather-live-recovery.json). No presentation video has been recorded by this task.

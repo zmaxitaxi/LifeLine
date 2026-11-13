@@ -8,7 +8,7 @@ The primary assistant uses local **Llama 3.1 8B through Ollama** to understand r
 
 The equal-work demonstration preserves 2.211 kWh more battery energy at midnight; sunshine-first ties the optimizer. A constructed window/power-limit example completes 3.8 kWh, leaving 1.030 kWh less unfinished work than the existing schedule and 0.330 kWh less than sunshine-first. Reversing greedy task order closes that gap. These are numerical examples, not clinic outcomes or universal optimizer superiority.
 
-Source, date, coordinates, timezone, retrieval time, assumptions and cache/failure status are visible. The final fresh-weather check could not connect to the provider API; the real local-agent workflow was verified against an explicitly recorded earlier actual forecast. Disclose this until fresh retrieval is reverified. No canned model response or invented weather is substituted.
+Source, date, coordinates, timezone, retrieval time, assumptions and cache/failure status are visible. A fresh Mac forecast-to-model run passed at 12:35 PM Pacific on November 13 after the normal connection recovered from an earlier TLS-handshake failure. [Network investigation](WEATHER_NETWORK.md). The separate local-model replay and comprehensive evaluation have their own scopes; do not present a replay as live weather or a small smoke test as a general model benchmark. No canned model response or invented weather is substituted.
 
 LifeLine primarily addresses planning relevant to SDG 7, with a potential supporting role for SDG 3. It does not control equipment, guarantee electricity, establish safe clinical operation or demonstrate patient outcomes. Its next validation step is practitioner review and comparison with permitted facility measurements across adverse conditions.
 

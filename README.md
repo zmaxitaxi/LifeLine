@@ -1,8 +1,10 @@
 # LifeLine
 
+**Weather investigation, November 13:** the Mac's normal Open-Meteo route recovered without a code, DNS or TLS-setting change. Fresh forecast-to-model execution passed. The earlier failure was traced to a TLS-handshake stall before HTTP, also reproduced outside Python. See [Mac/Windows diagnosis and recovery evidence](WEATHER_NETWORK.md); continue checking live availability before the demo.
+
 **Local AI is implemented:** Llama 3.1 8B through Ollama understands questions and selects LifeLine's validated tools. Python computes all schedules, energy figures and assessments. No cloud AI key is required. See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).
 
-Live weather planning retrieves today's/tomorrow's Open-Meteo forecasts when reachable; historical NASA and synthetic modes remain explicit alternatives. **The latest live check could not connect to the API hostname.** Earlier successful retrieval and a separately labeled real-local-LLM/recorded-forecast replay are retained as evidence. That replay is not fresh live verification. See [weather integration and availability](LIVE_WEATHER.md).
+Live weather planning retrieves today's/tomorrow's Open-Meteo forecasts when reachable; historical NASA and synthetic APIs remain available. **The Mac's normal route recovered and passed fresh forecast-to-model verification at 12:35 PM Pacific November 13.** The earlier TLS-handshake failure and its recovery are documented in [the network investigation](WEATHER_NETWORK.md). Recorded local-model replays remain separately labeled; they are not fresh weather or a comprehensive evaluation.
 
 LifeLine is an offline-capable electricity planning prototype for staff supporting resource-constrained healthcare clinics. It helps check equipment requirements and compare schedules and infrastructure alternatives; it does not guarantee power or control medical devices.
 
@@ -60,7 +62,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The backend suite has **266 passing tests**. The browser suite now contains **22 Chromium journeys**, including local-agent tools, provider failure, explicit requirement adoption, capacity search and the competing-window demo; the final run is recorded in [the objective checklist](FINAL_CHECKLIST.md). TypeScript/production-build and built-application/API checks are required. CI covers Python 3.11/3.12 and Chromium; remote results are in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
+The backend suite has **274 passing tests**. The browser suite now contains **22 Chromium journeys**, including local-agent tools, provider failure, explicit requirement adoption, capacity search and the competing-window demo; the final run is recorded in [the objective checklist](FINAL_CHECKLIST.md). TypeScript/production-build and built-application/API checks are required. CI covers Python 3.11/3.12 and Chromium; remote results are in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
 
 For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright uses the repo's `.venv` on Windows and Unix, and writes artifacts to `lifeline-playwright-results` in the OS temporary directory unless `LIFELINE_TEST_OUTPUT` is set.
 

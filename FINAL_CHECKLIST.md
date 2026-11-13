@@ -14,7 +14,7 @@ The user subsequently assigned the comprehensive 12-scenario local-LLM evaluatio
 | 6. Simple user experience | Implemented; final browser regression recorded below | Simple default retained; location, input source, midnight review, assessment/actions, Before → After, visible limits and conversation. Detailed/Advanced retain existing functionality. Keyboard/mobile tests and explicit stale-result invalidation; no formal accessibility certification. |
 | 7. Operational credibility | Documentation complete; pilot open | Initial user is an energy technician with a facility manager. Explicit input provenance/review. [Input acquisition and prototype → pilot → future pathway](OPERATIONS.md). No partner clinic, interview or measured benefit claimed. |
 | 8. Hackathon story and submission materials | Prepared; actual submission open | Updated [two-minute demo](DEMO.md), [submission text](SUBMISSION.md), README, architecture, research and validation gaps. Public searches found the organization's site but not an official event rubric/submission form. No organizer message, submission, hosted deployment or video was made. |
-| 9. Final verification | Automated/local checks pass as recorded; fresh weather unavailable in latest attempt | Earlier actual Open-Meteo integration succeeded. Current final check cannot connect to API hostname; typed unavailable response and explicit offline modes verified. Five real local-LLM journeys passed with an explicitly replayed earlier actual forecast, not a new live retrieval. |
+| 9. Final verification | Automated/local checks pass as recorded; fresh Mac weather recovered | Earlier TLS-handshake failures were reproduced outside the app. The normal route recovered without settings/code changes; fresh forecast-to-model checks passed at 12:35 PM Pacific November 13. Five local-LLM smoke journeys remain a separate explicitly recorded-weather replay, not a comprehensive evaluation. [Diagnosis](WEATHER_NETWORK.md). |
 
 ## Verification evidence
 
@@ -22,6 +22,7 @@ The user subsequently assigned the comprehensive 12-scenario local-LLM evaluatio
 - Frontend: production build and TypeScript pass; **22 Chromium journeys passed** in the final complete run, including explicit adoption and selected lower-sunshine schedules.
 - Real local model: all five targeted questions completed through actual local Llama inference and real numerical calculations in [recorded-weather replay evidence](docs/evidence/local-agent-recorded-weather-run.json). A small integration sample, not a general language-model benchmark.
 - Live weather: [earlier successful retrieval](docs/evidence/live-forecast-run.json); [latest failed availability check](docs/evidence/current-live-weather-check.json). No invented or unlabeled substitute weather.
+- Later recovery: [fresh normal-route Mac retrieval and physical-model checks](docs/evidence/mac-weather-live-recovery.json), at 12:35 PM Pacific November 13. The failed check above is preserved as history, not the current availability claim. [Network investigation](WEATHER_NETWORK.md).
 - Caden independently recorded a successful fresh forecast on Windows at 17:48 UTC in [the release record](docs/ACCEPTANCE.md#release-record), before this Mac's failed connection. Treat availability as machine/network/time-specific rather than a global outage claim.
 - Wajo: [sanitized authenticated evidence](docs/evidence/wajo-investigation.json). The app does not load/use the Wajo key.
 - Stronger benchmark: [computed input, schedules and metrics](docs/evidence/competing-windows.json). Runtime endpoints do not read the result fixture.
@@ -33,7 +34,7 @@ Caden’s commits through `edcea98` were merged with the local-agent work. The c
 
 ## What remains before presentation/submission
 
-1. Recheck fresh Open-Meteo retrieval on the presentation network. Run `.venv/bin/python scripts/check_local_agent.py --midnight-battery-kwh 6`; it must report local-tool-agent results, not fallback. If unavailable, disclose it and deliberately present historical/synthetic mode. Recorded tests are never described as current live weather.
+1. Recheck fresh Open-Meteo retrieval on the presentation network, despite the Mac's later recovery. Use `scripts/diagnose_weather.py` if it fails and `scripts/check_live_forecast.py` for numerical verification. The teammates separately own the comprehensive local-LLM evaluation. Recorded tests are never described as current live weather.
 2. Warm the local model, rehearse the two-minute demo on the final build, and keep the original heuristic tie plus unavoidable-shortage explanation ready.
 3. Confirm official rules, eligibility, team registration, exact deadline/timezone, submission URL, required video/hosting and AI/data-source attribution. The user-supplied deadline is November 14, 2026, 11:59 PM Pacific; public organization pages did not verify event-specific rules.
 4. Submit through the official form and retain confirmation. Nothing has been submitted automatically. Choose a project license if required; shadcn component licensing is already retained, but a repository-wide license has not been selected by the user.

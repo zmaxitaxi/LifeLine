@@ -1,0 +1,109 @@
+{
+  "collection_interval_utc": {
+    "after": "2026-11-13T20:22:35Z",
+    "before": "2026-11-13T20:31:49Z"
+  },
+  "timing_note": "Individual start timestamps were not captured; observations below were transcribed from actual tool outputs within this interval. Durations are measured, not reconstructed.",
+  "system_dns_addresses": [
+    "51.81.167.44"
+  ],
+  "ordinary_public_dns_agreed": {
+    "Google": "51.81.167.44",
+    "Cloudflare": "51.81.167.44"
+  },
+  "active_open_meteo_hosts_entries": [],
+  "proxy_environment_variables_present": false,
+  "enabled_macos_proxy_flags_reported": false,
+  "httpx_initial": [
+    {
+      "trust_env": true,
+      "seconds": 5.343,
+      "events": [
+        "connection.connect_tcp.complete",
+        "connection.start_tls.started",
+        "connection.start_tls.failed"
+      ],
+      "error_type": "ConnectTimeout"
+    },
+    {
+      "trust_env": false,
+      "seconds": 5.533,
+      "events": [
+        "connection.connect_tcp.complete",
+        "connection.start_tls.started",
+        "connection.start_tls.failed"
+      ],
+      "error_type": "ConnectTimeout"
+    }
+  ],
+  "python_tls_version_checks": [
+    {
+      "mode": "default",
+      "tcp_seconds": 0.083,
+      "total_seconds": 5.088,
+      "error_type": "TimeoutError"
+    },
+    {
+      "mode": "TLSv1.2",
+      "tcp_seconds": 0.284,
+      "total_seconds": 5.285,
+      "error_type": "TimeoutError"
+    },
+    {
+      "mode": "TLSv1.3",
+      "tcp_seconds": 0.082,
+      "total_seconds": 5.084,
+      "error_type": "TimeoutError"
+    }
+  ],
+  "native_curl_initial": {
+    "exit_code": 28,
+    "http_status": null,
+    "tcp_seconds": 0.078226,
+    "tls_completed": false,
+    "remote_ip": "51.81.167.44",
+    "error": "SSL connection timeout"
+  },
+  "chromium_initial": {
+    "seconds": 10.003,
+    "error_type": "TimeoutError",
+    "remote_ip_recorded": false
+  },
+  "verified_alternative_curl": [
+    {
+      "address": "167.114.211.86",
+      "http_status": 200,
+      "seconds": 0.466166,
+      "ssl_verify_result": 0
+    },
+    {
+      "address": "188.40.99.226",
+      "http_status": 200,
+      "seconds": 0.985185,
+      "ssl_verify_result": 0
+    }
+  ],
+  "verified_alternative_python": [
+    {
+      "address": "167.114.211.86",
+      "http_status": 200,
+      "seconds": 0.645,
+      "tls_hostname": "api.open-meteo.com",
+      "samples": 72
+    },
+    {
+      "address": "188.40.99.226",
+      "http_status": 200,
+      "seconds": 1.796,
+      "tls_hostname": "api.open-meteo.com",
+      "samples": 72
+    }
+  ],
+  "changes": {
+    "system_dns": false,
+    "hosts_file": false,
+    "certificate_verification_disabled": false,
+    "application_route_override_retained": false
+  },
+  "scope": "No failed HTTP/weather/energy calculation was inferred from an HTTP response: TLS never completed on the failing route. Does not identify server-versus-network fault or Caden destination IP."
+}

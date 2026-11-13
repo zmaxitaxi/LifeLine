@@ -17,7 +17,7 @@
 - Tomorrow's initial battery energy is an explicitly reviewed assumption, not a predicted outcome from today. A single-day forecast/sensitivity comparison is not multi-day reliability analysis.
 - Forecast accuracy at clinic scale, model calibration, operator adoption, time saved, real energy savings, health-service outcomes, costs and deployment partnerships are unvalidated.
 - Local-model robustness across arbitrary wording, languages, hardware and adversarial input is not established. Allowlisted tools and deterministic numerical rendering reduce the effect of model mistakes; missing/invalid calls still require clarification or fallback. The limited Wajo greeting does not validate hosted energy planning. No Claude model was run.
-- Current live-weather connectivity failed during the final check, despite an earlier successful actual retrieval. The app returns a truthful unavailable state and retains explicit offline modes; repeat real retrieval before presenting. No forecast-accuracy, availability or uptime guarantee is made.
+- Live weather is intermittent: the earlier Mac failure was traced to TLS handshaking before HTTP; the same normal route recovered without settings/code changes, and fresh forecast-to-model execution passed at 12:35 PM Pacific on November 13. [Diagnosis](WEATHER_NETWORK.md). The exact server/network component responsible remains unknown; Caden's destination address was not captured. Repeat checks on the presentation network. No forecast-accuracy, availability or uptime guarantee is made.
 
 ## Practitioner review and pilot inputs
 

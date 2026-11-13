@@ -25,7 +25,8 @@ The slide is not a complete judging rubric: scoring weights, required submission
 On November 13, 2026, a public search found the [Open Project club site](https://openprojectberkeley.com/) but no official rules or submission form for this specific event. The team still needs the organizer's instructions to verify the items below.
 
 - [ ] Confirm official eligibility/rubric, especially any mandatory LLM requirement.
-- [ ] Reverify fresh forecast retrieval: the latest API connection failed. Earlier actual retrieval and a labeled local-LLM/recorded-weather replay are evidence, not current live data.
+- [x] Fresh normal-route forecast-to-model verification passed on the Mac at 12:35 PM Pacific November 13 after a transient TLS-handshake failure recovered without settings/code changes. [Diagnosis and evidence](WEATHER_NETWORK.md).
+- [ ] Recheck live weather on the actual presentation network; recovery is not an uptime guarantee. Keep recorded/local-model evaluation evidence labeled separately.
 - [ ] Verify exact deadline/timezone, team registration, submission form, and required links.
 - [ ] Rehearse the two-minute script against the final release; keep the heuristic tie and unavoidable-shortage case visible.
 - [ ] If requested by organizers, record a short video of the working release and label it as a recording. No demo video is claimed to have been produced.

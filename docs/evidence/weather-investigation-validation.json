@@ -1,0 +1,14 @@
+{
+  "base_commit": "5db704d04d4107480bdc4f75ebe99b6105f5cb2d",
+  "tests": {
+    "backend_existing_and_diagnostics": 274,
+    "diagnostic_tests": 8,
+    "result": "passed",
+    "seconds": 3.51
+  },
+  "production_weather_code_changed": false,
+  "system_network_settings_changed": false,
+  "default_route_live_plan": "passed",
+  "retrieved_at_utc": "2026-11-13T20:35:35.783858Z",
+  "scope": "Isolated committed app, default hostname, no IP override; concurrent UI work and comprehensive LLM evaluation excluded."
+}

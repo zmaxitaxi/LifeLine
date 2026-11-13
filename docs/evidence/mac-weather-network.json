@@ -1,0 +1,344 @@
+{
+  "checked_at": "2026-11-13T20:31:49.728415+00:00",
+  "platform": "Darwin",
+  "python": "3.12.5",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+  "httpx": "0.28.1",
+  "location": {
+    "latitude": -0.0917,
+    "longitude": 34.768
+  },
+  "system_dns": {
+    "addresses": [
+      "51.81.167.44"
+    ]
+  },
+  "proxy_variables_present": {
+    "HTTP_PROXY": false,
+    "HTTPS_PROXY": false,
+    "ALL_PROXY": false,
+    "http_proxy": false,
+    "https_proxy": false,
+    "all_proxy": false
+  },
+  "scope": "Run from an ordinary terminal or an approved host context. Restricted-runner DNS failures do not establish a Mac/Windows defect. No OS settings, DNS cache, hosts file or certificate policy were changed.",
+  "public_dns": [
+    {
+      "resolver": "Google Public DNS over HTTPS",
+      "client_subnet": "0.0.0.0/0",
+      "dns_status": 0,
+      "records": [
+        {
+          "address": "51.81.167.44",
+          "ttl_seconds": 1800
+        }
+      ]
+    },
+    {
+      "resolver": "Google Public DNS over HTTPS",
+      "client_subnet": "8.8.8.0/24",
+      "dns_status": 0,
+      "records": [
+        {
+          "address": "167.114.211.86",
+          "ttl_seconds": 1800
+        }
+      ]
+    },
+    {
+      "resolver": "Google Public DNS over HTTPS",
+      "client_subnet": "1.1.1.0/24",
+      "dns_status": 0,
+      "records": [
+        {
+          "address": "167.114.211.86",
+          "ttl_seconds": 1800
+        },
+        {
+          "address": "188.40.99.226",
+          "ttl_seconds": 1800
+        },
+        {
+          "address": "188.40.99.226",
+          "ttl_seconds": 1800
+        }
+      ]
+    }
+  ],
+  "probes": [
+    {
+      "client": "httpx",
+      "connect_ip": null,
+      "trust_env": true,
+      "tls_hostname": "api.open-meteo.com",
+      "certificate_verification": true,
+      "validated_forecast": true,
+      "http_status": 200,
+      "timezone": "Africa/Nairobi",
+      "planning_dates": [
+        "2026-11-13",
+        "2026-11-14"
+      ],
+      "samples": 72,
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=-0.0917&longitude=34.768&hourly=shortwave_radiation%2Cterrestrial_radiation&timezone=auto&timeformat=unixtime&forecast_days=3",
+      "retrieved_at": "2026-11-13T20:31:52.016583+00:00",
+      "seconds": 0.619,
+      "events": [
+        {
+          "event": "connection.connect_tcp.started"
+        },
+        {
+          "event": "connection.connect_tcp.complete"
+        },
+        {
+          "event": "connection.start_tls.started"
+        },
+        {
+          "event": "connection.start_tls.complete"
+        },
+        {
+          "event": "http11.send_request_headers.started"
+        },
+        {
+          "event": "http11.send_request_headers.complete"
+        },
+        {
+          "event": "http11.send_request_body.started"
+        },
+        {
+          "event": "http11.send_request_body.complete"
+        },
+        {
+          "event": "http11.receive_response_headers.started"
+        },
+        {
+          "event": "http11.receive_response_headers.complete"
+        },
+        {
+          "event": "http11.receive_response_body.started"
+        },
+        {
+          "event": "http11.receive_response_body.complete"
+        },
+        {
+          "event": "http11.response_closed.started"
+        },
+        {
+          "event": "http11.response_closed.complete"
+        }
+      ],
+      "failed_stage": null
+    },
+    {
+      "client": "httpx",
+      "connect_ip": null,
+      "trust_env": false,
+      "tls_hostname": "api.open-meteo.com",
+      "certificate_verification": true,
+      "validated_forecast": true,
+      "http_status": 200,
+      "timezone": "Africa/Nairobi",
+      "planning_dates": [
+        "2026-11-13",
+        "2026-11-14"
+      ],
+      "samples": 72,
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=-0.0917&longitude=34.768&hourly=shortwave_radiation%2Cterrestrial_radiation&timezone=auto&timeformat=unixtime&forecast_days=3",
+      "retrieved_at": "2026-11-13T20:31:52.016258+00:00",
+      "seconds": 0.617,
+      "events": [
+        {
+          "event": "connection.connect_tcp.started"
+        },
+        {
+          "event": "connection.connect_tcp.complete"
+        },
+        {
+          "event": "connection.start_tls.started"
+        },
+        {
+          "event": "connection.start_tls.complete"
+        },
+        {
+          "event": "http11.send_request_headers.started"
+        },
+        {
+          "event": "http11.send_request_headers.complete"
+        },
+        {
+          "event": "http11.send_request_body.started"
+        },
+        {
+          "event": "http11.send_request_body.complete"
+        },
+        {
+          "event": "http11.receive_response_headers.started"
+        },
+        {
+          "event": "http11.receive_response_headers.complete"
+        },
+        {
+          "event": "http11.receive_response_body.started"
+        },
+        {
+          "event": "http11.receive_response_body.complete"
+        },
+        {
+          "event": "http11.response_closed.started"
+        },
+        {
+          "event": "http11.response_closed.complete"
+        }
+      ],
+      "failed_stage": null
+    },
+    {
+      "client": "native_curl",
+      "exit_code": 0,
+      "measurements": {
+        "http_status": "200",
+        "remote_ip": "51.81.167.44",
+        "tcp_seconds": 0.210491,
+        "tls_seconds": 0.403658,
+        "total_seconds": 0.588855
+      }
+    },
+    {
+      "client": "httpx",
+      "connect_ip": "167.114.211.86",
+      "trust_env": true,
+      "tls_hostname": "api.open-meteo.com",
+      "certificate_verification": true,
+      "validated_forecast": true,
+      "http_status": 200,
+      "timezone": "Africa/Nairobi",
+      "planning_dates": [
+        "2026-11-13",
+        "2026-11-14"
+      ],
+      "samples": 72,
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=-0.0917&longitude=34.768&hourly=shortwave_radiation%2Cterrestrial_radiation&timezone=auto&timeformat=unixtime&forecast_days=3",
+      "retrieved_at": "2026-11-13T20:31:52.016502+00:00",
+      "seconds": 0.615,
+      "events": [
+        {
+          "event": "connection.connect_tcp.started"
+        },
+        {
+          "event": "connection.connect_tcp.complete"
+        },
+        {
+          "event": "connection.start_tls.started"
+        },
+        {
+          "event": "connection.start_tls.complete"
+        },
+        {
+          "event": "http11.send_request_headers.started"
+        },
+        {
+          "event": "http11.send_request_headers.complete"
+        },
+        {
+          "event": "http11.send_request_body.started"
+        },
+        {
+          "event": "http11.send_request_body.complete"
+        },
+        {
+          "event": "http11.receive_response_headers.started"
+        },
+        {
+          "event": "http11.receive_response_headers.complete"
+        },
+        {
+          "event": "http11.receive_response_body.started"
+        },
+        {
+          "event": "http11.receive_response_body.complete"
+        },
+        {
+          "event": "http11.response_closed.started"
+        },
+        {
+          "event": "http11.response_closed.complete"
+        }
+      ],
+      "failed_stage": null
+    },
+    {
+      "client": "httpx",
+      "connect_ip": "188.40.99.226",
+      "trust_env": true,
+      "tls_hostname": "api.open-meteo.com",
+      "certificate_verification": true,
+      "validated_forecast": true,
+      "http_status": 200,
+      "timezone": "Africa/Nairobi",
+      "planning_dates": [
+        "2026-11-13",
+        "2026-11-14"
+      ],
+      "samples": 72,
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=-0.0917&longitude=34.768&hourly=shortwave_radiation%2Cterrestrial_radiation&timezone=auto&timeformat=unixtime&forecast_days=3",
+      "retrieved_at": "2026-11-13T20:31:53.740576+00:00",
+      "seconds": 1.727,
+      "events": [
+        {
+          "event": "connection.connect_tcp.started"
+        },
+        {
+          "event": "connection.connect_tcp.complete"
+        },
+        {
+          "event": "connection.start_tls.started"
+        },
+        {
+          "event": "connection.start_tls.complete"
+        },
+        {
+          "event": "http11.send_request_headers.started"
+        },
+        {
+          "event": "http11.send_request_headers.complete"
+        },
+        {
+          "event": "http11.send_request_body.started"
+        },
+        {
+          "event": "http11.send_request_body.complete"
+        },
+        {
+          "event": "http11.receive_response_headers.started"
+        },
+        {
+          "event": "http11.receive_response_headers.complete"
+        },
+        {
+          "event": "http11.receive_response_body.started"
+        },
+        {
+          "event": "http11.receive_response_body.complete"
+        },
+        {
+          "event": "http11.response_closed.started"
+        },
+        {
+          "event": "http11.response_closed.complete"
+        }
+      ],
+      "failed_stage": null
+    }
+  ],
+  "interpretation": "The normal route recovered without OS/DNS/TLS changes; native curl still connected to 51.81.167.44. Earlier host-approved observations recorded TLS stalls on that route while other verified public API addresses worked. This is evidence of an intermittent destination/path problem, not an established Windows/macOS application defect.",
+  "limitations": [
+    "Public DNS/addresses and availability change. Reverify a candidate before each temporary use; never hardcode it permanently.",
+    "An alternate route does not identify who drops/stalls the original TLS handshake or which address another machine used.",
+    "Exit success means at least one actual forecast was validated, not that the normal route is healthy."
+  ],
+  "verified_candidate_addresses": [
+    "167.114.211.86",
+    "188.40.99.226"
+  ],
+  "application_configuration_changed": false
+}
