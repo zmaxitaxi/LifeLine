@@ -2,6 +2,8 @@
 
 Updated November 13, 2026. This is the status of the final brief, not a claim of clinical deployment. The user's later instruction selected local AI instead of Claude.
 
+The user subsequently assigned the comprehensive 12-scenario local-LLM evaluation to the two teammates; this chat owns integration and fixes. See [the handoff](LLM_EVALUATION_HANDOFF.md) and [draft team update](TEAM_UPDATE.md). The five-question smoke test below is not that evaluation, and no comprehensive score is claimed.
+
 | Brief objective | Status | Evidence / remaining limit |
 |---|---|---|
 | 1. Investigate Wajo | Complete within scope | Authenticated MCP discovery, typed schemas, read-only listing and isolated no-action greeting succeeded. Python connectivity verified. Costs, restricted custom-tool orchestration and production embedding remain unvalidated. [Decision and evidence](WAJO_INVESTIGATION.md). |
@@ -20,6 +22,7 @@ Updated November 13, 2026. This is the status of the final brief, not a claim of
 - Frontend: production build and TypeScript pass; **22 Chromium journeys passed** in the final complete run, including explicit adoption and selected lower-sunshine schedules.
 - Real local model: all five targeted questions completed through actual local Llama inference and real numerical calculations in [recorded-weather replay evidence](docs/evidence/local-agent-recorded-weather-run.json). A small integration sample, not a general language-model benchmark.
 - Live weather: [earlier successful retrieval](docs/evidence/live-forecast-run.json); [latest failed availability check](docs/evidence/current-live-weather-check.json). No invented or unlabeled substitute weather.
+- Caden independently recorded a successful fresh forecast on Windows at 17:48 UTC in [the release record](docs/ACCEPTANCE.md#release-record), before this Mac's failed connection. Treat availability as machine/network/time-specific rather than a global outage claim.
 - Wajo: [sanitized authenticated evidence](docs/evidence/wajo-investigation.json). The app does not load/use the Wajo key.
 - Stronger benchmark: [computed input, schedules and metrics](docs/evidence/competing-windows.json). Runtime endpoints do not read the result fixture.
 - Credentials: ignored local configuration only. Tracked/untracked release files, bundles and Git history were checked against the actual local key: no matches; `.env.local` is ignored, untracked and mode 0600. [Scan evidence](docs/evidence/credential-check.json). No credential values were printed.

@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { test, expect, type Page } from "@playwright/test";
+import { testPython } from "../test-python";
 
 async function available(page: Page) {
   await page.route("**/api/agent/status", (route) =>
@@ -25,7 +26,7 @@ async function mockAgent(
   await page.route("**/api/agent/ask", (route) => {
     const result = JSON.parse(
       execFileSync(
-        resolve("../.venv/bin/python"),
+        testPython,
         ["backend/tests/agent_browser_fixture.py"],
         {
           cwd: resolve(".."),

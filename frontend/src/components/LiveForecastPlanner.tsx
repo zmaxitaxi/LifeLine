@@ -676,7 +676,7 @@ export function LiveForecastPlanner({
           forecast-backed plan
         </Button>
         {busy ? (
-          <p role="status">Retrieving forecast and running the energy model…</p>
+          <p role="status">Working on your request…</p>
         ) : null}
         {error ? (
           <Alert variant="destructive">

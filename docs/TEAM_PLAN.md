@@ -1,5 +1,7 @@
 # Three-person implementation plan
 
+Current handoff (November 13): the user assigned comprehensive local-LLM evaluation to the two teammates, with integration and fixes owned by this chat. Caden owns harness/execution; the other teammate owns independent review and demo readiness. See [evaluation handoff](../LLM_EVALUATION_HANDOFF.md) and [draft update](../TEAM_UPDATE.md). Earlier person-based milestones below remain historical context.
+
 ## Current interactive MVP status
 
 The configurable application is now implemented on the existing architecture. See [README](../README.md), [research](../RESEARCH.md), [data provenance](../DATA_SOURCES.md), [product validation](../PRODUCT_VALIDATION.md), [computed benchmarks](../BENCHMARK.md), [demo script](../DEMO.md), and [browser verification](FRONTEND_VALIDATION.md).
