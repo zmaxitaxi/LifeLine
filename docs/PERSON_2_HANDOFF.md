@@ -86,6 +86,6 @@ Backend [CI](../.github/workflows/ci.yml) installs pinned dependencies, runs `pi
 
 The [OpenAPI snapshot](../contracts/openapi.json) and [computed scheduling response](../contracts/examples/scheduling.response.json) support frontend development. The example is documentation-only; never use it as an undisclosed fallback for a failed API call. Regenerate with `python scripts/export_api_contract.py`; tests check schema parity and example physical validity. JSON endpoints need no runtime external network; Swagger UI's external assets are optional.
 
-Remaining release work: frontend, responsive/browser checks, integration screenshots, built-preview connectivity, full application offline execution, final rehearsal, and event-specific submission/deadline verification. No field effectiveness, clinical outcome, or operational readiness is established.
+The dashboard now consumes the integrated API. See the [release record](ACCEPTANCE.md#release-record) for the current build, browser, offline, and live forecast checks. The team rehearsal and event-specific submission requirements remain open.
 
 Cross-platform verification caught floating-point residue slightly above 100% in coverage reporting. Coverage now uses stable ratio arithmetic and stays within 0–100 only after raw flow/aggregate shortage validation. Independent accounting assertions also check the percentage range; energy dispatch and solver priorities are unchanged.

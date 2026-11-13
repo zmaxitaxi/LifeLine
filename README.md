@@ -23,6 +23,8 @@ npm --prefix frontend run build
 python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
+On Windows PowerShell, create the environment with `python -m venv .venv`. Skip the `source` line and use `.\.venv\Scripts\python.exe` for the remaining Python commands. The pinned requirements install the IANA timezone data used by the forecast planner on Windows.
+
 Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it serves `frontend/dist` and the API from one local origin. No internet is needed for the application after dependencies/datasets are installed. The optional Swagger API explorer uses external assets.
 
 For development, run the backend as above and `npm --prefix frontend run dev` in another terminal; open [localhost:5173](http://127.0.0.1:5173/). `npm --prefix frontend run preview` serves the build on port 4173 with an API proxy.
@@ -50,7 +52,7 @@ npm run test:e2e
 
 The current suite includes **241 backend tests** and **17 Chromium end-to-end tests**, plus TypeScript/production-build checks and built-application/API integration. Browser journeys cover first-time clinic selection, conversation and focused follow-ups, real requirement changes, explicit essential shortages, equipment editing, all three schedules, capacity bottlenecks, mobile/keyboard use, failure recovery, and historical planning with external requests blocked. Backend CI covers Python 3.11/3.12; frontend CI builds and exercises Chromium. Current remote results are available in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
 
-For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright artifacts go to `/tmp/lifeline-playwright-results` unless `LIFELINE_TEST_OUTPUT` is set.
+For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright uses the repo's `.venv` on Windows and Unix, and writes artifacts to `lifeline-playwright-results` in the OS temporary directory unless `LIFELINE_TEST_OUTPUT` is set.
 
 Read [RESEARCH.md](RESEARCH.md), [DATA_SOURCES.md](DATA_SOURCES.md), [PRODUCT_VALIDATION.md](PRODUCT_VALIDATION.md), [computed benchmark](BENCHMARK.md), [demo script](DEMO.md), and [UI verification](docs/FRONTEND_VALIDATION.md). No user interviews, deployment partnerships, measured clinic savings, health outcomes, or guaranteed availability are claimed.
 
