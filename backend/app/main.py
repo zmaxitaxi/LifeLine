@@ -30,6 +30,8 @@ from .agent_routes import router as agent_router
 from .demos import competing_windows, recovery_demo
 from .simulation import simulate_case
 from .recovery_routes import router as recovery_router
+from .planning_routes import router as planning_router
+from .planning_state import PlanningStore, PlanningError
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +56,16 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
         app.state.solve_lock = asyncio.Lock()
         app.state.forecasts = forecast_service or ForecastService()
         app.state.agent = agent_service or LocalAgent()
+        app.state.planning = PlanningStore()
         yield
 
     app = FastAPI(title='LifeLine API', version='1.0', lifespan=lifespan,
                   description='Synthetic energy planning; not for clinical or operational use.')
+
+    @app.exception_handler(PlanningError)
+    async def planning_error(request, exc):
+        details = [dict(loc=['body'] + field.split('.'), message='Required operator input', type='missing') for field in exc.fields]
+        return error_response(exc.status, exc.code, exc.message, details)
 
     @app.exception_handler(RequestValidationError)
     async def request_error(request, exc):
@@ -182,6 +190,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
     app.include_router(forecast_router)
     app.include_router(agent_router)
     app.include_router(recovery_router)
+    app.include_router(planning_router)
 
     @app.api_route('/api/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], include_in_schema=False)
     async def invalid_api_path(path: str, request: Request):

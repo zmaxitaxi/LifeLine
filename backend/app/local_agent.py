@@ -185,7 +185,7 @@ class LocalAgent:
             'note':'Local AI selects validated tools; Python computes figures and assessments. Live weather still needs internet. No patient information is needed.'}
         return self._status
 
-    async def decide(self, messages):
+    async def decide(self, messages, *, toolset=None):
         if self.lock.locked():
             raise AgentUnavailable('LOCAL_AGENT_BUSY')
         async with self.lock:
@@ -194,7 +194,7 @@ class LocalAgent:
                     response = await client.post(OLLAMA_URL+'/api/chat',json={
                         'model':self.model,'messages':messages,'stream':False,'think':False,'keep_alive':'10m',
                         'options':{'temperature':0,'num_ctx':8192,'num_predict':600},
-                        'tools':[{'type':'function','function':t} for t in definitions()]})
+                        'tools':[{'type':'function','function':t} for t in (toolset if toolset is not None else definitions())]})
                     response.raise_for_status()
                     data=response.json()
                 message=data['message']

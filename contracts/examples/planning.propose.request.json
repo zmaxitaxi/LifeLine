@@ -1,0 +1,12 @@
+{
+  "expected_revision": 0,
+  "details": {
+    "name": "Vaccination campaign",
+    "planning_date": "2026-11-14",
+    "start_hour": 10,
+    "end_hour": 15,
+    "equipment_ids": [
+      "fridge"
+    ]
+  }
+}

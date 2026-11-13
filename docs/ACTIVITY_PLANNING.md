@@ -1,0 +1,51 @@
+# Shared clinic activity planning contract
+
+Complete JSON request/response examples are in `contracts/examples/planning.*.json`; their computed confirmation response uses clearly synthetic test-transport weather and the real numerical model. Live-weather/native evidence is separate below.
+
+Authoritative contracts: `contracts/planning.ts`, `/openapi.json` (snapshot `contracts/openapi.json`). All new routes use `/api/planning/sessions`. Existing simulation, forecast, recovery and stateless agent APIs remain compatible. New sessions are local process-memory state; retain their returned ID in the UI. Restart discards sessions. No account or database. Clinic/location/date/energy/inventory configuration is immutable within a session; deliberately create a new session when editing that context, keeping any unconfirmed proposals visibly separate. No implicit migration of activities between clinics or dates.
+
+## Routes
+
+| Method / suffix | Request | Response |
+|---|---|---|
+| POST `/api/planning/sessions` | CreatePlanningSession | PlanningState |
+| GET `/{session_id}` | none | PlanningState |
+| POST `/{session_id}/proposals` | CreateActivityProposal | PlanningState |
+| GET `/{session_id}/proposals/{proposal_id}` | none | ActivityProposal |
+| PATCH `/{session_id}/proposals/{proposal_id}` | UpdateActivityProposal | PlanningState |
+| POST `/{session_id}/proposals/{proposal_id}/confirm` | ConfirmActivityProposal | PlanningState |
+| POST `/{session_id}/proposals/{proposal_id}/reject` | RejectActivityProposal | PlanningState |
+| POST `/{session_id}/recompute` | RecomputePlanningState | PlanningState |
+| POST `/{session_id}/recovery-selection` | SelectRecoveryIntervention | PlanningState |
+| POST `/{session_id}/agent` | SessionAgentRequest | SessionAgentResponse |
+
+Write requests require `expected_revision` from the latest GET/response. Revision conflicts return 409; GET state and review before retrying. `revision` covers all visible changes; `input_revision` changes only when active energy inputs change. Draft edits do not invalidate a valid confirmed plan. Confirm immediately commits the reviewed activity, invalidates old results, and recomputes. If weather/solver fails the activity stays confirmed with `plan_status=failed`, `computed_plan=null` and explanatory `plan_error`; recompute retries it. Concurrent results are installed only when both input revision and generation still match. Never render a cached result as current after confirmation.
+
+Confirmation requires an operator-supplied `idempotency_key`. Repeating that key for the same proposal returns current state without another activity or recomputation, including a stale expected revision. Reusing the key for a different proposal is 409. A second confirmation of the same proposal also returns current state. Confirmed activities cannot be directly patched. Create a proposal with `target_activity_id` to review a replacement, which records the target version and conflicts if someone else has revised it.
+
+## Activities and electrical demand
+
+`ActivityDraft` fields are optional while collecting facts. Name, selected date, start/end and explicitly reviewed equipment references are needed to confirm. `equipment_ids:null` means unknown; `[]` means explicitly no equipment. Match existing physical IDs. Associations alone add no demand. A vaccination campaign may reference the existing refrigerator without adding a refrigerator. No clinical association or appliance rating is inferred.
+
+`equipment_constraints` explicitly extend critical `required_hours` by union, or intersect flexible `allowed_hours`. Existing critical requirements can never be removed. Constraint hours must fit activity window/deadline and original flexible allowed hours. Required energy, ratings, efficiencies and priorities are preserved. Multiple references to one physical ID always produce exactly one equipment record and one demand profile. `duration_hours` states activity duration only; electrical hours must be explicit. Flexible electrical demand remains the existing divisible/interruptible approximation; unsupported continuous-cycle requirements are rejected rather than interpreted as medical operations.
+
+`additional_equipment` contains partial operator-provided specifications. Missing category/power/hours/energy/divisibility is reported in proposal `missing_fields`; confirmation is blocked. Critical equipment needs power_kw + required_hours; flexible equipment needs max_power_kw + required_energy_kwh + allowed_hours + divisible:true. IDs must identify new physical devices, never aliases of the existing inventory. New power ratings are never defaulted. New requirements must fit windows and hourly power capacity.
+
+## Example sequence
+
+Create session with configured clinic, coordinates, selected ISO date and explicit midnight stored energy. POST proposals with `{expected_revision:0,details:{name:"Vaccination campaign",planning_date:"2026-11-14"}}`. It returns a draft and missing start/end/equipment fields. PATCH the returned proposal ID with `{expected_revision:1,details:{start_hour:9}}`, then `{expected_revision:2,details:{start_hour:10,end_hour:15,equipment_ids:["fridge"]}}`. Omitted keys preserve the draft; null clears a field. Inspect the returned proposal before POST confirm `{expected_revision:3,idempotency_key:"operator-click-001"}`. The returned confirmed activity references the existing fridge once. POST recompute `{expected_revision:<latest>,sunshine_factor:0.5,include_recovery:true}` retains every confirmed activity, fetches actual Open-Meteo weather, then tests 50% of forecast irradiation using the original simulator/MILP and Recovery Planner. Selecting a recovery option records a reviewed comparison selection; it does not install hypothetical hardware.
+
+Session agent uses canonical state on every turn; send only `{expected_revision,question}`. The local model receives current draft/confirmed activity/inventory and chooses native strict tools. It may create/update drafts or compute weather/recovery; it cannot call confirmation or mutate confirmed facts. A conversational “Confirm” returns review instructions with the active proposal; UI invokes the explicit confirm endpoint after review. No repeat questions for known clinic/energy/weather inputs. `timezone` is nullable before a forecast calculation; create optionally accepts a validated IANA `timezone`. Relative-day extraction resolves an absent timezone through actual weather, rather than assuming Nairobi for other coordinates. A network failure still permits manual drafting by exact selected date. Local unavailability is explicit and leaves drafts intact.
+
+Errors use existing `{error:{code,message,details}}` shape. 404 `NOT_FOUND`; 409 `REVISION_CONFLICT`, `PROPOSAL_CLOSED`, `IDEMPOTENCY_CONFLICT`, `STALE_RESULT`; 422 `PROPOSAL_INCOMPLETE`, `INVALID_ACTIVITY`, `INVALID_REQUEST`, `UNSUPPORTED_FORECAST_DAY`. Missing fields appear in details with field locations. The selected date must match a currently supported complete 24-hour Open-Meteo day; timezone/DST limitations of the existing model remain explicit.
+
+
+## Native-model verification and limits
+
+Run `PYTHONPATH=backend .venv/bin/python -m pytest backend/tests -q` for the numerical/regression suite. Run `.venv/bin/python scripts/check_activity_agent.py --output docs/evidence/activity-agent-real-model.json` with local Ollama/`llama3.1:8b` and internet for genuine inference and fresh Open-Meteo weather. The checked-in evidence passed six real agent turns (five activity/review turns plus cloudier/recovery), explicit operator confirmation and a repeated idempotent confirmation. Activity turns took 8.0–12.9 seconds; the native weather/recovery selection took 9.0 seconds on this machine. The confirmed refrigerator remained one physical 0.1 kW device, consuming 2.4 kWh over its original 24 hours; subsequent 50% sunshine testing retained it and the confirmed activity. Date uses the clinic timezone; the recorded forecast was retrieved 2026-11-13T22:59Z for local planning date 2026-11-15 in Africa/Nairobi.
+
+The model did overextract an unstated start time and refrigerator association on the first vague turn. Backend grounding discarded those fields and retained only the operator-stated activity name; `missing_fields` then drove clarification. Later unrequested null/default/unchanged fields were discarded while the stated correction survived. Native tools use flat, inlined schemas because this local model did not reliably resolve nested `$ref` parameters. `correct_last_activity_time` uses canonical last-edited-field metadata for an ambiguous time correction. Diagnostics and raw native calls are in the evidence; this is a measured workflow smoke, not a claim of universal extraction accuracy.
+
+Only the active draft is exposed for conversational editing. Finish or reject it before starting another conversational activity; explicit proposal APIs can create several reviewable proposals. Native tools never confirm, reject, clear known facts with null defaults, or change existing equipment specifications. They can stage new device specifications across clarifications, preserving previously supplied draft facts. Explicit whole-hour electrical intervals such as “from 10 AM to 12 PM” compile to slots 10 and 11; clinical activity wording alone never supplies electrical runtime. Arbitrary cycle physics and sub-hour schedules remain unsupported.
+
+A recovery selection records the selected current comparison only; hypothetical hardware and optional-work changes are not silently adopted into the actual inventory. Confirmed added equipment becomes part of the session inventory; revising an activity does not silently delete its physical device or baseline essential hours.
