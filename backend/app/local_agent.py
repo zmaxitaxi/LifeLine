@@ -27,6 +27,9 @@ Use evaluate_fixed_requirement for an ADDITIONAL appliance before a deadline ONL
 whole-hour consecutive duration, earliest start, and deadline. Ask for missing fields using clarify.
 Never invent an appliance rating, runtime, earliest start or clinical priority. Never remove or move existing essential equipment.
 Use explore_battery_capacity for additional battery capacity questions; it computes a bounded search with fixed starting energy.
+If an additional requirement was given earlier and the user now asks about lower sunshine, call evaluate_fixed_requirement again with the same values and sunshine_factor.
+Leave reduced_sunshine_factors empty unless the user asks about less sunshine or more cloud; the actual forecast is always calculated.
+If the user asks to turn off, remove, shorten, move or reprioritize EXISTING equipment, call clarify with field protected_equipment.
 Use clarify when the intent or necessary inputs are missing. For sub-hour or medically validated cycle questions use cycle_constraints.
 Call a tool. Do not return a prose energy answer. The application renders verified calculations and limitations from the tool result.
 Days and operating hours are in the selected clinic's local timezone. Use the selected day unless the user explicitly specifies another.
@@ -41,7 +44,37 @@ QUESTIONS = {
     'intent':'Should I check forecast energy sufficiency, lower sunshine, an additional fixed equipment requirement, or battery capacity?',
     'cycle_constraints':'LifeLine cannot validate medical appliance cycles or sub-hour operation. Provide a reviewed whole-hour fixed load for an energy-only check, or consult an energy technician and the equipment operator.',
     'day':'The question and selected planning day differ or mention multiple days. Select one day and review its midnight battery assumption before calculating.',
+    'protected_equipment':'Existing essential equipment and its hours are protected. The assistant cannot turn off, remove, shorten, move or reprioritize them, because that is a medical-priority decision. An authorized operator can change the inventory in Detailed mode and then recalculate. To check an ADDITIONAL appliance instead, give its rated power, consecutive hours, earliest start and deadline.',
 }
+SOLAR_LIMITATION=(' The assistant has no tool to calculate added solar panels, so they are not compared here; '
+                  'Capacity Explorer in Detailed mode can test a proposed solar size.')
+GENERIC_WORDS={'equipment','device','devices','load','loads','additional','fixed','essential','critical','approximation',
+               'constant','average','hourly','energy','check','new','the','and','for','our'}
+
+
+def equipment_words(name):
+    return {w for w in re.findall(r'[a-z]+',re.sub(r'\(.*?\)','',name.lower())) if len(w)>=4 and w not in GENERIC_WORDS}
+
+
+def targets_existing_essential(name,equipment):
+    """True when a proposed 'additional' load names existing protected equipment."""
+    words=equipment_words(name)
+    return bool(words) and any(item.get('category')=='critical' and words & equipment_words(item['name']) for item in equipment)
+
+
+def mentions_solar_expansion(question):
+    return bool(re.search(r'solar panels?|more solar|add(ing)? (more )?(solar|panels)|bigger (solar|array)|solar (array|capacity)',question.lower()))
+
+
+def comparison_sentence(plan):
+    c=plan.comparison
+    stored,loss=c.battery_preserved_at_midnight_kwh,c.conversion_loss_reduction_kwh
+    text=(f' Compared with the existing schedule, the recommended schedule ends the day with {abs(stored):.3f} kWh '
+          f'{"more" if stored>=0 else "less"} stored in the battery and {abs(loss):.3f} kWh {"less" if loss>=0 else "more"} '
+          'lost in battery conversion. These are separate figures, not a total energy saving.')
+    if not c.same_flexible_work_completed:
+        text+=' The two schedules complete different amounts of flexible work, so this is not a like-for-like comparison.'
+    return text
 
 
 def normalize_model_arguments(arguments):
@@ -69,8 +102,8 @@ def requested_sunshine_factor(question):
 
 def asks_reduced_sunshine(question):
     text=question.lower()
-    return bool(re.search(r'\b(sun\w*|solar)\b',text) and
-                re.search(r'\b(less|lower|drops?|half|reduc\w*|cut|falls?|decreas\w*|only)\b',text))
+    return bool(re.search(r'\bcloudier\b|\bmore cloud|\bovercast\b',text) or (re.search(r'\b(sun\w*|solar)\b',text) and
+                re.search(r'\b(less|lower|drops?|half|reduc\w*|cut|falls?|decreas\w*|only)\b',text)))
 
 
 def definitions():
@@ -167,11 +200,13 @@ def computed_message(question,result,focus=None):
     if focus is None:
         focus = requested_sunshine_factor(question)
     reduced=next((c.plan for c in result.uncertainty_cases if focus is not None and abs(c.sunshine_factor-focus)<1e-6),None)
+    solar=SOLAR_LIMITATION if mentions_solar_expansion(question) else ''
     if focus is not None and focus!=1 and reduced is not None:
         return (f'With {(1-focus)*100:g}% lower forecast sunshine: '+computed_assessment(reduced)+
                 f' Solar generation is {reduced.optimized.metrics.total_solar_kwh:.3f} kWh versus '
-                f'{result.plan.optimized.metrics.total_solar_kwh:.3f} kWh for the forecast. Each case has its own computed schedule.')
-    return computed_assessment(result.plan)
+                f'{result.plan.optimized.metrics.total_solar_kwh:.3f} kWh for the forecast. Each case has its own computed schedule.'
+                +comparison_sentence(reduced)+solar)
+    return computed_assessment(result.plan)+comparison_sentence(result.plan)+solar
 
 
 async def ask_agent(context,catalog,service,lock,agent):
@@ -226,26 +261,41 @@ async def ask_agent(context,catalog,service,lock,agent):
         name,args=call['name'],normalize_model_arguments(call['arguments'])
         if name in ('plan_forecast','evaluate_fixed_requirement','explore_battery_capacity'):
             args['day']=context.day  # operator-selected day, not a generated assumption
+        if name=='plan_forecast' and isinstance(args.get('reduced_sunshine_factors'),list):
+            # Factor 1 is the actual forecast, which is always calculated; the model
+            # often sends [1] for a plain plan, which the schema would reject.
+            args['reduced_sunshine_factors']=[f for f in args['reduced_sunshine_factors']
+                                              if not (isinstance(f,(int,float)) and not isinstance(f,bool) and f>=1)]
         try:
             if name=='clarify':
                 field=ClarifyArguments.model_validate(args).field
                 return clarification(context,field,traces+[ToolTrace(name=name,status='completed')],agent.model)
             if name=='evaluate_fixed_requirement':
                 validated=FixedRequirementArguments.model_validate(args)
+                if targets_existing_essential(validated.name,config['equipment']):
+                    # An "additional" load naming protected equipment is an attempt to
+                    # change existing essential requirements; never evaluate or apply it.
+                    return clarification(context,'protected_equipment',traces+[ToolTrace(name=name,status='rejected')],agent.model)
                 missing=explicit_requirement(validated,context.previous_questions+[context.question])
                 if missing:
                     return clarification(context,missing,traces+[ToolTrace(name=name,status='rejected')],agent.model)
+                factor=requested_sunshine_factor(context.question)
+                if factor is not None and factor<1:
+                    validated=validated.model_copy(update={'sunshine_factor':factor})
+                elif validated.sunshine_factor<1 and not asks_reduced_sunshine(context.question):
+                    validated=validated.model_copy(update={'sunshine_factor':1.})  # unrequested stress case
                 result=await evaluate_fixed_requirement(context,validated,catalog,service,lock)
                 return answer(context,model=agent.model,message=result.explanation,needs_clarification=False,
-                    tool_calls=traces+[ToolTrace(name=name,status='completed')],result=result.proposed,requirement=result)
+                    tool_calls=traces+[ToolTrace(name=name,status='completed')],result=result.proposed,requirement=result,
+                    selected_sunshine_factor=validated.sunshine_factor)
             if name=='explore_battery_capacity':
                 validated=CapacityArguments.model_validate(args)
                 factor=requested_sunshine_factor(context.question)
                 if factor is not None:
                     validated=CapacityArguments(day=validated.day,sunshine_factor=factor,target=validated.target)
                 result=await explore_capacity(context,validated,catalog,service,lock)
-                return answer(context,model=agent.model,message=result.explanation,needs_clarification=False,
-                    tool_calls=traces+[ToolTrace(name=name,status='completed')],capacity=result)
+                return answer(context,model=agent.model,message=result.explanation+(SOLAR_LIMITATION if mentions_solar_expansion(context.question) else ''),
+                    needs_clarification=False,tool_calls=traces+[ToolTrace(name=name,status='completed')],capacity=result)
             if name not in ('plan_forecast','get_solar_forecast','get_clinic_configuration'):
                 raise ValueError('Unknown tool')
             validated=(PlanForecastArguments if name=='plan_forecast' else EmptyArguments).model_validate(args)
@@ -275,8 +325,14 @@ async def ask_agent(context,catalog,service,lock,agent):
             messages += [{'role':'assistant','tool_calls':[{'function':call}],'content':''},
                          {'role':'tool','tool_name':name,'content':json.dumps(payload)},
                          {'role':'user','content':'Now select the planning tool or ask for a missing input.'}]
-        except (ValidationError, ValueError, TypeError, KeyError):
+        except (ValidationError, ValueError, TypeError, KeyError) as exc:
             traces.append(ToolTrace(name=name,status='rejected'))
-            messages.append({'role':'user','content':'The tool selection failed schema validation. Use an allowed tool with valid arguments; do not change clinic equipment or safety constraints.'})
+            # Say which field was invalid (field paths and messages only, never
+            # user values) so the model does not resend the same invalid call.
+            detail=''
+            if isinstance(exc,ValidationError):
+                detail=' Invalid: '+'; '.join(f"{'.'.join(map(str,e['loc'])) or 'arguments'}: {e['msg']}" for e in exc.errors()[:4])+'.'
+            messages.append({'role':'user','content':f'The {name} selection failed schema validation.{detail} Do not repeat it. '
+                'If a value is unknown, call clarify instead of guessing. Use an allowed tool with valid arguments; do not change clinic equipment or safety constraints.'})
     return await fallback(context,catalog,service,lock,'INVALID_AGENT_RESPONSE',traces)
 

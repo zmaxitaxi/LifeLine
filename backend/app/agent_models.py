@@ -20,6 +20,7 @@ class FixedRequirementArguments(StrictModel):
     duration_hours: Annotated[int, Field(ge=1, le=24)]
     earliest_start: Annotated[int, Field(ge=0, le=23)]
     deadline: Annotated[int, Field(ge=1, le=24)]
+    sunshine_factor: Annotated[float, Field(gt=0, le=1)] = 1.
 
     @model_validator(mode='after')
     def fits_window(self):
@@ -35,7 +36,7 @@ class CapacityArguments(StrictModel):
 
 
 class ClarifyArguments(StrictModel):
-    field: Literal['power', 'duration', 'earliest_start', 'deadline', 'equipment', 'midnight_battery', 'intent', 'cycle_constraints', 'day']
+    field: Literal['power', 'duration', 'earliest_start', 'deadline', 'equipment', 'midnight_battery', 'intent', 'cycle_constraints', 'day', 'protected_equipment']
 
 
 class ToolTrace(StrictModel):

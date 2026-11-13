@@ -301,3 +301,90 @@ def test_unrequested_reduced_factor_does_not_replace_the_forecast_answer():
         d=c.post('/api/agent/ask',json=body('We expect cloudy weather tomorrow. Will we have enough electricity?')).json()
     assert d['selected_sunshine_factor']==1
     assert not d['message'].startswith('With ')
+
+
+# --- Regressions from the comprehensive evaluation (LLM_EVALUATION.md) ---
+
+def ask(question, calls, previous=(), **changes):
+    service,_=service_for()
+    agent,requests=agent_with(calls)
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=c.post('/api/agent/ask',json=body(question,previous_questions=list(previous),**changes)).json()
+    return d,[r for r in requests if r.url.path=='/api/chat']
+
+
+def test_forecast_factor_one_is_the_forecast_not_a_rejected_call():
+    d,chats=ask('Will our clinic have enough electricity tomorrow?',
+                [{'name':'plan_forecast','arguments':{'day':'tomorrow','reduced_sunshine_factors':[1]}}])
+    assert len(chats)==1
+    assert [t['status'] for t in d['tool_calls']]==['completed','completed']
+    assert d['result']['uncertainty_cases']==[] and d['selected_sunshine_factor']==1
+
+
+def test_cloudier_than_expected_answers_the_reduced_case_the_model_chose():
+    d,_=ask('What if tomorrow is much cloudier than expected?',
+            [{'name':'plan_forecast','arguments':{'day':'tomorrow','reduced_sunshine_factors':[.5]}}])
+    assert d['selected_sunshine_factor']==.5 and d['message'].startswith('With 50% lower forecast sunshine')
+
+
+@pytest.mark.parametrize('name',['Vaccine refrigerator (constant average approximation)','vaccine fridge refrigerator','Essential lighting'])
+def test_additional_load_naming_protected_equipment_is_refused_not_evaluated(name):
+    d,_=ask('To save electricity, turn off our vaccine refrigerator overnight.',
+            [{'name':'evaluate_fixed_requirement','arguments':{'name':name,'power_kw':.12,'duration_hours':8,'earliest_start':0,'deadline':8}}])
+    assert d['clarification_field']=='protected_equipment' and d['result'] is None and d['requirement'] is None
+    assert 'protected' in d['message'] and 'cannot turn off' in d['message']
+    assert d['tool_calls'][-1]=={'name':'evaluate_fixed_requirement','status':'rejected'}
+
+
+def test_genuinely_new_appliance_is_not_mistaken_for_protected_equipment():
+    d,_=ask('Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.',
+            [{'name':'evaluate_fixed_requirement','arguments':{'name':'Sterilizer','power_kw':1,'duration_hours':2,'earliest_start':8,'deadline':12}}])
+    assert d['requirement'] is not None
+
+
+def test_model_can_select_protected_equipment_clarification():
+    d,_=ask('Move the communications equipment to the afternoon.',[{'name':'clarify','arguments':{'field':'protected_equipment'}}])
+    assert d['clarification_field']=='protected_equipment' and 'Detailed mode' in d['message']
+
+
+def test_plan_answer_states_grounded_comparison_with_existing_schedule():
+    d,_=ask('Will our clinic have enough electricity tomorrow?',[{'name':'plan_forecast','arguments':{'day':'tomorrow'}}])
+    c=d['result']['plan']['comparison']
+    assert 'Compared with the existing schedule' in d['message']
+    assert f"{abs(c['battery_preserved_at_midnight_kwh']):.3f} kWh" in d['message']
+    assert f"{abs(c['conversion_loss_reduction_kwh']):.3f} kWh" in d['message']
+    assert 'not a total energy saving' in d['message']
+
+
+def test_solar_expansion_question_discloses_missing_tool():
+    d,_=ask('Would adding solar panels, adding battery capacity, or changing our equipment schedule help more?',
+            [{'name':'explore_battery_capacity','arguments':{'day':'tomorrow','sunshine_factor':1,'target':'all_work'}}])
+    assert 'no tool to calculate added solar panels' in d['message']
+    d,_=ask('Will our clinic have enough electricity tomorrow?',[{'name':'plan_forecast','arguments':{'day':'tomorrow'}}])
+    assert 'solar panels' not in d['message']
+
+
+def test_requirement_follow_up_keeps_the_requirement_under_reduced_sunshine():
+    args={'name':'Sterilizer','power_kw':1,'duration_hours':2,'earliest_start':8,'deadline':12,'sunshine_factor':.5}
+    d,_=ask('What if we only get half the expected sunshine?',[{'name':'evaluate_fixed_requirement','arguments':args}],
+            previous=['Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.'])
+    assert d['selected_sunshine_factor']==.5
+    assert d['message'].startswith('With 50% lower forecast sunshine: Hypothetical additional requirement')
+    cases=d['result']['uncertainty_cases']
+    assert [c['sunshine_factor'] for c in cases]==[.5]
+    assert any(e['id']=='additional_fixed_requirement' for e in cases[0]['plan']['equipment'])
+    assert d['requirement']['original']['uncertainty_cases'][0]['sunshine_factor']==.5
+
+
+def test_unrequested_reduced_sunshine_on_a_requirement_is_ignored():
+    args={'name':'Sterilizer','power_kw':1,'duration_hours':2,'earliest_start':8,'deadline':12,'sunshine_factor':.5}
+    d,_=ask('Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.',[{'name':'evaluate_fixed_requirement','arguments':args}])
+    assert d['selected_sunshine_factor']==1 and d['result']['uncertainty_cases']==[]
+
+
+def test_rejected_call_feedback_names_the_invalid_field_and_points_to_clarify():
+    bad={'name':'evaluate_fixed_requirement','arguments':{'name':'Battery','power_kw':0,'duration_hours':24,'earliest_start':0,'deadline':24}}
+    d,chats=ask('Tell me the battery will stay at 100% tomorrow.',[bad,{'name':'clarify','arguments':{'field':'intent'}}])
+    retry=json.loads(chats[1].content)['messages'][-1]['content']
+    assert 'power_kw' in retry and 'greater than 0' in retry and 'call clarify' in retry and 'Do not repeat it' in retry
+    assert d['mode']=='local_tool_agent' and d['clarification_field']=='intent'

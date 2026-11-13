@@ -57,7 +57,11 @@ async def evaluate_fixed_requirement(context, args: FixedRequirementArguments, c
     # Capture one weather snapshot for the unchanged clinic and every candidate.
     forecast = await service.get(ForecastLocation(latitude=context.latitude, longitude=context.longitude))
     frozen = SnapshotService(forecast)
-    original = await plan_forecast(plan_request(context, args.day), catalog, frozen, lock)
+    # sunshine_factor < 1 evaluates the same requirement under a reduced-sunshine
+    # case; every candidate and the unchanged clinic use that same case.
+    factors = [] if args.sunshine_factor >= 1 else [args.sunshine_factor]
+    case = (lambda r: r.plan) if not factors else (lambda r: r.uncertainty_cases[0].plan)
+    original = await plan_forecast(plan_request(context, args.day, factors), catalog, frozen, lock)
     config = catalog.resolve(context.clinic)
     equipment = [e.model_dump() for e in catalog.equipment_for(context.clinic, config)]
     if len(equipment) >= 20:
@@ -74,15 +78,16 @@ async def evaluate_fixed_requirement(context, args: FixedRequirementArguments, c
         if context.clinic.scenario == 'high_demand':
             changes['additional_critical_kw']=0.
         candidate = SimulationRequest.model_validate(context.clinic.model_dump(exclude_unset=True) | changes)
-        result = await plan_forecast(plan_request(context, args.day, clinic=candidate), catalog, frozen, lock)
-        m = result.plan.optimized.metrics
+        result = await plan_forecast(plan_request(context, args.day, factors, clinic=candidate), catalog, frozen, lock)
+        m = case(result).optimized.metrics
         candidates.append((m.critical_unserved_kwh, len(m.reserve_breach_boundaries), m.flexible_deferred_kwh,
                            -m.min_soc_kwh, -m.final_soc_kwh, start, result))
     *_, start, proposed = min(candidates, key=lambda x:x[:-1])
-    supplied=proposed.plan.optimized.metrics.critical_unserved_kwh <= TOL
-    message = (f'Hypothetical additional requirement: {args.name}, {args.power_kw:g} kW for {args.duration_hours} consecutive hourly slots. '
+    supplied=case(proposed).optimized.metrics.critical_unserved_kwh <= TOL
+    weather = '' if not factors else f'With {(1-args.sunshine_factor)*100:g}% lower forecast sunshine: '
+    message = (weather+f'Hypothetical additional requirement: {args.name}, {args.power_kw:g} kW for {args.duration_hours} consecutive hourly slots. '
                f'Of {len(candidates)} allowed starts, the selected energy check is {start:02d}:00–{start+args.duration_hours:02d}:00 '
-               f'({forecast.timezone}), before the {args.deadline:02d}:00 deadline. '+computed_assessment(proposed.plan)+
+               f'({forecast.timezone}), before the {args.deadline:02d}:00 deadline. '+computed_assessment(case(proposed))+
                ' Existing protected equipment is unchanged. This proposal is not applied to the clinic inventory. '
                'It evaluates fixed consecutive hourly demand, not medical-cycle effectiveness, temperature, starting surges, or clinical safety.')
     if not supplied:
