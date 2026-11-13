@@ -55,4 +55,5 @@ export interface GuidedForecastResponse {
   message: string;
   tool_calls: { name: string; arguments: Record<string, unknown> }[];
   result: ForecastPlanResponse | null;
+  selected_sunshine_factor: number;
 }

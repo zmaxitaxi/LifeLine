@@ -1,0 +1,411 @@
+{
+  "retrieved_at": "2026-11-13T19:00:59.854555+00:00",
+  "inputs": {
+    "latitude": -0.0917,
+    "longitude": 34.768,
+    "clinic": {
+      "scenario": "scheduling"
+    },
+    "day": "tomorrow",
+    "midnight_battery_kwh": 6.0,
+    "inputs_confirmed": true,
+    "input_basis": "synthetic_example"
+  },
+  "cases": [
+    {
+      "question": "We expect cloudy weather tomorrow. Will we have enough electricity?",
+      "seconds": 15.178,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "plan_forecast",
+          "status": "completed"
+        }
+      ],
+      "message": "Under the forecast and stated midnight battery assumption, essential demand is covered in the model. Minimum battery energy is 4.831 kWh; flexible work deferred is 0.000 kWh. This is not a safety or availability guarantee.",
+      "needs_clarification": false,
+      "planning_date": "2026-11-14",
+      "forecast_source": "Open-Meteo Forecast API",
+      "forecast_retrieved_at": "2026-11-13T08:34:16.390183Z",
+      "timezone": "Africa/Nairobi",
+      "metrics": {
+        "baseline": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 5.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 4.592421052631581,
+          "final_soc_kwh": 4.592421052631581,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.0999999999999996,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.7035767313019428,
+          "conversion_loss_kwh": 0.3956022160664817,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": [
+            23,
+            24
+          ]
+        },
+        "heuristic": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 5.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 4.831157894736844,
+          "final_soc_kwh": 5.469900000000005,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.0999999999999996,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.22169999999999998,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        },
+        "optimized": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 5.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 4.8311578947368385,
+          "final_soc_kwh": 5.476345263157895,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.1,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.2152547368421054,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        }
+      },
+      "comparison": {
+        "same_flexible_work_completed": true,
+        "battery_preserved_at_midnight_kwh": 0.8839242105263141,
+        "minimum_battery_improvement_kwh": 0.2387368421052578,
+        "evening_minimum_improvement_kwh": 0.8839242105263141,
+        "conversion_loss_reduction_kwh": 0.18034747922437633,
+        "heuristic_matches_optimizer_metrics": false
+      },
+      "uncertainty": [
+        {
+          "factor": 0.5,
+          "metrics": {
+            "total_solar_kwh": 3.5658000000000007,
+            "critical_requested_kwh": 5.34,
+            "critical_unserved_kwh": 0.0,
+            "critical_coverage_pct": 100.0,
+            "min_soc_kwh": 4.037609999999999,
+            "final_soc_kwh": 4.037609999999999,
+            "flexible_requested_kwh": 2.1,
+            "flexible_served_kwh": 0.0,
+            "flexible_deferred_kwh": 2.1,
+            "curtailed_kwh": 0.0,
+            "conversion_loss_kwh": 0.18818999999999994,
+            "critical_shortage_hours": [],
+            "reserve_breach_boundaries": [
+              8,
+              9,
+              10,
+              20,
+              21,
+              22,
+              23,
+              24
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "question": "We need to sterilize equipment before noon. Can we do that without compromising essential services?",
+      "seconds": 4.373,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "evaluate_fixed_requirement",
+          "status": "rejected"
+        }
+      ],
+      "message": "What is the additional equipment\u2019s rated power in watts or kW? Use its nameplate or a verified specification; I will not guess.",
+      "needs_clarification": true
+    },
+    {
+      "question": "Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.",
+      "seconds": 4.128,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "evaluate_fixed_requirement",
+          "status": "completed"
+        }
+      ],
+      "message": "Hypothetical additional requirement: sterilizer, 1 kW for 2 consecutive hourly slots. Of 3 allowed starts, the selected energy check is 10:00\u201312:00 (Africa/Nairobi), before the 12:00 deadline. Under the forecast and stated midnight battery assumption, essential demand is covered in the model. Minimum battery energy is 4.800 kWh; flexible work deferred is 1.345 kWh. This is not a safety or availability guarantee. Existing protected equipment is unchanged. This proposal is not applied to the clinic inventory. It evaluates fixed consecutive hourly demand, not medical-cycle effectiveness, temperature, starting surges, or clinical safety.",
+      "needs_clarification": false,
+      "planning_date": "2026-11-14",
+      "forecast_source": "Open-Meteo Forecast API",
+      "forecast_retrieved_at": "2026-11-13T08:34:16.390183Z",
+      "timezone": "Africa/Nairobi",
+      "metrics": {
+        "baseline": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 7.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 3.3064652631578983,
+          "final_soc_kwh": 3.3064652631578983,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.0999999999999996,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.38513473684210514,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": [
+            20,
+            21,
+            22,
+            23,
+            24
+          ]
+        },
+        "heuristic": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 7.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 3.4901347368421085,
+          "final_soc_kwh": 3.4901347368421085,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.0999999999999996,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.2014652631578946,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+          ]
+        },
+        "optimized": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 7.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 4.8,
+          "final_soc_kwh": 4.8,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 0.7547279778393335,
+          "flexible_deferred_kwh": 1.3452720221606667,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.23687202216066489,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        }
+      },
+      "comparison": {
+        "same_flexible_work_completed": false,
+        "battery_preserved_at_midnight_kwh": 1.4935347368421015,
+        "minimum_battery_improvement_kwh": 1.4935347368421015,
+        "evening_minimum_improvement_kwh": 1.4935347368421015,
+        "conversion_loss_reduction_kwh": 0.14826271468144026,
+        "heuristic_matches_optimizer_metrics": false
+      },
+      "uncertainty": [],
+      "requirement": {
+        "name": "sterilizer",
+        "start_hour": 10,
+        "end_hour": 12,
+        "candidates_evaluated": 3,
+        "essential_requirements_fully_supplied": true,
+        "explanation": "Hypothetical additional requirement: sterilizer, 1 kW for 2 consecutive hourly slots. Of 3 allowed starts, the selected energy check is 10:00\u201312:00 (Africa/Nairobi), before the 12:00 deadline. Under the forecast and stated midnight battery assumption, essential demand is covered in the model. Minimum battery energy is 4.800 kWh; flexible work deferred is 1.345 kWh. This is not a safety or availability guarantee. Existing protected equipment is unchanged. This proposal is not applied to the clinic inventory. It evaluates fixed consecutive hourly demand, not medical-cycle effectiveness, temperature, starting surges, or clinical safety."
+      }
+    },
+    {
+      "question": "What happens if we receive 50% less sunlight?",
+      "seconds": 2.356,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "plan_forecast",
+          "status": "completed"
+        }
+      ],
+      "message": "With 50% lower forecast sunshine: Essential demand is covered in this modeled day, but the battery minimum is 4.038 kWh, below the 4.800 kWh reserve target. Solar generation is 3.566 kWh versus 7.132 kWh for the forecast. Each case has its own computed schedule.",
+      "needs_clarification": false,
+      "planning_date": "2026-11-14",
+      "forecast_source": "Open-Meteo Forecast API",
+      "forecast_retrieved_at": "2026-11-13T08:34:16.390183Z",
+      "timezone": "Africa/Nairobi",
+      "metrics": {
+        "baseline": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 5.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 4.592421052631581,
+          "final_soc_kwh": 4.592421052631581,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.0999999999999996,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.7035767313019428,
+          "conversion_loss_kwh": 0.3956022160664817,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": [
+            23,
+            24
+          ]
+        },
+        "heuristic": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 5.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 4.831157894736844,
+          "final_soc_kwh": 5.469900000000005,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.0999999999999996,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.22169999999999998,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        },
+        "optimized": {
+          "total_solar_kwh": 7.1316000000000015,
+          "critical_requested_kwh": 5.34,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 4.8311578947368385,
+          "final_soc_kwh": 5.476345263157895,
+          "flexible_requested_kwh": 2.1,
+          "flexible_served_kwh": 2.1,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.2152547368421054,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        }
+      },
+      "comparison": {
+        "same_flexible_work_completed": true,
+        "battery_preserved_at_midnight_kwh": 0.8839242105263141,
+        "minimum_battery_improvement_kwh": 0.2387368421052578,
+        "evening_minimum_improvement_kwh": 0.8839242105263141,
+        "conversion_loss_reduction_kwh": 0.18034747922437633,
+        "heuristic_matches_optimizer_metrics": false
+      },
+      "uncertainty": [
+        {
+          "factor": 0.5,
+          "metrics": {
+            "total_solar_kwh": 3.5658000000000007,
+            "critical_requested_kwh": 5.34,
+            "critical_unserved_kwh": 0.0,
+            "critical_coverage_pct": 100.0,
+            "min_soc_kwh": 4.037609999999999,
+            "final_soc_kwh": 4.037609999999999,
+            "flexible_requested_kwh": 2.1,
+            "flexible_served_kwh": 0.0,
+            "flexible_deferred_kwh": 2.1,
+            "curtailed_kwh": 0.0,
+            "conversion_loss_kwh": 0.18818999999999994,
+            "critical_shortage_hours": [],
+            "reserve_breach_boundaries": [
+              8,
+              9,
+              10,
+              20,
+              21,
+              22,
+              23,
+              24
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "question": "How much additional battery capacity would we need to meet all our requirements?",
+      "seconds": 2.399,
+      "mode": "local_tool_agent",
+      "model": "llama3.1:8b",
+      "tool_calls": [
+        {
+          "name": "get_clinic_configuration",
+          "status": "completed"
+        },
+        {
+          "name": "explore_battery_capacity",
+          "status": "completed"
+        }
+      ],
+      "message": "The current battery capacity meets this modeled target; no additional capacity is indicated by this single-day check.",
+      "needs_clarification": false,
+      "capacity": {
+        "target": "all_work",
+        "sunshine_factor": 1.0,
+        "current_capacity_kwh": 8.0,
+        "tested_capacity_kwh": 8.0,
+        "additional_capacity_kwh": 0.0,
+        "resolution_kwh": 0.25,
+        "search_limit_kwh": 200.0,
+        "samples": [
+          {
+            "battery_capacity_kwh": 8.0,
+            "essential_unmet_kwh": 0.0,
+            "flexible_deferred_kwh": 0.0,
+            "minimum_battery_kwh": 4.8311578947368385,
+            "reserve_breached": false,
+            "meets_target": true
+          }
+        ],
+        "explanation": "The current battery capacity meets this modeled target; no additional capacity is indicated by this single-day check.",
+        "assumptions": [
+          "Same forecast snapshot, equipment, absolute reserve, initial stored kWh, efficiencies, and charge/discharge limits at every tested capacity.",
+          "A larger battery is not assumed to arrive charged. More empty storage cannot fix inadequate input energy or output power.",
+          "Single-day idealized capacity sensitivity; no multi-day autonomy, degradation, cost, backup generator, or installation design."
+        ]
+      }
+    }
+  ],
+  "weather_mode": "recorded_forecast_replay",
+  "scope": "Real installed local model; illustrative clinic only. Small integration sample, not a general model-quality or clinical validation study.",
+  "agent": {
+    "mode": "local_tool_agent",
+    "available": true,
+    "model": "llama3.1:8b",
+    "provider": "Ollama on localhost",
+    "cloud_ai": false,
+    "note": "Local AI selects validated tools; Python computes figures and assessments. Live weather still needs internet. No patient information is needed."
+  }
+}

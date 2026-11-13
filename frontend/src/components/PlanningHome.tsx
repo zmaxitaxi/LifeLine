@@ -160,8 +160,8 @@ export function PlanningHome({
         </FieldGroup>
         <div className="composer-footer">
           <p id="assistant-availability">
-            Offline planning available · Local assistant, no live AI provider
-            connected
+            Local example planning available · Open the live-weather panel for
+            local AI tools and forecast-backed answers
           </p>
           {pending ? (
             <Button type="button" variant="ghost" onClick={onCancel}>

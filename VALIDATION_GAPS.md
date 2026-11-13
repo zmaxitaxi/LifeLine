@@ -6,6 +6,8 @@
 - Forecast adapter tests: Open-Meteo's preceding-hour W/m² convention, overlap conversion, local dates, fractional-hour time zones, explicit rejection of 23/25-hour simulation days, missing values/units, night handling, cache/failure behavior and typed tool arguments.
 - Actual live forecast retrieval and browser-to-API-to-model execution, with a recorded dated snapshot in [live weather documentation](LIVE_WEATHER.md). This verifies the integration, not forecast accuracy or clinical suitability.
 - Browser workflows, responsive layouts and keyboard controls; test scope is recorded separately. No formal accessibility certification is claimed.
+- Real local Llama 3.1 8B tool selections, missing-input clarification, additional fixed consecutive-load checks, and computed capacity/weather questions. The five-question final integration run used an explicitly recorded actual forecast because a fresh API connection failed; see [replay evidence](docs/evidence/local-agent-recorded-weather-run.json). It is not a successful fresh live retrieval or a broad language-model benchmark.
+- Wajo authentication, schemas and isolated no-action greeting succeeded. Wajo is not a production dependency; no custom planning connector was validated.
 
 ## Assumed or unvalidated
 
@@ -14,7 +16,8 @@
 - Horizontal irradiance and the fixed PV performance ratio adequately approximate a particular installation. No tilt, shading, inverter clipping, measured battery condition or temperature-dependent behavior is modeled.
 - Tomorrow's initial battery energy is an explicitly reviewed assumption, not a predicted outcome from today. A single-day forecast/sensitivity comparison is not multi-day reliability analysis.
 - Forecast accuracy at clinic scale, model calibration, operator adoption, time saved, real energy savings, health-service outcomes, costs and deployment partnerships are unvalidated.
-- No hosted language model was run or validated. The guided fallback and structured tools are labeled accordingly. Hackathon LLM eligibility remains an organizer question.
+- Local-model robustness across arbitrary wording, languages, hardware and adversarial input is not established. Allowlisted tools and deterministic numerical rendering reduce the effect of model mistakes; missing/invalid calls still require clarification or fallback. The limited Wajo greeting does not validate hosted energy planning. No Claude model was run.
+- Current live-weather connectivity failed during the final check, despite an earlier successful actual retrieval. The app returns a truthful unavailable state and retains explicit offline modes; repeat real retrieval before presenting. No forecast-accuracy, availability or uptime guarantee is made.
 
 ## Practitioner review and pilot inputs
 

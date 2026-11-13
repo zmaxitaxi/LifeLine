@@ -18,6 +18,9 @@ All three methods within a comparison receive the exact same immutable `ModelInp
 | `backend/app/forecast_models.py` | Strict public forecast/plan/tool contracts |
 | `backend/app/forecast_planner.py` | Adapt forecasts to existing inputs, serialize calculations, generate computed assessments |
 | `backend/app/planner_tools.py` | Read-only configuration/forecast and validated simulation dispatch; constrained non-LLM fallback |
+| `backend/app/local_agent.py`, `agent_models.py`, `agent_routes.py` | Local Ollama native tool selection, bounded requests, cloud-model rejection, strict model-argument validation and explicit fallback |
+| `backend/app/agent_tools.py` | Single-snapshot consecutive fixed-load proposals and battery-capacity searches; no saved configuration mutation |
+| `backend/app/demos.py` | Input-only competing-window example; existing API calculates all results |
 | `backend/app/forecast_routes.py` | Additive HTTP endpoints |
 | `backend/app/solar_forecast.py` | Existing synthetic generator plus shared irradiation-to-PV conversion |
 | `backend/app/energy_simulator.py`, `optimizer.py`, `heuristic.py` | Existing dispatch, optimization and comparator; unchanged |
@@ -27,6 +30,12 @@ Forecast calls run asynchronously; the existing solve lock and worker thread ser
 
 ## Assistant boundary
 
-The hosted LLM is not configured in this release. Tool JSON Schemas and a validated execution boundary are available for a provider integration. The working guided planner is explicitly deterministic. Model-generated arguments cannot edit essential requirements, supply weather values, change numerical results or control equipment. Unknown guided requests require clarification.
+The selected provider is **local Ollama with Llama 3.1 8B**. `GET /api/agent/status` verifies an installed model with tool capability and rejects cloud/remote model records. `POST /api/agent/ask` receives the operator's reviewed clinic, location, explicit midnight charge, question and bounded user-question history. It reads the current configuration, asks the local model for a native tool call, validates its name/arguments, and executes existing Python planning functions. Model requests use a fixed loopback URL, no provider key, a bounded context/output, at most three selections and an overall request timeout. Generated prose is never rendered as an energy answer; assessments/actions/numbers are generated from actual tool results. This is genuine LLM tool selection with a deterministic result renderer, not free-form model reasoning presented as numerical evidence.
 
-Future hosted integration requires an explicit provider credential decision, environment-only secrets, bounded tool calls, and tests of real provider behavior. A tool-interface test is not proof that an LLM has run. A local/remote LLM outage must preserve the ordinary deterministic planner and clearly disclose the unavailable provider.
+The operator context remains authoritative. New fixed-equipment proposals require explicit user evidence for power, consecutive whole-hour runtime, earliest start and deadline. Existing protected equipment cannot be edited through agent tools. A hypothetical appliance is checked at every allowed start as fixed hourly demand; this does not validate clinical cycles. Capacity search holds initial stored kWh, forecast, reserve, efficiencies, equipment and output limits fixed. It brackets a modeled transition to within 0.25 kWh, up to 200 kWh; no charged new battery, price or certified sizing is inferred.
+
+Native local templates sometimes encode numeric/list arguments as JSON strings. A narrow provider adapter decodes only known numeric/list fields before strict validation. HTTP user inputs remain strict. Unknown tools, unsupported arguments and malformed responses cannot execute code or write configuration. Missing inputs produce focused backend-authored questions.
+
+The original `/api/assistant` offline rule-based editor and `/api/planner/ask` guided forecast workflow remain unchanged. Local-model connection failures, invalid calls and busy/timeout cases disclose deterministic fallback. Weather errors propagate as unavailable rather than inventing a forecast. Historical/synthetic planning remains an explicit offline alternative.
+
+Wajo authenticated discovery and a harmless greeting were tested separately. The application neither loads its credential nor invokes Fo. No Claude integration or hosted-LLM validation is claimed. See [architecture decision and proof](WAJO_INVESTIGATION.md).

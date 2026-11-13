@@ -1,5 +1,20 @@
 import { test, expect, type Page } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/agent/status", (route) =>
+    route.fulfill({
+      json: {
+        available: false,
+        mode: "deterministic_guided_fallback",
+        model: null,
+        provider: "test",
+        cloud_ai: false,
+        note: "Offline test",
+      },
+    }),
+  );
+});
+
 async function home(page: Page) {
   await page.goto("/");
   await expect(
@@ -428,7 +443,7 @@ test("bundled historical weather and local conversation work with external reque
 }) => {
   await page.route("**/*", (route) =>
     new URL(route.request().url()).hostname === "127.0.0.1"
-      ? route.continue()
+      ? route.fallback()
       : route.abort(),
   );
   await home(page);

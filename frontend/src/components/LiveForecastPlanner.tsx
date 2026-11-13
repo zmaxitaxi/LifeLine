@@ -28,7 +28,11 @@ import { Disclosure } from "./Disclosure";
 import { ScheduleOverview } from "./ScheduleOverview";
 import { DetailedAnalysis } from "./DetailedAnalysis";
 import { api, num } from "@/lib/clinic";
-import type { SimulationRequest } from "../../../contracts/api";
+import type {
+  SimulationRequest,
+  SimulationResponse,
+} from "../../../contracts/api";
+import type { AgentResponse, AgentStatus } from "../../../contracts/agent";
 import type {
   ForecastPlanResponse,
   GuidedForecastResponse,
@@ -104,7 +108,16 @@ export function ForecastProvenance({ forecast }: { forecast: SolarForecast }) {
   );
 }
 
-export function ForecastResults({ result }: { result: ForecastPlanResponse }) {
+export function ForecastResults({
+  result,
+  focusFactor = 1,
+}: {
+  result: ForecastPlanResponse;
+  focusFactor?: number;
+}) {
+  const focusedPlan =
+    result.uncertainty_cases.find((c) => c.sunshine_factor === focusFactor)
+      ?.plan ?? result.plan;
   const cases = [
     { sunshine_factor: 1, plan: result.plan },
     ...result.uncertainty_cases,
@@ -134,19 +147,28 @@ export function ForecastResults({ result }: { result: ForecastPlanResponse }) {
       ) : null}
       <Alert
         variant={
-          result.plan.status === "CRITICAL_SHORTAGE" ? "destructive" : "default"
+          focusedPlan.status === "CRITICAL_SHORTAGE" ? "destructive" : "default"
         }
         className={
-          result.plan.status === "RESERVE_AT_RISK"
+          focusedPlan.status === "RESERVE_AT_RISK"
             ? "border-amber-400 bg-amber-50 text-amber-950"
             : undefined
         }
       >
         <AlertTitle>
           <h3>Computed plan for {result.planning_date}</h3>
+          {focusFactor !== 1 ? (
+            <p>
+              Showing {Math.round((1 - focusFactor) * 100)}% lower-sunshine case
+            </p>
+          ) : null}
         </AlertTitle>
         <AlertDescription>
-          <p>{result.assessment}</p>
+          <p>
+            {focusFactor === 1
+              ? result.assessment
+              : focusedPlan.diagnosis.explanation}
+          </p>
           <p>
             {result.initial_battery_basis} Assumed charge:{" "}
             {num(result.midnight_battery_kwh)} kWh.
@@ -154,11 +176,16 @@ export function ForecastResults({ result }: { result: ForecastPlanResponse }) {
         </AlertDescription>
       </Alert>
       <ol className="list-decimal space-y-2 pl-5 text-sm">
-        {result.actions.slice(0, 3).map((a) => (
-          <li key={a}>{a}</li>
-        ))}
+        {(focusFactor === 1
+          ? result.actions
+          : focusedPlan.recommendations.map((r) => r.explanation)
+        )
+          .slice(0, 3)
+          .map((a) => (
+            <li key={a}>{a}</li>
+          ))}
       </ol>
-      <ScheduleOverview result={result.plan} id="forecast-schedule" />
+      <ScheduleOverview result={focusedPlan} id="forecast-schedule" />
       <div>
         <h3 className="mb-2">What if sunshine is lower?</h3>
         <p className="mb-3 text-sm text-muted-foreground">
@@ -205,7 +232,7 @@ export function ForecastResults({ result }: { result: ForecastPlanResponse }) {
         </Table>
       </div>
       <Disclosure title="Forecast detailed analysis" keepMounted={false}>
-        <DetailedAnalysis result={result.plan} idPrefix="forecast-" />
+        <DetailedAnalysis result={focusedPlan} idPrefix="forecast-" />
       </Disclosure>
       <Disclosure title="Forecast assumptions, limitations and provenance">
         <ForecastProvenance forecast={result.forecast} />
@@ -224,10 +251,14 @@ export function LiveForecastPlanner({
   clinic,
   onPlan,
   questionPrompt,
+  onMessage,
+  onApplyRequirement,
 }: {
   clinic: SimulationRequest;
   onPlan?: (result: ForecastPlanResponse, answer?: string) => void;
   questionPrompt?: { text: string; id: number } | null;
+  onMessage?: (message: string) => void;
+  onApplyRequirement?: (plan: SimulationResponse) => void;
 }) {
   const [locations, setLocations] = useState<LocationOption[]>([]);
   const [selected, setSelected] = useState("kisumu");
@@ -244,13 +275,35 @@ export function LiveForecastPlanner({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null);
+  const [useAgent, setUseAgent] = useState(false);
+  const [agentAnswer, setAgentAnswer] = useState<AgentResponse | null>(null);
+  const [responseFocus, setResponseFocus] = useState(1);
+  const [previousQuestions, setPreviousQuestions] = useState<string[]>([]);
+  const [inputBasis, setInputBasis] = useState<
+    "synthetic_example" | "operator_entered_unverified"
+  >("synthetic_example");
   const abort = useRef<AbortController | null>(null);
   const sequence = useRef(0);
   const signature = JSON.stringify(clinic);
   useEffect(() => {
+    const controller = new AbortController();
+    void api<AgentStatus>("agent/status", undefined, controller.signal)
+      .then((status) => {
+        setAgentStatus(status);
+        setUseAgent(status.available);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+  useEffect(() => {
+    setPreviousQuestions([]);
+  }, [signature, latitude, longitude, midnight, day, inputBasis]);
+  useEffect(() => {
     if (questionPrompt) {
       setQuestion(questionPrompt.text);
-      setDay("tomorrow");
+      if (/\btoday\b/i.test(questionPrompt.text)) setDay("today");
+      else if (/\btomorrow\b/i.test(questionPrompt.text)) setDay("tomorrow");
     }
   }, [questionPrompt]);
   useEffect(() => {
@@ -284,8 +337,19 @@ export function LiveForecastPlanner({
     abort.current?.abort();
     setBusy(false);
     setResult(null);
+    setResponseFocus(1);
     setMessage("");
-  }, [signature, latitude, longitude, midnight, day, question]);
+    setAgentAnswer(null);
+  }, [
+    signature,
+    latitude,
+    longitude,
+    midnight,
+    day,
+    question,
+    useAgent,
+    inputBasis,
+  ]);
   useEffect(() => {
     setForecast(null);
   }, [latitude, longitude]);
@@ -348,7 +412,31 @@ export function LiveForecastPlanner({
         };
         let output: ForecastPlanResponse | null;
         let answer: string | undefined;
-        if (day === "tomorrow") {
+        if (useAgent) {
+          const response = await api<AgentResponse>(
+            "agent/ask",
+            {
+              clinic,
+              latitude: lat,
+              longitude: lon,
+              day,
+              midnight_battery_kwh: charge,
+              question,
+              previous_questions: previousQuestions.slice(-8),
+              inputs_confirmed: confirmed,
+              input_basis: inputBasis,
+            },
+            controller.signal,
+          );
+          if (current !== sequence.current) return;
+          setAgentAnswer(response);
+          setResponseFocus(response.selected_sunshine_factor);
+          setPreviousQuestions((history) => [...history, question].slice(-8));
+          setMessage(response.message);
+          answer = response.message;
+          output = response.result;
+          if (!output) onMessage?.(response.message);
+        } else if (day === "tomorrow") {
           const response = await api<GuidedForecastResponse>(
             "planner/ask",
             { ...body, question },
@@ -358,6 +446,7 @@ export function LiveForecastPlanner({
           setMessage(response.message);
           answer = response.message;
           output = response.result;
+          setResponseFocus(response.selected_sunshine_factor);
         } else
           output = await api<ForecastPlanResponse>(
             "forecast/plan",
@@ -401,11 +490,60 @@ export function LiveForecastPlanner({
         </CardTitle>
         <CardDescription>
           Open-Meteo today/tomorrow forecasts replace example sunshine, using
-          this clinic’s equipment and physical limits. Guided planning is
-          deterministic; no hosted language model is connected.
+          this clinic’s equipment and physical limits. Local AI selects
+          validated tools; energy figures and assessments come from Python.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
+        <p role="status" className="text-sm" data-testid="local-agent-status">
+          {agentStatus?.available
+            ? `Local AI ready · ${agentStatus.model} · Ollama on this computer`
+            : "Local AI unavailable · deterministic guided planning remains available"}
+        </p>
+        <FieldGroup className="grid gap-4 sm:grid-cols-2">
+          <Field>
+            <FieldLabel htmlFor="assistant-mode">Planning assistant</FieldLabel>
+            <NativeSelect
+              id="assistant-mode"
+              value={useAgent ? "local" : "guided"}
+              onChange={(e) => setUseAgent(e.target.value === "local")}
+            >
+              <NativeSelectOption value="local">
+                Local AI · validated tools
+              </NativeSelectOption>
+              <NativeSelectOption value="guided">
+                Guided fallback · no LLM
+              </NativeSelectOption>
+            </NativeSelect>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="clinic-input-basis">
+              Clinic input source
+            </FieldLabel>
+            <NativeSelect
+              id="clinic-input-basis"
+              value={inputBasis}
+              onChange={(e) => {
+                setInputBasis(e.target.value as typeof inputBasis);
+                setConfirmed(false);
+              }}
+            >
+              <NativeSelectOption value="synthetic_example">
+                Synthetic example clinic
+              </NativeSelectOption>
+              <NativeSelectOption value="operator_entered_unverified">
+                Operator-entered inventory · unverified
+              </NativeSelectOption>
+            </NativeSelect>
+          </Field>
+        </FieldGroup>
+        <p className="text-sm text-muted-foreground">
+          {inputBasis === "synthetic_example"
+            ? "This is an illustrative clinic, not a verified facility. "
+            : "Verify hardware ratings, equipment hours and battery readings with the facility operator. "}
+          Do not enter patient information. Local AI needs no cloud key; live
+          forecasts require internet.
+        </p>
         <FieldGroup className="grid gap-4 sm:grid-cols-2">
           <Field>
             <FieldLabel htmlFor="forecast-location">Clinic location</FieldLabel>
@@ -508,9 +646,11 @@ export function LiveForecastPlanner({
             onCheckedChange={setConfirmed}
             aria-label="Confirm midnight battery assumption"
           />
-          <span>I reviewed the midnight battery assumption.</span>
+          <span>
+            I reviewed the midnight battery assumption and clinic inputs above.
+          </span>
         </label>
-        {day === "tomorrow" ? (
+        {day === "tomorrow" || useAgent ? (
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="forecast-question">
@@ -549,7 +689,97 @@ export function LiveForecastPlanner({
             {message}
           </p>
         ) : null}
-        {result ? <ForecastResults result={result} /> : null}
+        {agentAnswer ? (
+          <div className="space-y-3 text-sm" data-testid="agent-answer">
+            <p>
+              {agentAnswer.mode === "local_tool_agent"
+                ? `Local AI tool selection: ${agentAnswer.model}. Figures and assessment computed by LifeLine.`
+                : "Guided fallback active. No LLM answer was used."}
+            </p>
+            {agentAnswer.fallback_reason ? (
+              <p className="text-amber-800">
+                Local model unavailable or tool selection rejected; the result
+                below is explicitly from guided fallback.
+              </p>
+            ) : null}
+            <p>
+              Tools:{" "}
+              {agentAnswer.tool_calls
+                .map((t) => `${t.name} (${t.status})`)
+                .join(" → ") || "Waiting for reviewed inputs"}
+            </p>
+            {agentAnswer.requirement ? (
+              <Alert>
+                <AlertTitle>Additional requirement · hypothetical</AlertTitle>
+                <AlertDescription>
+                  <p>
+                    The added equipment is checked as fixed consecutive hourly
+                    demand. Existing essential hours stay protected. This
+                    proposal has not changed the clinic inventory. Medical
+                    cycles and surge power need separate validation.
+                  </p>
+                  {onApplyRequirement ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        onApplyRequirement(
+                          agentAnswer.requirement!.proposed.plan,
+                        );
+                        onMessage?.(
+                          "The additional fixed requirement was added to the inventory by your action. Review and confirm the midnight assumption again, then calculate the updated forecast plan. Other equipment and hardware settings are unchanged.",
+                        );
+                      }}
+                    >
+                      Add fixed requirement to inventory
+                    </Button>
+                  ) : null}
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            {agentAnswer.capacity ? (
+              <div className="space-y-3" data-testid="agent-capacity">
+                <h3>Battery capacity sensitivity</h3>
+                <p>
+                  Target:{" "}
+                  {agentAnswer.capacity.target === "all_work"
+                    ? "all requested work and essential demand"
+                    : "essential demand"}
+                  , with reserve protected. Solar multiplier:{" "}
+                  {num(agentAnswer.capacity.sunshine_factor)}.
+                </p>
+                <Table aria-label="Computed battery capacity search">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Capacity (kWh)</TableHead>
+                      <TableHead>Essential unmet (kWh)</TableHead>
+                      <TableHead>Work deferred (kWh)</TableHead>
+                      <TableHead>Minimum battery (kWh)</TableHead>
+                      <TableHead>Meets target</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {agentAnswer.capacity.samples.map((s, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{num(s.battery_capacity_kwh, 3)}</TableCell>
+                        <TableCell>{num(s.essential_unmet_kwh, 3)}</TableCell>
+                        <TableCell>{num(s.flexible_deferred_kwh, 3)}</TableCell>
+                        <TableCell>{num(s.minimum_battery_kwh, 3)}</TableCell>
+                        <TableCell>{s.meets_target ? "Yes" : "No"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {agentAnswer.capacity.assumptions.map((a) => (
+                  <p key={a}>{a}</p>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+        {result ? (
+          <ForecastResults result={result} focusFactor={responseFocus} />
+        ) : null}
       </CardContent>
     </Card>
   );

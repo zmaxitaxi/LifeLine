@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-11-13T19:04:34.394750+00:00",
+  "backend_tests": 266,
+  "backend_result": "passed",
+  "browser_tests": 22,
+  "browser_result": "passed",
+  "typescript": "passed",
+  "production_build": "passed",
+  "reference_calibration": "passed",
+  "pip_dependencies": "no broken requirements",
+  "local_model": "llama3.1:8b",
+  "runtime": "Ollama 0.33.2; native tool calls; no cloud provider",
+  "real_local_model_cases": 5,
+  "real_local_model_weather_mode": "explicit recorded actual forecast replay",
+  "fresh_forecast_status": "connection unavailable in latest check; earlier successful retrieval retained separately",
+  "credential_scan": "passed; actual local key absent from release files, bundle and history; local file ignored",
+  "limits": [
+    "No field or clinical validation",
+    "No fresh live-weather success claimed for this final run",
+    "No general LLM benchmark or accessibility certification",
+    "Official event-specific rules/submission not independently verified"
+  ]
+}

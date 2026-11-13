@@ -21,7 +21,7 @@ Critical loads are supplied by a hypothetical facility operator. The software do
 
 ## 2. Stack and repository structure
 
-Use React, TypeScript, Vite, Tailwind CSS, and Recharts for the frontend. Use Python 3.11, FastAPI, Pydantic, NumPy, SciPy MILP, and Pytest for the backend. Keep the pure energy model independent of FastAPI and UI code. No LLM, external credentials, or runtime network service is required.
+Use React, TypeScript, Vite, Tailwind CSS, and Recharts for the frontend. Use Python 3.11, FastAPI, Pydantic, NumPy, SciPy MILP, and Pytest for the backend. Keep the pure energy model independent of FastAPI and UI code. The numerical core needs no LLM, credentials or runtime network service. The optional local Ollama agent now selects planning tools without a cloud key; fresh forecasts require network access. See the current final checklist.
 
 Backend versions and transitive dependencies are pinned in `backend/requirements.txt` and `requirements-dev.txt`. Person 3 still owns frontend dependencies. Target Node 22.12+ within Node 22 and the Vite version compatible with that environment. Do not spend the hackathon upgrading stacks or introducing a database.
 

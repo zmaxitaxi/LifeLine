@@ -71,4 +71,4 @@ async def guided_plan(body: GuidedPlanRequest, request: Request):
     else:
         message += ' '+computed_assessment(result.plan)
     return {'mode':'deterministic_guided_fallback', 'needs_clarification':False, 'tool_calls':[call.model_dump()],
-            'message':message, 'result':result}
+            'message':message, 'result':result, 'selected_sunshine_factor':factor}

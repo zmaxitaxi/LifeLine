@@ -25,6 +25,9 @@ from .scenarios import CONFIG_PATH, load_catalog, load_weather
 from .assistant import AssistantRequest, AssistantResponse, prepare, summarize
 from .forecast_routes import router as forecast_router
 from .weather_forecast import ForecastError, ForecastService
+from .local_agent import LocalAgent
+from .agent_routes import router as agent_router
+from .demos import competing_windows
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +43,7 @@ def validation_details(errors, prefix=()):
     return [dict(loc=list(prefix)+list(e['loc']), message=e['msg'], type=e['type']) for e in errors]
 
 
-def create_app(config_path: Path = CONFIG_PATH, forecast_service=None):
+def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_service=None):
     @asynccontextmanager
     async def lifespan(app):
         app.state.catalog = load_catalog(config_path)
@@ -48,6 +51,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None):
         importlib.import_module('scipy.optimize')  # preload before accepting requests
         app.state.solve_lock = asyncio.Lock()
         app.state.forecasts = forecast_service or ForecastService()
+        app.state.agent = agent_service or LocalAgent()
         yield
 
     app = FastAPI(title='LifeLine API', version='1.0', lifespan=lifespan,
@@ -97,6 +101,10 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None):
     @app.get('/api/weather')
     async def weather_datasets():
         return {'datasets': [load_weather()]}
+
+    @app.get('/api/demos/competing-windows')
+    async def competing_demo(request:Request):
+        return competing_windows(request.app.state.catalog)
 
     @app.get('/api/planning-status')
     async def planning_status():
@@ -192,6 +200,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None):
             tools_used=['energy_simulator', 'schedule_optimizer', 'schedule_comparison'])
 
     app.include_router(forecast_router)
+    app.include_router(agent_router)
 
     @app.api_route('/api/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], include_in_schema=False)
     async def invalid_api_path(path: str, request: Request):

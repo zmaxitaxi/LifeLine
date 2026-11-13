@@ -39,6 +39,7 @@ import type {
   SimulationRequest,
   SimulationResponse,
 } from "../../contracts/api";
+import type { AgentStatus } from "../../contracts/agent";
 
 const TechnicalResults = lazy(() => import("@/components/TechnicalResults"));
 type View = "simple" | "detailed" | "advanced";
@@ -59,6 +60,7 @@ export default function App() {
     id: number;
   } | null>(null);
   const [usingForecast, setUsingForecast] = useState(false);
+  const [localAIAvailable, setLocalAIAvailable] = useState(false);
   const [pending, setPending] = useState<PlanningQuestion | null>(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -75,6 +77,7 @@ export default function App() {
     const outcomes = await Promise.allSettled([
       api<ScenarioListResponse>("scenarios"),
       api<PlanningStatus>("planning-status"),
+      api<AgentStatus>("agent/status"),
     ]);
     if (outcomes[0].status === "fulfilled") {
       const list = outcomes[0].value.scenarios;
@@ -92,6 +95,9 @@ export default function App() {
       setStatus(outcomes[1].value);
       setStatusError(false);
     } else setStatusError(true);
+    setLocalAIAvailable(
+      outcomes[2].status === "fulfilled" && outcomes[2].value.available,
+    );
     setInitializing(false);
   }, []);
   useEffect(() => {
@@ -180,7 +186,12 @@ export default function App() {
     const abort = new AbortController();
     controller.current = abort;
     const question = followup ? pending : null;
-    if (!question && (/\bforecasts?\b/i.test(message) || (usingForecast && /sunshine|weather|cloud|tomorrow|today|electricity/i.test(message)))) {
+    if (
+      !question &&
+      (/\bforecasts?\b/i.test(message) ||
+        usingForecast ||
+        (localAIAvailable && draft.dataset !== "kisumu-2025-01-14"))
+    ) {
       setBusy(false);
       setError("");
       setView("simple");
@@ -191,7 +202,7 @@ export default function App() {
         { role: "user", text: message },
         {
           role: "assistant",
-          text: "I can check the actual weather forecast for the configured equipment. In the live-weather panel, choose the location and confirm the assumed battery energy at tomorrow’s local midnight, then calculate the forecast-backed plan. This is a guided tool workflow, not a connected language model.",
+          text: "In the live-weather panel, review the clinic location, equipment and assumed charge at local midnight, then calculate the plan. Local AI can select validated planning tools when Ollama is running; guided fallback remains available.",
         },
       ]);
       return;
@@ -241,6 +252,53 @@ export default function App() {
       const panel = document.getElementById(`${next}-view`);
       if (panel && !panel.contains(document.activeElement)) panel.focus();
     });
+  }
+  async function loadCompetingExample() {
+    invalidate();
+    const current = ++sequence.current;
+    const abort = new AbortController();
+    controller.current = abort;
+    setBusy(true);
+    setError("");
+    setMessages([]);
+    setPending(null);
+    setUsingForecast(false);
+    setDirty(true);
+    try {
+      const demo = await api<{
+        request: SimulationRequest;
+        description: string;
+        limitations: string[];
+      }>("demos/competing-windows", undefined, abort.signal);
+      const response = await api<SimulationResponse>(
+        "simulate",
+        demo.request,
+        abort.signal,
+      );
+      if (current !== sequence.current) return;
+      const next = fromResult(response);
+      next.dataset = "kisumu-2025-01-14";
+      setDraft(next);
+      setResult(response);
+      setLastRequest(demo.request);
+      setDirty(false);
+      setMessages([
+        {
+          role: "assistant",
+          text: [demo.description, ...demo.limitations].join(" "),
+        },
+      ]);
+      setView("detailed");
+    } catch (e) {
+      if (
+        e instanceof Error &&
+        e.name !== "AbortError" &&
+        current === sequence.current
+      )
+        setError(e.message);
+    } finally {
+      if (current === sequence.current) setBusy(false);
+    }
   }
   const valid = draft ? validDraft(draft) : false;
   const problem = draft ? draftProblem(draft) : null;
@@ -342,7 +400,7 @@ export default function App() {
                 </NativeSelect>
               </label>
               <h1>{clinicNames[draft.scenario]}</h1>
-              <p>Kisumu, Kenya · East Africa time</p>
+              <p>Equipment profile · choose the forecast location below</p>
             </section>
             <WeatherContext
               draft={draft}
@@ -352,7 +410,7 @@ export default function App() {
               onChange={edit}
               forecastQuestion={forecastQuestion}
               onForecastAnswer={(answer) => {
-            setUsingForecast(true);
+                setUsingForecast(true);
                 setResult(null);
                 setLastRequest(null);
                 setDirty(false);
@@ -445,6 +503,14 @@ export default function App() {
                 >
                   <ArrowLeft data-icon="inline-start" />
                   Back to your simple plan
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() => void loadCompetingExample()}
+                >
+                  Load competing-window example
                 </Button>
                 <form
                   onSubmit={(e) => {

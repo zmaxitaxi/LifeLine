@@ -1,6 +1,8 @@
 # LifeLine
 
-**Live weather planning is available:** select clinic coordinates, retrieve today's and tomorrow's [Open-Meteo forecasts](https://open-meteo.com/), confirm the assumed battery energy at local midnight, and generate a forecast-backed equipment schedule with lower-sunshine comparisons. Historical NASA and synthetic modes remain available. See [live weather setup, API/tools and evidence](LIVE_WEATHER.md), [architecture](ARCHITECTURE.md) and [validation gaps](VALIDATION_GAPS.md).
+**Local AI is implemented:** Llama 3.1 8B through Ollama understands questions and selects LifeLine's validated tools. Python computes all schedules, energy figures and assessments. No cloud AI key is required. See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).
+
+Live weather planning retrieves today's/tomorrow's Open-Meteo forecasts when reachable; historical NASA and synthetic modes remain explicit alternatives. **The latest live check could not connect to the API hostname.** Earlier successful retrieval and a separately labeled real-local-LLM/recorded-forecast replay are retained as evidence. That replay is not fresh live verification. See [weather integration and availability](LIVE_WEATHER.md).
 
 LifeLine is an offline-capable electricity planning prototype for staff supporting resource-constrained healthcare clinics. It helps check equipment requirements and compare schedules and infrastructure alternatives; it does not guarantee power or control medical devices.
 
@@ -8,7 +10,7 @@ LifeLine is an offline-capable electricity planning prototype for staff supporti
 
 The shadcn/ui + Tailwind interface opens in **Simple mode**: choose a demonstration clinic, ask a question, or choose **Plan tomorrow’s electricity**, **Prepare for cloudy weather**, or **Check battery reliability**. A plan shows an overall assessment, its main limitation, at most three actions, and an equipment timeline. Exact model values and warnings are expandable. **Detailed mode** retains equipment editing, all three schedules, battery charts, computed comparisons, capacity alternatives, and JSON export. **Advanced settings** contains solar/battery capacities, charge, reserve, power limits, efficiencies, sunshine adjustments, and model details.
 
-The bundled **offline assistant is rule-based, not a connected AI model**. It supports electricity checks, battery checks, cloudier-day tests, equipment duration/deadline changes, and focused follow-up questions. Unsupported requests ask for clarification. A missing sterilizer prompts for power, whole-hour runtime, and earliest start, then compares real consecutive fixed-hour energy checks before its deadline; this does not validate sterilization cycles. Both conversation and forms use the same simulator and optimizer. No OpenAI credentials are connected. The separate live-weather planner retrieves actual forecasts and exposes validated agent-callable tools; its guided fallback is also explicitly non-LLM. Forecasts require internet; synthetic and bundled historical modes work locally after installation.
+The primary **local AI assistant** retrieves reviewed configuration and chooses forecast, consecutive-load, capacity or clarification tools. It cannot change existing medical priorities, generate weather, calculate energy independently or control equipment. A hypothetical additional appliance must be explicitly adopted before the inventory changes. Generated prose is not used as numerical evidence. The original **rule-based offline assistant** and **deterministic guided fallback** remain labeled separately. Forecasts require internet; synthetic/historical planning works locally after installation.
 
 ## Run the complete demo
 
@@ -23,7 +25,15 @@ npm --prefix frontend run build
 python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it serves `frontend/dist` and the API from one local origin. No internet is needed for the application after dependencies/datasets are installed. The optional Swagger API explorer uses external assets.
+Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it serves `frontend/dist` and the API from one local origin. Synthetic/historical planning works offline after installation; fresh forecasts require internet. The optional Swagger explorer uses external assets.
+
+For local AI, install/start Ollama and ensure `ollama list` includes `llama3.1:8b` (already installed on this Mac). If it is not running, use a separate terminal:
+
+```bash
+OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 ollama serve
+```
+
+On a fresh machine, `ollama pull llama3.1:8b` downloads the model first. The app accepts only an installed local model with tool capability; cloud records are rejected. `LIFELINE_LOCAL_MODEL` in the backend process environment can select another installed tool-capable model, requiring separate validation. Weights are not bundled in Git. Check `GET /api/agent/status` and **Local AI ready** in the weather panel. Local inference needs memory and may have a slow cold start. No Anthropic setup is needed.
 
 For development, run the backend as above and `npm --prefix frontend run dev` in another terminal; open [localhost:5173](http://127.0.0.1:5173/). `npm --prefix frontend run preview` serves the build on port 4173 with an API proxy.
 
@@ -48,13 +58,15 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The current suite includes **241 backend tests** and **17 Chromium end-to-end tests**, plus TypeScript/production-build checks and built-application/API integration. Browser journeys cover first-time clinic selection, conversation and focused follow-ups, real requirement changes, explicit essential shortages, equipment editing, all three schedules, capacity bottlenecks, mobile/keyboard use, failure recovery, and historical planning with external requests blocked. Backend CI covers Python 3.11/3.12; frontend CI builds and exercises Chromium. Current remote results are available in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
+The backend suite has **266 passing tests**. The browser suite now contains **22 Chromium journeys**, including local-agent tools, provider failure, explicit requirement adoption, capacity search and the competing-window demo; the final run is recorded in [the objective checklist](FINAL_CHECKLIST.md). TypeScript/production-build and built-application/API checks are required. CI covers Python 3.11/3.12 and Chromium; remote results are in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
 
 For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright artifacts go to `/tmp/lifeline-playwright-results` unless `LIFELINE_TEST_OUTPUT` is set.
 
 Read [RESEARCH.md](RESEARCH.md), [DATA_SOURCES.md](DATA_SOURCES.md), [PRODUCT_VALIDATION.md](PRODUCT_VALIDATION.md), [computed benchmark](BENCHMARK.md), [demo script](DEMO.md), and [UI verification](docs/FRONTEND_VALIDATION.md). No user interviews, deployment partnerships, measured clinic savings, health outcomes, or guaranteed availability are claimed.
 
 Forecast integration adds 37 independently testable backend checks and four browser checks. A real forecast/browser/model run is recorded in [weather validation evidence](docs/evidence/live-forecast-run.json). These check integration and calculations, not forecast accuracy or clinical outcomes. Forecast browser fixtures invoke the actual Python API/model with injected test weather and are never application fallbacks.
+
+Local-agent contract tests use injected model/weather transport and real numerical calculations. A separate run exercised the actual installed Llama model on five questions using an earlier actual forecast, clearly labeled [recorded replay](docs/evidence/local-agent-recorded-weather-run.json). Repeat fresh live verification with `.venv/bin/python scripts/check_local_agent.py --midnight-battery-kwh 6` when the forecast endpoint is reachable. The prompt sample is not a general language-model evaluation.
 
 ## Run the API
 
@@ -118,6 +130,8 @@ The improvement is **2.211 kWh more stored energy at midnight**, **0.368 kWh hig
 
 **Sunshine-first matches the optimizer's key metrics in this primary case.** A separate constrained-window test demonstrates an advantage for the MILP. No general superiority or empirical clinic benefit is claimed.
 
+The new **Detailed mode → Load competing-window example** completes 3.8 kWh, versus 2.770 kWh for the existing schedule and 3.470 kWh for sunshine-first, under identical inputs. Essential demand/reserve are protected. This is an unequal-work comparison. Reversing greedy task order closes its completion gap. See [complete inputs, results and caveats](STRONGEST_DEMO.md).
+
 Storm still cannot maintain reserve when optional work is deferred. High Demand still has 1.320 kWh critical shortfall due to an hourly discharge limit. Their battery improvements come with less flexible work completed; do not present those as the same-work demonstration.
 
 ## Implementation and handoff
@@ -144,7 +158,7 @@ This checks reference dispatch and inputs, separately from the optimizer's tests
 
 The dashboard now consumes the actual API with request cancellation/stale guards, configurable equipment, all four examples, historical weather, responsive charts, and a Capacity Explorer. Further work is practitioner validation, measured facility inputs, multi-day/uncertainty evaluation, and electrical/clinical review. Drafts are held in browser memory; export computed results as JSON. There is no saved account or device integration.
 
-The earlier Person 2 milestone had 177 passing tests; the current suite has 241 backend tests plus 17 browser tests. See the current evidence above; [Person 2 HTTP evidence](docs/evidence/person-2-http-results.json) remains a historical record.
+The earlier Person 2 milestone had 177 tests; a later milestone had 241 backend/17 browser tests. Current checks and external gaps are recorded above and in [the final checklist](FINAL_CHECKLIST.md). [Person 2 HTTP evidence](docs/evidence/person-2-http-results.json) remains a historical record.
 
 The supplied hackathon deadline is Saturday, November 14, 2026, 11:59 PM America/Los_Angeles; event rules have not been independently verified. The prototype supports investigation of SDG 7 and SDG 3; it does not demonstrate measured health outcomes.
 

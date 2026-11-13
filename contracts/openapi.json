@@ -58,6 +58,22 @@
         }
       }
     },
+    "/api/demos/competing-windows": {
+      "get": {
+        "summary": "Competing Demo",
+        "operationId": "competing_demo_api_demos_competing_windows_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/planning-status": {
       "get": {
         "summary": "Planning Status",
@@ -445,10 +461,273 @@
           }
         }
       }
+    },
+    "/api/agent/status": {
+      "get": {
+        "summary": "Status",
+        "operationId": "status_api_agent_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/tools": {
+      "get": {
+        "summary": "Tools",
+        "operationId": "tools_api_agent_tools_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/ask": {
+      "post": {
+        "summary": "Ask",
+        "operationId": "ask_api_agent_ask_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AgentRequest": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "clinic": {
+            "$ref": "#/components/schemas/SimulationRequest"
+          },
+          "midnight_battery_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Midnight Battery Kwh"
+          },
+          "question": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Question"
+          },
+          "previous_questions": {
+            "items": {
+              "type": "string",
+              "maxLength": 2000,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "Previous Questions",
+            "default": []
+          },
+          "inputs_confirmed": {
+            "type": "boolean",
+            "title": "Inputs Confirmed",
+            "default": false
+          },
+          "input_basis": {
+            "type": "string",
+            "enum": [
+              "synthetic_example",
+              "operator_entered_unverified"
+            ],
+            "title": "Input Basis",
+            "default": "synthetic_example"
+          },
+          "day": {
+            "type": "string",
+            "enum": [
+              "today",
+              "tomorrow"
+            ],
+            "title": "Day",
+            "default": "tomorrow"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "clinic",
+          "question"
+        ],
+        "title": "AgentRequest"
+      },
+      "AgentResponse": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "local_tool_agent",
+              "deterministic_guided_fallback"
+            ],
+            "title": "Mode"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "needs_clarification": {
+            "type": "boolean",
+            "title": "Needs Clarification"
+          },
+          "clarification_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clarification Field"
+          },
+          "tool_calls": {
+            "items": {
+              "$ref": "#/components/schemas/ToolTrace"
+            },
+            "type": "array",
+            "title": "Tool Calls"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForecastPlanResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requirement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RequirementResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CapacityResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason"
+          },
+          "input_basis": {
+            "type": "string",
+            "enum": [
+              "synthetic_example",
+              "operator_entered_unverified"
+            ],
+            "title": "Input Basis"
+          },
+          "selected_sunshine_factor": {
+            "type": "number",
+            "title": "Selected Sunshine Factor",
+            "default": 1.0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "mode",
+          "message",
+          "needs_clarification",
+          "tool_calls",
+          "input_basis"
+        ],
+        "title": "AgentResponse"
+      },
       "ApiErrorResponse": {
         "properties": {
           "error": {
@@ -549,6 +828,128 @@
           "message"
         ],
         "title": "AssistantResponse"
+      },
+      "CapacityResult": {
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "essential",
+              "all_work"
+            ],
+            "title": "Target"
+          },
+          "sunshine_factor": {
+            "type": "number",
+            "title": "Sunshine Factor"
+          },
+          "current_capacity_kwh": {
+            "type": "number",
+            "title": "Current Capacity Kwh"
+          },
+          "tested_capacity_kwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tested Capacity Kwh"
+          },
+          "additional_capacity_kwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Additional Capacity Kwh"
+          },
+          "resolution_kwh": {
+            "type": "number",
+            "title": "Resolution Kwh"
+          },
+          "search_limit_kwh": {
+            "type": "number",
+            "title": "Search Limit Kwh"
+          },
+          "samples": {
+            "items": {
+              "$ref": "#/components/schemas/CapacitySample"
+            },
+            "type": "array",
+            "title": "Samples"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assumptions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "target",
+          "sunshine_factor",
+          "current_capacity_kwh",
+          "tested_capacity_kwh",
+          "additional_capacity_kwh",
+          "resolution_kwh",
+          "search_limit_kwh",
+          "samples",
+          "explanation",
+          "assumptions"
+        ],
+        "title": "CapacityResult"
+      },
+      "CapacitySample": {
+        "properties": {
+          "battery_capacity_kwh": {
+            "type": "number",
+            "title": "Battery Capacity Kwh"
+          },
+          "essential_unmet_kwh": {
+            "type": "number",
+            "title": "Essential Unmet Kwh"
+          },
+          "flexible_deferred_kwh": {
+            "type": "number",
+            "title": "Flexible Deferred Kwh"
+          },
+          "minimum_battery_kwh": {
+            "type": "number",
+            "title": "Minimum Battery Kwh"
+          },
+          "reserve_breached": {
+            "type": "boolean",
+            "title": "Reserve Breached"
+          },
+          "meets_target": {
+            "type": "boolean",
+            "title": "Meets Target"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "battery_capacity_kwh",
+          "essential_unmet_kwh",
+          "flexible_deferred_kwh",
+          "minimum_battery_kwh",
+          "reserve_breached",
+          "meets_target"
+        ],
+        "title": "CapacitySample"
       },
       "ComparisonMetrics": {
         "properties": {
@@ -1184,6 +1585,11 @@
                 "type": "null"
               }
             ]
+          },
+          "selected_sunshine_factor": {
+            "type": "number",
+            "title": "Selected Sunshine Factor",
+            "default": 1.0
           }
         },
         "additionalProperties": false,
@@ -1722,6 +2128,53 @@
         ],
         "title": "RequestedTaskAllocation"
       },
+      "RequirementResult": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "start_hour": {
+            "type": "integer",
+            "title": "Start Hour"
+          },
+          "end_hour": {
+            "type": "integer",
+            "title": "End Hour"
+          },
+          "candidates_evaluated": {
+            "type": "integer",
+            "title": "Candidates Evaluated"
+          },
+          "essential_requirements_fully_supplied": {
+            "type": "boolean",
+            "title": "Essential Requirements Fully Supplied"
+          },
+          "original": {
+            "$ref": "#/components/schemas/ForecastPlanResponse"
+          },
+          "proposed": {
+            "$ref": "#/components/schemas/ForecastPlanResponse"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "start_hour",
+          "end_hour",
+          "candidates_evaluated",
+          "essential_requirements_fully_supplied",
+          "original",
+          "proposed",
+          "explanation"
+        ],
+        "title": "RequirementResult"
+      },
       "ScenarioListResponse": {
         "properties": {
           "api_version": {
@@ -2257,6 +2710,30 @@
           "served_kwh"
         ],
         "title": "TaskAllocation"
+      },
+      "ToolTrace": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "rejected",
+              "unavailable"
+            ],
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "ToolTrace"
       },
       "ValidationError": {
         "properties": {

@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-11-13T18:47:25.080850+00:00",
+  "endpoint": "Open-Meteo live forecast through LifeLine",
+  "http_status": 503,
+  "response": {
+    "error": {
+      "code": "FORECAST_UNAVAILABLE",
+      "message": "Live weather is unavailable. Retry, or explicitly select historical NASA data or a synthetic scenario. No fallback weather has been presented as a live forecast.",
+      "details": []
+    }
+  },
+  "scope": "Current verification attempt; an external connection failure is not proof of global provider downtime. Earlier successful retrieval is retained separately. No forecast was fabricated or silently replaced."
+}

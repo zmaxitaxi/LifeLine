@@ -11,7 +11,7 @@ import type {
 import type { Draft } from "../lib/clinic";
 import { Disclosure } from "@/components/Disclosure";
 import { LiveForecastPlanner } from "@/components/LiveForecastPlanner";
-import { requestFor } from "../lib/clinic";
+import { requestFor, fromResult } from "../lib/clinic";
 import { useEffect, useState } from "react";
 
 export function WeatherContext({
@@ -61,6 +61,10 @@ export function WeatherContext({
         <LiveForecastPlanner
           clinic={requestFor(draft)}
           questionPrompt={forecastQuestion}
+          onMessage={onForecastAnswer}
+          onApplyRequirement={(plan) =>
+            onChange({ ...draft, equipment: fromResult(plan).equipment })
+          }
           onPlan={(output, answer) =>
             onForecastAnswer?.(
               `${answer ?? output.assessment} Forecast date: ${output.planning_date} (${output.forecast.timezone}); weather source: ${output.forecast.source}. Review the computed schedule and lower-sunshine cases in the live-weather panel.`,

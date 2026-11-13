@@ -192,7 +192,7 @@ export async function api<T>(
   signal?: AbortSignal,
 ): Promise<T> {
   let response: Response;
-  const timeout = AbortSignal.timeout(20000);
+  const timeout = AbortSignal.timeout(path === "agent/ask" ? 90000 : 20000);
   try {
     response = await fetch(`/api/${path}`, {
       method: body === undefined ? "GET" : "POST",

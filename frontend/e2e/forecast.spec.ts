@@ -2,6 +2,21 @@ import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { test, expect, type Page } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/agent/status", (route) =>
+    route.fulfill({
+      json: {
+        available: false,
+        mode: "deterministic_guided_fallback",
+        model: null,
+        provider: "test",
+        cloud_ai: false,
+        note: "Offline test",
+      },
+    }),
+  );
+});
+
 /** Test fixtures contain injected radiation; every plan is computed by Python. */
 function fixture(path: string, body?: unknown) {
   return JSON.parse(
@@ -199,9 +214,20 @@ test("the main question opens live planning and returns a computed forecast answ
   await expect(
     page.getByRole("log", { name: "Conversation with LifeLine" }),
   ).toContainText("weather source: Open-Meteo Forecast API");
-  await page.getByLabel('Describe your clinic’s situation',{exact:true}).fill("What happens if tomorrow's sunshine is 50% lower?");
-  await page.getByRole('button',{name:'Make a plan',exact:true}).click();
-  await expect(panel.getByLabel('Ask about tomorrow’s weather',{exact:true})).toHaveValue("What happens if tomorrow's sunshine is 50% lower?");
-  await panel.getByRole('button',{name:'Calculate forecast-backed plan',exact:true}).click();
-  await expect(page.getByRole('log',{name:'Conversation with LifeLine'})).toContainText('For 50% lower sunshine');
+  await page
+    .getByLabel("Describe your clinic’s situation", { exact: true })
+    .fill("What happens if tomorrow's sunshine is 50% lower?");
+  await page.getByRole("button", { name: "Make a plan", exact: true }).click();
+  await expect(
+    panel.getByLabel("Ask about tomorrow’s weather", { exact: true }),
+  ).toHaveValue("What happens if tomorrow's sunshine is 50% lower?");
+  await panel
+    .getByRole("button", {
+      name: "Calculate forecast-backed plan",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("log", { name: "Conversation with LifeLine" }),
+  ).toContainText("For 50% lower sunshine");
 });

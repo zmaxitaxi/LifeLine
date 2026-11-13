@@ -1,0 +1,392 @@
+{
+  "description": "Synthetic clinic requirements with historical NASA POWER irradiance. Device charging competes with a daytime water-transfer window on a limited battery output. No clinic has validated these inputs.",
+  "limitations": [
+    "Only postpone water transfer when the operator has verified adequate essential water stock; tank levels are not modeled.",
+    "Both tasks are interruptible energy aggregates. No laundry, pumping or medical device cycle is validated.",
+    "The sunshine-first benchmark is input-order-sensitive. More sophisticated deadline-aware rules may close the gap.",
+    "This complements the original equal-work battery-reserve demo; unequal work completion must not be presented as an equal-work battery saving."
+  ],
+  "inputs": {
+    "battery_capacity_kwh": 8.0,
+    "initial_battery_kwh": 7.0,
+    "reserve_kwh": 4.8,
+    "pv_capacity_kw": 1.5,
+    "max_discharge_kw": 0.4,
+    "scenario": "scheduling",
+    "equipment": [
+      {
+        "id": "vaccine_refrigerator",
+        "name": "Vaccine refrigerator (constant average approximation)",
+        "category": "critical",
+        "power_kw": 0.12,
+        "required_hours": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "id": "communications",
+        "name": "Communications",
+        "category": "critical",
+        "power_kw": 0.04,
+        "required_hours": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "id": "essential_lighting",
+        "name": "Essential lighting",
+        "category": "critical",
+        "power_kw": 0.15,
+        "required_hours": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ]
+      },
+      {
+        "id": "shared_device_charging",
+        "name": "Shared device charging (synthetic aggregate)",
+        "category": "flexible",
+        "max_power_kw": 0.6,
+        "required_energy_kwh": 1.8,
+        "allowed_hours": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "baseline_allocations": [
+          {
+            "hour": 18,
+            "requested_kwh": 0.6
+          },
+          {
+            "hour": 19,
+            "requested_kwh": 0.6
+          },
+          {
+            "hour": 20,
+            "requested_kwh": 0.6
+          }
+        ],
+        "divisible": true
+      },
+      {
+        "id": "reserve_tank_transfer",
+        "name": "Reserve-tank transfer (postponable, illustrative)",
+        "category": "flexible",
+        "max_power_kw": 1.0,
+        "required_energy_kwh": 2.0,
+        "allowed_hours": [
+          11,
+          12,
+          13,
+          14
+        ],
+        "baseline_allocations": [
+          {
+            "hour": 11,
+            "requested_kwh": 1.0
+          },
+          {
+            "hour": 12,
+            "requested_kwh": 1.0
+          }
+        ],
+        "divisible": true
+      }
+    ],
+    "cloud_factors": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "weather_dataset": "kisumu-2025-01-14"
+  },
+  "source": "Bundled NASA POWER historical irradiation, Kisumu 2025-01-14; synthetic demand/hardware.",
+  "metrics": {
+    "baseline": {
+      "total_solar_kwh": 8.301264000000002,
+      "critical_requested_kwh": 5.34,
+      "critical_unserved_kwh": 0.0,
+      "critical_coverage_pct": 100.0,
+      "min_soc_kwh": 5.774021052631581,
+      "final_soc_kwh": 6.213764210526316,
+      "flexible_requested_kwh": 3.8,
+      "flexible_served_kwh": 2.7695600000000002,
+      "flexible_deferred_kwh": 1.0304399999999996,
+      "curtailed_kwh": 0.672179567867039,
+      "conversion_loss_kwh": 0.30576022160664806,
+      "critical_shortage_hours": [],
+      "reserve_breach_boundaries": []
+    },
+    "heuristic": {
+      "total_solar_kwh": 8.301264000000002,
+      "critical_requested_kwh": 5.34,
+      "critical_unserved_kwh": 0.0,
+      "critical_coverage_pct": 100.0,
+      "min_soc_kwh": 5.774021052631581,
+      "final_soc_kwh": 6.2311443263157935,
+      "flexible_requested_kwh": 3.8,
+      "flexible_served_kwh": 3.4698640000000003,
+      "flexible_deferred_kwh": 0.33013599999999954,
+      "curtailed_kwh": 0.0,
+      "conversion_loss_kwh": 0.2602556736842105,
+      "critical_shortage_hours": [],
+      "reserve_breach_boundaries": []
+    },
+    "optimized": {
+      "total_solar_kwh": 8.301264000000002,
+      "critical_requested_kwh": 5.34,
+      "critical_unserved_kwh": 0.0,
+      "critical_coverage_pct": 100.0,
+      "min_soc_kwh": 5.774021052631574,
+      "final_soc_kwh": 5.98849102105263,
+      "flexible_requested_kwh": 3.8,
+      "flexible_served_kwh": 3.799999999999999,
+      "flexible_deferred_kwh": 0.0,
+      "curtailed_kwh": 0.0,
+      "conversion_loss_kwh": 0.17277297894736854,
+      "critical_shortage_hours": [],
+      "reserve_breach_boundaries": []
+    }
+  },
+  "comparison": {
+    "same_flexible_work_completed": false,
+    "battery_preserved_at_midnight_kwh": -0.22527318947368613,
+    "minimum_battery_improvement_kwh": -7.105427357601002e-15,
+    "evening_minimum_improvement_kwh": -0.22527318947368613,
+    "conversion_loss_reduction_kwh": 0.13298724265927953,
+    "heuristic_matches_optimizer_metrics": false
+  },
+  "task_schedules": {
+    "baseline": [
+      {
+        "task_id": "shared_device_charging",
+        "requested_kwh": 1.8,
+        "served_kwh": 0.76956,
+        "deferred_kwh": 1.03044,
+        "allocations": [
+          {
+            "hour": 18,
+            "served_kwh": 0.28956000000000004
+          },
+          {
+            "hour": 19,
+            "served_kwh": 0.24000000000000002
+          },
+          {
+            "hour": 20,
+            "served_kwh": 0.24000000000000002
+          }
+        ]
+      },
+      {
+        "task_id": "reserve_tank_transfer",
+        "requested_kwh": 2.0,
+        "served_kwh": 2.0,
+        "deferred_kwh": 0.0,
+        "allocations": [
+          {
+            "hour": 11,
+            "served_kwh": 1.0
+          },
+          {
+            "hour": 12,
+            "served_kwh": 1.0
+          }
+        ]
+      }
+    ],
+    "heuristic": [
+      {
+        "task_id": "shared_device_charging",
+        "requested_kwh": 1.8,
+        "served_kwh": 1.7999999999999998,
+        "deferred_kwh": 0.0,
+        "allocations": [
+          {
+            "hour": 11,
+            "served_kwh": 0.6
+          },
+          {
+            "hour": 12,
+            "served_kwh": 0.6
+          },
+          {
+            "hour": 13,
+            "served_kwh": 0.6
+          }
+        ]
+      },
+      {
+        "task_id": "reserve_tank_transfer",
+        "requested_kwh": 2.0,
+        "served_kwh": 1.6698640000000002,
+        "deferred_kwh": 0.33013599999999976,
+        "allocations": [
+          {
+            "hour": 12,
+            "served_kwh": 0.6698640000000002
+          },
+          {
+            "hour": 14,
+            "served_kwh": 1.0
+          }
+        ]
+      }
+    ],
+    "optimized": [
+      {
+        "task_id": "shared_device_charging",
+        "requested_kwh": 1.8,
+        "served_kwh": 1.8000000000000003,
+        "deferred_kwh": 0.0,
+        "allocations": [
+          {
+            "hour": 8,
+            "served_kwh": 0.07796000000000008
+          },
+          {
+            "hour": 9,
+            "served_kwh": 0.36578000000000005
+          },
+          {
+            "hour": 10,
+            "served_kwh": 0.6
+          },
+          {
+            "hour": 12,
+            "served_kwh": 0.15625999999999995
+          },
+          {
+            "hour": 13,
+            "served_kwh": 0.6
+          }
+        ]
+      },
+      {
+        "task_id": "reserve_tank_transfer",
+        "requested_kwh": 2.0,
+        "served_kwh": 1.9999999999999984,
+        "deferred_kwh": 0.0,
+        "allocations": [
+          {
+            "hour": 11,
+            "served_kwh": 0.7784599999999999
+          },
+          {
+            "hour": 12,
+            "served_kwh": 0.7136040000000002
+          },
+          {
+            "hour": 13,
+            "served_kwh": 0.2669600000000002
+          },
+          {
+            "hour": 14,
+            "served_kwh": 0.2409759999999983
+          }
+        ]
+      }
+    ]
+  },
+  "reversed_task_order_heuristic": {
+    "total_solar_kwh": 8.301264000000002,
+    "critical_requested_kwh": 5.34,
+    "critical_unserved_kwh": 0.0,
+    "critical_coverage_pct": 100.0,
+    "min_soc_kwh": 5.774021052631581,
+    "final_soc_kwh": 5.961480852631584,
+    "flexible_requested_kwh": 3.8,
+    "flexible_served_kwh": 3.8,
+    "flexible_deferred_kwh": 0.0,
+    "curtailed_kwh": 0.0,
+    "conversion_loss_kwh": 0.19978314736842098,
+    "critical_shortage_hours": [],
+    "reserve_breach_boundaries": []
+  }
+}

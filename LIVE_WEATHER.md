@@ -6,7 +6,7 @@ LifeLine retrieves actual Open-Meteo weather-model forecasts for operator-select
 
 Use the normal [application commands](README.md). Asking the primary forecast question in the main question box opens the live-weather workflow and requests the reviewed midnight assumption; computed answers return to the conversation. You can also open **Live weather forecast and tomorrow’s plan**, select a representative location or enter coordinates, and fetch today/tomorrow. Enter and confirm the assumed battery energy **at local midnight for the selected day**, then calculate a forecast-backed plan. Example locations are representative points, not partner clinics.
 
-The primary guided question is: “Can our clinic safely operate tomorrow given the weather forecast?” The answer is computed from configured equipment, the retrieved weather, and the stated midnight assumption. The guided fallback recognizes a small documented set of questions; it is explicitly **not an LLM agent**. A natural-language model is not configured. Unknown requests ask for clarification and do not alter equipment.
+The primary question is: “Can our clinic safely operate tomorrow given the weather forecast?” The answer is computed from configured equipment, retrieved weather and the reviewed midnight assumption. Local **Llama 3.1 8B through Ollama** can now select validated tools through `/api/agent/ask`; it never supplies weather or energy calculations. The original `/api/planner/ask` remains a limited, explicitly non-LLM guided fallback. Unknown guided requests ask for clarification and do not alter equipment.
 
 Forecast-backed results include the actual forecast, a 25%-lower and a 50%-lower sunlight case, Before → After allocations, all three schedule comparisons, battery charts, shortage diagnostics and assumptions. Each sunlight case is independently reoptimized; this is not a fixed-schedule robustness guarantee or a calibrated probability interval.
 
@@ -68,7 +68,9 @@ Existing `/api/simulate`, scenarios, historical data and health behavior remain 
 
 Tools bind the clinic equipment, physical limits, location and starting-energy assumption outside model-generated arguments. The model-facing planning arguments can select the day and sensitivity factors; attempts to add or change equipment through tool arguments are rejected. Calls cannot access arbitrary URLs or operate devices.
 
-Hosted agent integration remains a separate, explicit credential/provider step. No OpenAI key was present during this implementation; there is no live LLM validation claim. A configured provider can consume the tool definitions and send calls to this interface. All weather and numerical calculations remain backend-owned. Keys must stay in ignored local configuration/server environment variables, never in frontend bundles or commits.
+Local-agent setup requires Ollama and the selected installed model, without an API key. The app uses a fixed localhost model endpoint and rejects cloud model records. All weather and numerical calculations remain backend-owned. Wajo was tested separately with a privately configured key; it is not used by the app. See [agent architecture](ARCHITECTURE.md) and [Wajo findings](WAJO_INVESTIGATION.md).
+
+Current verification note: the earlier successful live retrieval is retained in `docs/evidence/live-forecast-run.json`. During the final November 13 checks, the API hostname could not be connected to from this machine, while the documentation site remained reachable. This does not establish a global outage. The app returned `FORECAST_UNAVAILABLE` and did not invent weather. See `docs/evidence/current-live-weather-check.json`; repeat the live check before presenting. Recorded-forecast replays are explicitly labeled verification artifacts, never automatic runtime fallbacks.
 
 ## Verification
 

@@ -104,3 +104,4 @@ class GuidedForecastResponse(StrictModel):
     tool_calls: list[PlannerToolCall]
     message: str
     result: ForecastPlanResponse | None
+    selected_sunshine_factor: float = 1.
