@@ -62,6 +62,26 @@ def inline_schema(schema):
     return expand(schema)
 
 
+def normalize_activity_arguments(arguments):
+    """Decode known native-template fields only; HTTP inputs stay strict."""
+    value=dict(arguments)
+    typed={'start_hour','end_hour','deadline_hour','duration_hours','hour','sunshine_factor','include_recovery',
+        'equipment_ids','equipment_constraints','additional_equipment','required_hours','allowed_hours',
+        'power_kw','max_power_kw','required_energy_kwh','divisible'}
+    for key in typed:
+        if isinstance(value.get(key),str):
+            try:
+                value[key]=json.loads(value[key])
+            except ValueError:
+                pass
+    if isinstance(value.get('details'),dict):
+        value['details']=normalize_activity_arguments(value['details'])
+    for key in ('additional_equipment','equipment_constraints'):
+        if isinstance(value.get(key),list):
+            value[key]=[normalize_activity_arguments(item) if isinstance(item,dict) else item for item in value[key]]
+    return value
+
+
 def definitions(state=None, latest_fields=None):
     # Ollama's llama3.1 template cannot reliably resolve nested $ref objects.
     # Flatten native parameters only; HTTP proposal schemas remain unchanged.
@@ -245,16 +265,28 @@ async def ask_session_agent(session_id, body, store, catalog, service, lock, age
     calls = []
     offered_tools = definitions(state, latest_fields)
     error = None
-    for _ in range(3):
+    for attempt in range(3):
         try:
             async with asyncio.timeout(50):
                 call = await agent.decide(messages, toolset=offered_tools)
-            name, arguments = call['name'], call['arguments']
+            name, arguments = call['name'], normalize_activity_arguments(call['arguments'])
             if name not in {tool['name'] for tool in offered_tools}:
                 raise PlanningError('INVALID_ACTIVITY', 'This tool is unavailable in the current draft state. Inspect state or finish the active review first.')
             if name in ('inspect_planning_state', 'review_activity_proposal'):
                 EmptyArguments.model_validate(arguments)
                 state = store.check(session_id, body.expected_revision)
+                if name=='inspect_planning_state' and attempt<2:
+                    # A state read is an intermediate tool step, as in the
+                    # stateless agent's configuration/forecast getter loop.
+                    calls.append(name)
+                    offered_tools=[tool for tool in offered_tools if tool['name']!='inspect_planning_state']
+                    messages.extend([{'role':'assistant','tool_calls':[{'function':call}],'content':''},
+                        {'role':'tool','tool_name':name,'content':json.dumps({
+                            'revision':state.revision,'active_proposal_id':state.active_proposal_id,
+                            'confirmed_activity_count':len(state.confirmed_activities),
+                            'active_draft':next((p.model_dump(mode='json') for p in state.proposals if p.id==state.active_proposal_id),None)})},
+                        {'role':'user','content':'State inspection is complete. Now fulfill the current request with the appropriate activity or calculation tool; do not inspect again. Preserve stated facts and leave unknown facts missing.'}])
+                    continue
             elif name in ('propose_activity', 'update_activity_draft', 'correct_last_activity_time', 'propose_activity_revision'):
                 revision_target = None
                 if name == 'propose_activity_revision':
@@ -296,6 +328,14 @@ async def ask_session_agent(session_id, body, store, catalog, service, lock, age
                     try:
                         validate_grounding(partial, body.question, state)
                     except PlanningError:
+                        # Recover an operator-stated name if an earlier read-only
+                        # turn did not stage it. Known draft names never change
+                        # from history, and timings/specifications still require
+                        # current evidence or previously stored draft facts.
+                        if field=='name' and (not active_before or active_before.details.name is None) and any(
+                            value.casefold() in question.casefold() for question in history):
+                            grounded[field]=value
+                            continue
                         discarded.append(field)
                         continue
                     grounded[field] = value

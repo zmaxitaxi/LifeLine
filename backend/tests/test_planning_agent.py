@@ -227,6 +227,38 @@ def test_clock_grounding_retains_am_pm(text,right,wrong):
     assert not quoted_hour(text,wrong)
 
 
+def test_state_inspection_feeds_back_before_creating_the_requested_activity():
+    agent,calls=agent_with([
+        native('inspect_planning_state'),
+        {'name':'propose_activity','arguments':{'name':'Vaccination campaign','start_hour':'9'}},
+    ])
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=ask(c,create(c),'Vaccination campaign starts at 9 AM.')
+        assert d['tool_calls']==['inspect_planning_state','propose_activity']
+        assert d['state']['proposals'][0]['details']['start_hour']==9
+        wire=json.loads(calls[-1].content)
+        assert any(m['role']=='tool' and m.get('tool_name')=='inspect_planning_state' for m in wire['messages'])
+
+
+def test_native_encoded_arguments_preserve_known_facts_and_http_remains_strict():
+    agent,_=agent_with([
+        {'name':'propose_activity','arguments':{'name':'Vaccination campaign','start_hour':9}},
+        {'name':'update_activity_draft','arguments':{'name':'null','start_hour':'null','end_hour':'15','equipment_ids':'["fridge"]'}},
+    ])
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=ask(c,create(c),'Vaccination campaign starts at 9 AM.');s=d['state']
+        d=ask(c,s,'It ends at 3 PM and uses the Vaccine refrigerator.');s=d['state']
+        assert s['proposals'][0]['details']['name']=='Vaccination campaign'
+        assert s['proposals'][0]['details']['start_hour']==9
+        assert s['proposals'][0]['details']['end_hour']==15
+        assert s['proposals'][0]['details']['equipment_ids']==['fridge']
+        r=c.patch(f"{BASE}/{s['id']}/proposals/{s['active_proposal_id']}",json={
+            'expected_revision':s['revision'],'details':{'end_hour':'15'}})
+        assert r.status_code==422
+
+
 def test_native_confirmed_activity_correction_stages_reviewed_version_not_duplicate():
     agent,calls=agent_with([])
     service,_=service_for()
