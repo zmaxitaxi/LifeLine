@@ -1,623 +1,630 @@
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Activity, ArrowLeft, LoaderCircle, Settings2 } from "lucide-react";
+  ArrowUp,
+  CloudSun,
+  LoaderCircle,
+  MapPin,
+  RefreshCw,
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Disclosure } from "@/components/Disclosure";
-import { PlanningHome, type ChatMessage } from "@/components/PlanningHome";
-import { WeatherContext } from "@/components/WeatherContext";
-import { SimplePlan } from "@/components/SimplePlan";
-import { QuickRequirements } from "@/components/QuickRequirements";
-import { AdvancedSettings } from "@/components/AdvancedSettings";
-import { EquipmentEditor } from "@/components/EquipmentEditor";
-import {
-  api,
-  clinicNames,
-  draftProblem,
-  fromPreset,
-  fromResult,
-  requestFor,
-  validDraft,
-  type Draft,
-} from "@/lib/clinic";
-import type {
-  AssistantResponse,
-  PlanningQuestion,
-  PlanningStatus,
-  ScenarioListResponse,
-  ScenarioSummary,
-  SimulationRequest,
-  SimulationResponse,
-} from "../../contracts/api";
+import { api, num } from "@/lib/clinic";
 import type { AgentStatus } from "../../contracts/agent";
+import type {
+  Activity,
+  ActivityDraft,
+  ActivityProposal,
+} from "../../contracts/planning";
+import {
+  Workspace,
+  useWorkspaceNavigation,
+} from "@/features/planning/Workspace";
+import { usePlanningSession } from "@/features/planning/usePlanningSession";
+import { planningApi } from "@/features/planning/planning-api";
+import { ActivityConfirmation } from "@/features/planning/ActivityConfirmation";
+import { ActivitiesSection } from "@/features/planning/ActivitiesSection";
+import { WeatherSection } from "@/features/planning/WeatherSection";
+import { SolutionsSection } from "@/features/planning/SolutionsSection";
+import { BatteryEvidence } from "@/features/planning/BatteryEvidence";
+import { PlanOutcome } from "@/features/planning/PlanOutcome";
 
-const TechnicalResults = lazy(() => import("@/components/TechnicalResults"));
-type View = "simple" | "detailed" | "advanced";
-
+interface Message {
+  id: string;
+  role: "user" | "assistant" | "notice";
+  text: string;
+  tools?: string[];
+  inputRevision?: number;
+}
+const toolLabels: Record<string, string> = {
+  inspect_planning_state: "Inspect clinic planning state",
+  review_activity_proposal: "Review the activity draft",
+  propose_activity: "Propose a clinic activity",
+  update_activity_draft: "Update the activity draft",
+  propose_activity_revision: "Prepare a reviewed activity change",
+  correct_last_activity_time: "Correct the draft’s operating time",
+  recompute_clinic_plan: "Calculate the clinic energy plan",
+};
 export default function App() {
-  const [presets, setPresets] = useState<ScenarioSummary[]>([]);
-  const [draft, setDraft] = useState<Draft | null>(null);
-  const [view, setView] = useState<View>("simple");
-  const [result, setResult] = useState<SimulationResponse | null>(null);
-  const [lastRequest, setLastRequest] = useState<SimulationRequest | null>(
-    null,
-  );
-  const [status, setStatus] = useState<PlanningStatus | null>(null);
-  const [statusError, setStatusError] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [forecastQuestion, setForecastQuestion] = useState<{
-    text: string;
-    id: number;
-  } | null>(null);
-  const [usingForecast, setUsingForecast] = useState(false);
-  const [localAIAvailable, setLocalAIAvailable] = useState(false);
-  const [pending, setPending] = useState<PlanningQuestion | null>(null);
-  const [dirty, setDirty] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [quickEdit, setQuickEdit] = useState(false);
-  const [initializing, setInitializing] = useState(true);
-  const controller = useRef<AbortController | null>(null);
-  const sequence = useRef(0);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const initialize = useCallback(async () => {
-    setInitializing(true);
-    setError("");
-    const outcomes = await Promise.allSettled([
-      api<ScenarioListResponse>("scenarios"),
-      api<PlanningStatus>("planning-status"),
-      api<AgentStatus>("agent/status"),
-    ]);
-    if (outcomes[0].status === "fulfilled") {
-      const list = outcomes[0].value.scenarios;
-      const first = list.find((p) => p.id === "scheduling") ?? list[0];
-      if (first) {
-        setPresets(list);
-        setDraft(fromPreset(first));
-      } else
-        setError("There are no clinic examples available. Please try again.");
-    } else
-      setError(
-        "The clinic examples could not be loaded. Check that the local planner is running, then retry.",
-      );
-    if (outcomes[1].status === "fulfilled") {
-      setStatus(outcomes[1].value);
-      setStatusError(false);
-    } else setStatusError(true);
-    setLocalAIAvailable(
-      outcomes[2].status === "fulfilled" && outcomes[2].value.available,
-    );
-    setInitializing(false);
-  }, []);
+  const session = usePlanningSession();
+  const { state, computed, busy } = session;
+  const route = useWorkspaceNavigation();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [text, setText] = useState("");
+  const [agent, setAgent] = useState<AgentStatus | null>(null);
+  const [modelError, setModelError] = useState(false);
+  const [locations, setLocations] = useState<
+    { name: string; latitude: number; longitude: number }[]
+  >([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const transcript = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLTextAreaElement>(null);
+  const following = useRef(true);
+  const confirmationKeys = useRef(new Map<string, string>());
+  async function checkModel() {
+    setModelError(false);
+    try {
+      setAgent(await api<AgentStatus>("agent/status"));
+    } catch {
+      setModelError(true);
+    }
+  }
   useEffect(() => {
-    void initialize();
-    return () => {
-      controller.current?.abort();
-      if (timer.current) clearTimeout(timer.current);
-    };
-  }, [initialize]);
-
-  function invalidate() {
-    if (timer.current) clearTimeout(timer.current);
-    controller.current?.abort();
-    ++sequence.current;
-    setBusy(false);
-  }
-  const run = useCallback(async (d: Draft) => {
-    controller.current?.abort();
-    const current = ++sequence.current;
-    const abort = new AbortController();
-    controller.current = abort;
-    setBusy(true);
-    setError("");
-    setPending(null);
-    setMessages([]);
-    setDirty(true);
-    try {
-      const payload = requestFor(d);
-      const response = await api<SimulationResponse>(
-        "simulate",
-        payload,
-        abort.signal,
-      );
-      if (sequence.current !== current) return;
-      setResult(response);
-      setLastRequest(payload);
-      setDirty(false);
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        e.name !== "AbortError" &&
-        sequence.current === current
-      )
-        setError(e.message);
-    } finally {
-      if (sequence.current === current) setBusy(false);
-    }
+    void checkModel();
+    void api<{
+      locations: { name: string; latitude: number; longitude: number }[];
+    }>("forecast/locations")
+      .then((data) => setLocations(data.locations))
+      .catch(() => {});
   }, []);
-
-  function edit(next: Draft) {
-    setUsingForecast(false);
-    invalidate();
-    setDraft(next);
-    setDirty(true);
-    setError("");
-    setPending(null);
-    setMessages([]);
-    if (result && validDraft(next))
-      timer.current = setTimeout(() => void run(next), 650);
-  }
-  function choose(id: string) {
-    setUsingForecast(false);
-    const selected = presets.find((p) => p.id === id);
-    if (!selected) return;
-    invalidate();
-    setDraft(fromPreset(selected));
-    setResult(null);
-    setLastRequest(null);
-    setMessages([]);
-    setPending(null);
-    setDirty(false);
-    setError("");
-    setQuickEdit(false);
-    setView("simple");
-  }
-  async function ask(message: string, followup = false) {
-    if (!draft) return;
-    if (!validDraft(draft)) {
-      setError(
-        "Please correct the equipment and battery information before making a plan. Charge and reserve must fit within battery capacity; equipment needs valid power, hours, and a name.",
-      );
-      return;
-    }
-    invalidate();
-    const current = ++sequence.current;
-    const abort = new AbortController();
-    controller.current = abort;
-    const question = followup ? pending : null;
-    if (
-      !question &&
-      (/\bforecasts?\b/i.test(message) ||
-        usingForecast ||
-        (localAIAvailable && draft.dataset !== "kisumu-2025-01-14"))
-    ) {
-      setBusy(false);
-      setError("");
-      setView("simple");
-      setPending(null);
-      setForecastQuestion({ text: message, id: Date.now() });
-      setMessages((prev) => [
-        ...prev,
-        { role: "user", text: message },
+  useLayoutEffect(() => {
+    if (following.current && transcript.current)
+      transcript.current.scrollTop = transcript.current.scrollHeight;
+  }, [messages, busy, computed, state?.revision]);
+  const activeProposal = state?.proposals.find(
+    (p) => p.id === state.active_proposal_id && p.status === "draft",
+  );
+  const recovery = computed?.recovery;
+  const selected = recovery?.options.find(
+    (o) =>
+      o.id ===
+      (state?.selected_recovery_intervention_id ??
+        recovery.recommended_option_id),
+  );
+  async function say(question: string) {
+    if (!question.trim() || busy || !state) return;
+    following.current = true;
+    setText("");
+    setMessages((items) => [
+      ...items,
+      { id: crypto.randomUUID(), role: "user", text: question },
+    ]);
+    const response = await session.run(
+      "Sending your message to the local assistant…",
+      (s) => planningApi.ask(s, question),
+      (r) => r.state,
+      true,
+    );
+    if (response) {
+      setMessages((items) => [
+        ...items,
         {
+          id: crypto.randomUUID(),
           role: "assistant",
-          text: "In the live-weather panel, review the clinic location, equipment and assumed charge at local midnight, then calculate the plan. Local AI can select validated planning tools when Ollama is running; guided fallback remains available.",
+          text: response.message,
+          tools: response.tool_calls,
+          inputRevision: response.state.input_revision,
         },
       ]);
-      return;
-    }
-    setBusy(true);
-    setError("");
-    setView("simple");
-    setDirty(!!result);
-    setMessages((prev) => [...prev, { role: "user", text: message }]);
-    try {
-      const response = await api<AssistantResponse>(
-        "assistant",
-        { message, plan: requestFor(draft), pending: question },
-        abort.signal,
-      );
-      if (current !== sequence.current) return;
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", text: response.message },
-      ]);
-      setPending(response.question);
-      if (response.result && response.request) {
-        const next = fromResult(response.result);
-        next.dataset = response.request.weather_dataset ?? "synthetic";
-        setDraft(next);
-        setResult(response.result);
-        setLastRequest(response.request);
-        setDirty(false);
-        requestAnimationFrame(() => {
-          document.getElementById("plan-title")?.focus();
-        });
-      }
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        e.name !== "AbortError" &&
-        current === sequence.current
-      )
-        setError(e.message);
-    } finally {
-      if (current === sequence.current) setBusy(false);
+      setEditingId(null);
+      requestAnimationFrame(() => input.current?.focus());
     }
   }
-  function changeView(next: View) {
-    setView(next);
-    requestAnimationFrame(() => {
-      const panel = document.getElementById(`${next}-view`);
-      if (panel && !panel.contains(document.activeElement)) panel.focus();
-    });
-  }
-  async function loadCompetingExample() {
-    invalidate();
-    const current = ++sequence.current;
-    const abort = new AbortController();
-    controller.current = abort;
-    setBusy(true);
-    setError("");
-    setMessages([]);
-    setPending(null);
-    setUsingForecast(false);
-    setDirty(true);
-    try {
-      const demo = await api<{
-        request: SimulationRequest;
-        description: string;
-        limitations: string[];
-      }>("demos/competing-windows", undefined, abort.signal);
-      const response = await api<SimulationResponse>(
-        "simulate",
-        demo.request,
-        abort.signal,
-      );
-      if (current !== sequence.current) return;
-      const next = fromResult(response);
-      next.dataset = "kisumu-2025-01-14";
-      setDraft(next);
-      setResult(response);
-      setLastRequest(demo.request);
-      setDirty(false);
-      setMessages([
+  async function save(proposal: ActivityProposal, details: ActivityDraft) {
+    const response = await session.run(
+      "Saving the draft for review…",
+      (s) => planningApi.edit(s, proposal.id, details),
+      (s) => s,
+    );
+    if (response) {
+      setEditingId(null);
+      setMessages((items) => [
+        ...items,
         {
-          role: "assistant",
-          text: [demo.description, ...demo.limitations].join(" "),
+          id: crypto.randomUUID(),
+          role: "notice",
+          text: "Draft saved for review. It has not changed the active energy plan.",
         },
       ]);
-      setView("detailed");
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        e.name !== "AbortError" &&
-        current === sequence.current
-      )
-        setError(e.message);
-    } finally {
-      if (current === sequence.current) setBusy(false);
     }
   }
-  const valid = draft ? validDraft(draft) : false;
-  const problem = draft ? draftProblem(draft) : null;
-  const currentResult = !dirty ? result : null;
-  return (
-    <>
-      <a className="skip-link" href="#main">
-        Skip to clinic planner
-      </a>
-      <header className="app-header">
-        <a
-          className="brand"
-          href="#main"
-          onClick={() => setView("simple")}
-          aria-label="LifeLine home"
+  async function confirm(proposal: ActivityProposal) {
+    let idempotencyKey = confirmationKeys.current.get(proposal.id);
+    if (!idempotencyKey) {
+      idempotencyKey = crypto.randomUUID();
+      confirmationKeys.current.set(proposal.id, idempotencyKey);
+    }
+    const response = await session.run(
+      "Confirming the activity and calculating the updated plan…",
+      (s) => planningApi.confirm(s, proposal.id, idempotencyKey!),
+      (s) => s,
+      true,
+    );
+    if (response) {
+      setEditingId(null);
+      setMessages((items) => [
+        ...items,
+        {
+          id: crypto.randomUUID(),
+          role: "notice",
+          text:
+            response.plan_status === "failed"
+              ? "The activity is confirmed. The updated energy calculation failed; no earlier plan is shown as current."
+              : "Activity confirmed. Both pages now use the updated clinic requirements.",
+        },
+      ]);
+    }
+  }
+  async function cancel(proposal: ActivityProposal) {
+    const response = await session.run(
+      "Cancelling the activity draft…",
+      (s) => planningApi.reject(s, proposal.id),
+      (s) => s,
+    );
+    if (response) {
+      setEditingId(null);
+      setMessages((items) => [
+        ...items,
+        {
+          id: crypto.randomUUID(),
+          role: "notice",
+          text: "Draft cancelled. Confirmed activities and their electrical requirements are unchanged.",
+        },
+      ]);
+    }
+  }
+  async function recompute(factor?: number) {
+    await session.run(
+      "Calculating the plan from confirmed requirements and the weather forecast…",
+      (s) => planningApi.recompute(s, factor ?? s.sunshine_factor),
+      (s) => s,
+      true,
+    );
+  }
+  function calculateFromChat() {
+    if (!state || busy) return;
+    following.current = true;
+    setMessages((items) => [
+      ...items,
+      {
+        id: crypto.randomUUID(),
+        role: "user",
+        text: "Calculate the energy plan.",
+      },
+      ...(state.proposals.some((proposal) => proposal.status === "draft")
+        ? [
+            {
+              id: crypto.randomUUID(),
+              role: "notice" as const,
+              text: "This calculation uses confirmed activities only. Draft activities are excluded until you confirm them.",
+            },
+          ]
+        : []),
+    ]);
+    void recompute();
+  }
+  async function add() {
+    const response = await session.run(
+      "Creating an activity draft…",
+      (s) => planningApi.propose(s, { planning_date: s.planning_date }),
+      (s) => s,
+    );
+    if (response) setEditingId(response.active_proposal_id);
+  }
+  async function edit(activity: Activity) {
+    const response = await session.run(
+      "Preparing a draft of the activity changes…",
+      (s) => planningApi.propose(s, activity.details, activity.id),
+      (s) => s,
+    );
+    if (response) setEditingId(response.active_proposal_id);
+  }
+  const currentWeather = state?.forecast_reference ?? session.weather;
+  const essential = computed?.simulation.baseline.metrics;
+  const outlook = essential
+    ? essential.critical_requested_kwh <= 1e-6
+      ? "Essential equipment needs review"
+      : essential.critical_unserved_kwh > 1e-6
+        ? "Energy shortage in the current schedule"
+        : essential.min_soc_kwh <
+            computed!.simulation.effective_config.reserve_kwh - 1e-6
+          ? "Current schedule may use the battery reserve"
+          : "Current schedule supplies essential equipment in the model"
+    : "Ask LifeLine to check the energy outlook";
+  const errorUI = session.error ? (
+    <Alert variant="destructive" role="alert" className="shared-error">
+      <AlertTriangle />
+      <AlertTitle>Planning update needs attention</AlertTitle>
+      <AlertDescription>
+        {session.error}
+        <Button
+          variant="outline"
+          disabled={Boolean(busy)}
+          onClick={() => void session.reload()}
         >
-          <Activity size={28} strokeWidth={2} />
-          <span>LifeLine</span>
-        </a>
-        <nav aria-label="Planning views">
+          Reload shared state
+        </Button>
+      </AlertDescription>
+    </Alert>
+  ) : null;
+  const planFailure =
+    state?.plan_status === "failed" ? (
+      <Alert variant="destructive" role="alert">
+        <AlertTriangle />
+        <AlertTitle>No current energy plan</AlertTitle>
+        <AlertDescription>
+          {state.plan_error ?? "The calculation failed."} Confirmed activities
+          are saved. No old battery or solution is shown.
           <Button
-            type="button"
-            variant={view === "simple" ? "secondary" : "ghost"}
-            aria-pressed={view === "simple"}
-            onClick={() => changeView("simple")}
+            variant="outline"
+            disabled={Boolean(busy)}
+            onClick={() => void recompute()}
           >
-            Simple mode
+            Retry energy calculation
           </Button>
-          <Button
-            type="button"
-            variant={view === "detailed" ? "secondary" : "ghost"}
-            aria-pressed={view === "detailed"}
-            onClick={() => changeView("detailed")}
-          >
-            Detailed mode
-          </Button>
-          <Button
-            type="button"
-            variant={view === "advanced" ? "secondary" : "ghost"}
-            aria-pressed={view === "advanced"}
-            onClick={() => changeView("advanced")}
-          >
-            <Settings2 data-icon="inline-start" />
-            Advanced settings
-          </Button>
-        </nav>
-      </header>
-      <main id="main" className="clinic-workspace">
-        {initializing ? (
-          <p className="loading" role="status">
+        </AlertDescription>
+      </Alert>
+    ) : null;
+  const locationName = state
+    ? (locations
+        .find(
+          (location) =>
+            location.latitude === state.location.latitude &&
+            location.longitude === state.location.longitude,
+        )
+        ?.name.replace(/\s*\([^)]*\)/, "") ??
+      `${state.location.latitude.toFixed(4)}, ${state.location.longitude.toFixed(4)}`)
+    : "";
+  const context = state ? (
+    <div className="chat-context">
+      <div className="clinic-context-row">
+        <div>
+          <strong>{state.clinic_name}</strong>
+          <span>
+            <MapPin aria-hidden="true" />
+            {locationName} · {state.planning_date}
+            {state.timezone
+              ? ` · ${state.timezone}`
+              : " · timezone awaiting forecast"}
+          </span>
+        </div>
+      </div>
+      <div className="chat-weather" role="status">
+        <CloudSun aria-hidden="true" />
+        <div>
+          <strong>
+            {session.weatherLoading && !currentWeather
+              ? "Checking live weather…"
+              : currentWeather
+                ? currentWeather.cache_status === "stale"
+                  ? `Older forecast · ${outlook}`
+                  : outlook
+                : "Live weather is unavailable"}
+          </strong>
+        </div>
+      </div>
+    </div>
+  ) : null;
+  const assistant = (
+    <>
+      <div
+        className="chat-transcript"
+        ref={transcript}
+        aria-label="Conversation with LifeLine"
+        onScroll={() => {
+          const el = transcript.current;
+          if (el)
+            following.current =
+              el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+        }}
+      >
+        {session.loading ? (
+          <p className="chat-loading" role="status">
             <LoaderCircle className="loading-spin" />
-            Loading your clinic planner…
+            Loading the shared clinic plan…
           </p>
         ) : null}
-        {error ? (
-          <Alert variant="destructive" className="planner-error" role="alert">
-            <AlertTitle>
-              {draft
-                ? "This plan could not be updated"
-                : "LifeLine could not connect"}
-            </AlertTitle>
-            <AlertDescription>
-              <p>{error}</p>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={busy || (!!draft && !valid)}
-                onClick={() =>
-                  draft ? valid && void run(draft) : void initialize()
-                }
-              >
-                {draft ? "Retry with local planner" : "Retry"}
-              </Button>
-              {draft ? (
-                <p>
-                  The local planner checks the entered requirements. Any
-                  unanswered conversation request will still need to be entered.
-                </p>
-              ) : null}
-            </AlertDescription>
-          </Alert>
-        ) : null}
-        {draft ? (
-          <>
-            <section className="clinic-context" aria-label="Selected clinic">
-              <label className="clinic-selector">
-                Choose a clinic
-                <NativeSelect
-                  className="w-full"
-                  aria-label="Choose a clinic"
-                  value={draft.scenario}
-                  onChange={(e) => choose(e.target.value)}
-                >
-                  {presets.map((p) => (
-                    <NativeSelectOption key={p.id} value={p.id}>
-                      {clinicNames[p.id]}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-              </label>
-              <h1>{clinicNames[draft.scenario]}</h1>
-              <p>Equipment profile · choose the forecast location below</p>
-            </section>
-            <WeatherContext
-              draft={draft}
-              status={status}
-              statusError={statusError}
-              result={currentResult}
-              onChange={edit}
-              forecastQuestion={forecastQuestion}
-              onForecastAnswer={(answer) => {
-                setUsingForecast(true);
-                setResult(null);
-                setLastRequest(null);
-                setDirty(false);
-                setPending(null);
-                setMessages((prev) => [
-                  ...prev,
-                  { role: "assistant", text: answer },
-                ]);
-              }}
-            />
-            {problem ? (
-              <Alert variant="destructive" className="requirements-error">
-                <AlertTitle>Check one requirement</AlertTitle>
-                <AlertDescription>{problem}</AlertDescription>
-              </Alert>
-            ) : null}
-            <div
-              className={`planning-state ${!busy && !result && !pending && !error ? "quiet-state" : ""}`}
-              role="status"
-              aria-live="polite"
+        {!session.loading && !state ? (
+          <div className="chat-initial-error" role="alert">
+            <p>{session.error}</p>
+            <Button
+              onClick={() => void session.initialize(session.missingSession)}
             >
-              {busy ? (
-                <>
-                  <LoaderCircle className="loading-spin" />
-                  Checking the equipment, battery, and available energy…
-                </>
-              ) : error ? (
-                "No updated plan is available. Review the error above and retry."
-              ) : pending ? (
-                "One question before updating your plan. Any previous plan is hidden."
-              ) : dirty && result ? (
-                valid ? (
-                  "Requirements changed. The previous plan is hidden while LifeLine recalculates."
-                ) : (
-                  "Please correct the requirements. The previous plan is hidden until a new plan can be calculated."
-                )
-              ) : result ? (
-                "Plan calculated from current inputs."
-              ) : (
-                ""
-              )}
-            </div>
-            {view === "simple" ? (
-              <div id="simple-view" tabIndex={-1} className="view-content">
-                <PlanningHome
-                  busy={busy}
-                  messages={messages}
-                  pending={pending}
-                  hasPlan={!!result}
-                  onAsk={(text, followup) => void ask(text, followup)}
-                  onCancel={() => {
-                    setPending(null);
-                    setMessages([]);
-                    if (result) void run(draft);
-                  }}
-                />
-                {quickEdit ? (
-                  <QuickRequirements
-                    draft={draft}
-                    onChange={edit}
-                    onDetails={() => changeView("detailed")}
-                    onClose={() => setQuickEdit(false)}
-                  />
-                ) : null}
-                {currentResult ? (
-                  <SimplePlan
-                    result={currentResult}
-                    onDetails={() => changeView("detailed")}
-                    onChange={() => {
-                      setQuickEdit(true);
-                      requestAnimationFrame(() =>
-                        document
-                          .getElementById("requirements-title")
-                          ?.scrollIntoView({ block: "center" }),
-                      );
-                    }}
-                  />
-                ) : null}
-              </div>
-            ) : (
-              <div
-                id={`${view}-view`}
-                tabIndex={-1}
-                className="view-content secondary-view"
+              {session.missingSession
+                ? "Start a new session"
+                : "Retry connection"}
+            </Button>
+          </div>
+        ) : null}
+        {state && !messages.length ? (
+          <div className="chat-welcome">
+            <h1>Plan your clinic’s day.</h1>
+            <p>
+              Describe an activity. Review its equipment needs before it changes
+              the energy plan.
+            </p>
+            <div className="chat-suggestions" aria-label="Suggested questions">
+              <Button
+                variant="outline"
+                disabled={Boolean(busy)}
+                onClick={calculateFromChat}
               >
+                Calculate plan
+              </Button>
+              {[
+                "We have a vaccination campaign tomorrow from 9 AM to 3 PM.",
+                "How can we prevent an energy shortage?",
+              ].map((q) => (
                 <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => changeView("simple")}
-                >
-                  <ArrowLeft data-icon="inline-start" />
-                  Back to your simple plan
-                </Button>
-                <Button
-                  type="button"
+                  key={q}
                   variant="outline"
-                  disabled={busy}
-                  onClick={() => void loadCompetingExample()}
+                  disabled={Boolean(busy)}
+                  onClick={() => void say(q)}
                 >
-                  Load competing-window example
+                  {q}
                 </Button>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (valid) void run(draft);
-                  }}
-                >
-                  {view === "advanced" ? (
-                    <AdvancedSettings
-                      draft={draft}
-                      result={currentResult}
-                      onChange={edit}
-                      onReset={() => {
-                        const p = presets.find((p) => p.id === draft.scenario);
-                        if (p) edit(fromPreset(p));
-                      }}
-                    />
-                  ) : (
-                    <>
-                      <div className="detailed-heading">
-                        <h2>Detailed mode</h2>
-                        <p>
-                          Review equipment requirements, battery forecasts,
-                          schedule comparisons, and alternative scenarios.
-                        </p>
-                      </div>
-                      <EquipmentEditor
-                        equipment={draft.equipment}
-                        onChange={(equipment) => edit({ ...draft, equipment })}
-                      />
-                    </>
-                  )}
-                  <Button type="submit" size="lg" disabled={busy || !valid}>
-                    {busy
-                      ? "Calculating…"
-                      : result
-                        ? "Recalculate plan"
-                        : "Calculate a plan"}
-                  </Button>
-                </form>
-                {view === "detailed" && currentResult && lastRequest ? (
-                  <Suspense
-                    fallback={<p role="status">Loading detailed results…</p>}
-                  >
-                    <TechnicalResults
-                      result={currentResult}
-                      request={lastRequest}
-                    />
-                  </Suspense>
-                ) : null}
-                {view === "detailed" && !result ? (
-                  <p className="detail-empty">
-                    Review the clinic’s requirements above, then calculate a
-                    plan to see the comparisons.
-                  </p>
-                ) : null}
-              </div>
-            )}
-            <footer className="planner-footer">
-              <p>
-                Demonstration clinic. Review equipment and battery information
-                before relying on a plan. LifeLine does not measure live power
-                or control equipment.
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {state && session.notice ? (
+          <p className="chat-notice" role="status">
+            {session.notice}
+          </p>
+        ) : null}
+        {messages.map((message) => (
+          <article
+            key={message.id}
+            className={`chat-message ${message.role === "user" ? "user-message" : message.role === "notice" ? "notice-message" : "assistant-message"}`}
+          >
+            {message.role !== "notice" ? (
+              <strong className="message-author">
+                {message.role === "user" ? "You" : "LifeLine"}
+              </strong>
+            ) : null}
+            <p className="assistant-text">{message.text}</p>
+            {message.inputRevision !== undefined &&
+            state &&
+            message.inputRevision !== state.input_revision ? (
+              <p className="chat-result-note">
+                Earlier response · clinic requirements have since changed.
               </p>
-              <Disclosure title="Assumptions and data sources">
+            ) : null}
+            {message.tools?.length ? (
+              <Disclosure title="Reported tool activity" keepMounted={false}>
+                <ul>
+                  {message.tools.map((tool, i) => (
+                    <li key={`${tool}-${i}`}>
+                      Requested: {toolLabels[tool] ?? tool}
+                    </li>
+                  ))}
+                </ul>
                 <p>
-                  All example clinics and equipment are illustrative. Entered
-                  values are unverified. Live weather planning uses Open-Meteo;
-                  a hosted AI model is not connected. The local assistant uses
-                  supported requests and the same simulator and optimizer as
-                  Detailed mode.
-                </p>
-                <p>
-                  Historical weather: NASA POWER satellite-derived irradiance
-                  for Kisumu, 14 January 2025. It is not a clinic measurement or
-                  a forecast. Synthetic sunshine uses a fixed daylight curve.
-                  Live forecast dates, retrieval times and timezone are
-                  displayed in the live-weather planner when retrieved.
-                </p>
-                <p>
-                  <a
-                    href="https://power.larc.nasa.gov/docs/services/api/temporal/hourly/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    NASA POWER documentation
-                  </a>{" "}
-                  ·{" "}
-                  <a
-                    href="https://www.seforall.org/publications/medical-appliances-for-resource-constrained-settings"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Equipment study
-                  </a>
-                </p>
-                <p>
-                  This prototype does not model refrigeration temperature,
-                  voltage quality, sub-hour surges, degradation, or validated
-                  medical appliance cycles. No safety or availability guarantee.
-                  Illustrative simulation; not for clinical or operational use.
+                  These are tool requests reported by the backend. Reviewed
+                  drafts and verified calculation results are shown separately;
+                  a request alone does not confirm a change.
                 </p>
               </Disclosure>
-            </footer>
-          </>
+            ) : null}
+          </article>
+        ))}
+        {busy ? (
+          <p className="live-activity" role="status">
+            <LoaderCircle className="loading-spin" aria-hidden="true" />
+            {busy}
+          </p>
         ) : null}
-      </main>
+        {state ? errorUI : null}
+        {planFailure}
+        {activeProposal && state ? (
+          <ActivityConfirmation
+            key={`assistant-${activeProposal.id}-${state.revision}`}
+            proposal={activeProposal}
+            state={state}
+            busy={Boolean(busy)}
+            editInitially={activeProposal.id === editingId}
+            onSave={(details) => void save(activeProposal, details)}
+            onConfirm={() => void confirm(activeProposal)}
+            onCancel={() => void cancel(activeProposal)}
+          />
+        ) : null}
+        {computed ? (
+          <PlanOutcome
+            computed={computed}
+            onExplore={() => route.explore("solutions")}
+          />
+        ) : null}
+        {state &&
+        messages.length > 0 &&
+        !computed &&
+        !busy &&
+        state.plan_status !== "failed" ? (
+          <div className="chat-suggestions" aria-label="Chat options">
+            <Button variant="outline" onClick={calculateFromChat}>
+              Calculate plan
+            </Button>
+          </div>
+        ) : null}
+      </div>
+      <div className="chat-composer-region">
+        <form
+          className="chat-composer"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void say(text);
+          }}
+        >
+          <label htmlFor="chat-input" className="sr-only">
+            Message LifeLine
+          </label>
+          <textarea
+            id="chat-input"
+            ref={input}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Describe a clinic activity or ask about electricity…"
+            maxLength={2000}
+            disabled={!state || Boolean(busy)}
+            onKeyDown={(event) => {
+              if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                void say(text);
+              }
+            }}
+          />
+          <Button
+            type="submit"
+            aria-label="Send message"
+            disabled={!state || Boolean(busy) || !text.trim()}
+          >
+            {busy ? <LoaderCircle className="loading-spin" /> : <ArrowUp />}
+          </Button>
+        </form>
+        <p className="chat-composer-note">
+          Runs locally. Live weather needs internet. Don’t enter patient
+          information.
+        </p>
+      </div>
     </>
+  );
+  const overview = state ? (
+    <>
+      {errorUI}
+      {planFailure}
+      {busy ? <p role="status">{busy}</p> : null}
+      <ActivitiesSection
+        state={state}
+        busy={Boolean(busy)}
+        editingId={editingId}
+        error=""
+        onAdd={() => void add()}
+        onEdit={(activity) => void edit(activity)}
+        onSave={(proposal, details) => void save(proposal, details)}
+        onConfirm={(proposal) => void confirm(proposal)}
+        onCancel={(proposal) => void cancel(proposal)}
+      />
+      <WeatherSection
+        forecast={currentWeather}
+        simulation={computed?.simulation ?? null}
+        date={state.planning_date}
+        loading={session.weatherLoading}
+        error={session.weatherError}
+        onRetry={() => void session.refreshWeather()}
+      />
+      <section
+        data-overview-section="energy"
+        className="overview-section"
+        aria-labelledby="energy-title"
+      >
+        <h2 id="energy-title">Battery &amp; Energy</h2>
+        {computed ? (
+          <BatteryEvidence
+            key={`${state.id}-${computed.input_revision}-${computed.generation}`}
+            result={computed.simulation}
+            date={state.planning_date}
+            intervention={selected}
+            showIndicators={false}
+          />
+        ) : (
+          <p>
+            No current verified battery forecast. Confirmed activities remain
+            saved; calculate the plan to inspect the battery.
+          </p>
+        )}
+        <Disclosure
+          title="Starting energy and battery assumptions"
+          keepMounted={false}
+        >
+          <p>
+            Starting stored energy:{" "}
+            {state.clinic.initial_battery_kwh != null
+              ? num(state.clinic.initial_battery_kwh)
+              : "Not provided"}{" "}
+            kWh at 00:00 {state.planning_date}. This comes from the configured
+            clinic assumption, not a current battery measurement. The session is
+            based on {state.selected_clinic_id} inputs.
+          </p>
+        </Disclosure>
+        <Button
+          variant="outline"
+          disabled={Boolean(busy)}
+          onClick={() => void recompute()}
+        >
+          Calculate plan
+        </Button>
+      </section>
+      <SolutionsSection
+        computed={computed}
+        selectedId={state.selected_recovery_intervention_id}
+        busy={Boolean(busy)}
+        onSelect={(id) =>
+          void session.run(
+            "Saving the selected recovery comparison…",
+            (s) => planningApi.selectRecovery(s, id),
+            (s) => s,
+          )
+        }
+        onRecompute={() => void recompute()}
+      />
+      <a className="return-to-chat" href="#assistant">
+        Return to AI Assistant
+      </a>
+    </>
+  ) : (
+    <p role="status">
+      {session.loading
+        ? "Loading the shared clinic state…"
+        : "Connect to the planning service from AI Assistant to view clinic details."}
+    </p>
+  );
+  return (
+    <Workspace
+      page={route.page}
+      section={route.section}
+      context={context}
+      assistant={assistant}
+      overview={overview}
+      modelStatus={
+        <>
+          <span
+            className={agent?.available ? "status-dot ready" : "status-dot"}
+          />
+          <span>
+            {modelError
+              ? "Local model connection unavailable"
+              : agent?.available
+                ? `Local model · ${agent.model}`
+                : agent
+                  ? "Local model unavailable · manual planning ready"
+                  : "Checking the local model…"}
+          </span>
+          {modelError || (agent && !agent.available) ? (
+            <Button
+              variant="ghost"
+              aria-label="Reconnect local model"
+              onClick={() => void checkModel()}
+            >
+              <RefreshCw data-icon="inline-start" />
+              Retry
+            </Button>
+          ) : null}
+        </>
+      }
+    />
   );
 }

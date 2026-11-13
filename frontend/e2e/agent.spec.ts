@@ -1,280 +1,188 @@
-import { execFileSync } from "node:child_process";
-import { resolve } from "node:path";
-import { test, expect, type Page } from "@playwright/test";
-import { testPython } from "../test-python";
+import { test, expect } from "@playwright/test";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import {
+  open,
+  seed,
+  weatherFailure,
+  readyDraft,
+  confirm,
+  read,
+  say,
+  proposal,
+  overview,
+  assistant,
+  apiBase,
+} from "./support/planning";
+test.beforeEach(() => weatherFailure(false));
+test.afterEach(() => weatherFailure(false));
 
-async function available(page: Page) {
-  await page.route("**/api/agent/status", (route) =>
+test("activity conversation produces a structured proposal and explicit confirmation updates both pages", async ({
+  page,
+  request,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const initial = await seed(request);
+  await open(page, initial);
+  await say(page, "We have a vaccination campaign tomorrow from 9 AM to 3 PM.");
+  await expect(proposal(page)).toContainText("vaccination campaign");
+  await expect(proposal(page)).toContainText("2026-11-14");
+  await expect(proposal(page)).toContainText("09:00–15:00");
+  await expect(
+    proposal(page).getByRole("button", { name: "Confirm", exact: true }),
+  ).toBeDisabled();
+  expect((await read(request, initial.id)).confirmed_activities).toHaveLength(
+    0,
+  );
+  await say(page, "Use the Vaccine refrigerator.");
+  await expect(proposal(page)).toContainText("100 W");
+  await proposal(page).evaluate((el) => {
+    const root = el.closest(".chat-transcript")!;
+    root.scrollTop +=
+      el.getBoundingClientRect().top - root.getBoundingClientRect().top - 12;
+  });
+  await page.screenshot({
+    path: join(tmpdir(), "lifeline-two-page-proposal.png"),
+  });
+  await say(page, "Confirm.");
+  expect((await read(request, initial.id)).confirmed_activities).toHaveLength(
+    0,
+  );
+  await confirm(page);
+  const state = await read(request, initial.id);
+  expect(state.confirmed_activities).toHaveLength(1);
+  expect(
+    state.computed_plan!.simulation.optimized.metrics.critical_requested_kwh,
+  ).toBeCloseTo(2.4, 8);
+  expect(state.equipment_inventory).toHaveLength(2);
+  await expect(proposal(page)).toHaveCount(0);
+  await expect(
+    page.getByTestId("current-plan-summary").filter({ visible: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Explore plan", exact: true }).click();
+  await expect(overview(page)).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("confirmed-activity")).toContainText(
+    "vaccination campaign",
+  );
+  await assistant(page).click();
+  await expect(assistant(page)).toHaveAttribute("aria-current", "page");
+  await expect(
+    page
+      .locator(".assistant-text")
+      .filter({ hasText: "We have a vaccination campaign tomorrow" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Reported tool activity", exact: true })
+    .first()
+    .click();
+  await expect(page.locator(".chat-transcript")).toContainText(
+    "Requested: Propose a clinic activity",
+  );
+  await expect(
+    page.getByText("INVENTED MODEL PROSE MUST NOT RENDER", { exact: false }),
+  ).toHaveCount(0);
+});
+
+test("a correction updates the same draft and cancel never adopts its requirements", async ({
+  page,
+  request,
+}) => {
+  const state = await seed(request);
+  await open(page, state);
+  await readyDraft(page);
+  const before = await read(request, state.id);
+  const id = before.active_proposal_id;
+  await say(page, "Actually start at 10 AM.");
+  const corrected = await read(request, state.id);
+  expect(corrected.active_proposal_id).toBe(id);
+  expect(corrected.proposals).toHaveLength(1);
+  expect(corrected.proposals[0].details.start_hour).toBe(10);
+  await proposal(page)
+    .getByRole("button", { name: "Cancel", exact: true })
+    .click();
+  await expect(proposal(page)).toHaveCount(0);
+  const rejected = await read(request, state.id);
+  expect(rejected.confirmed_activities).toHaveLength(0);
+  expect(rejected.proposals[0].status).toBe("rejected");
+  expect(rejected.input_revision).toBe(before.input_revision);
+});
+
+test("missing added-equipment specifications can be filled manually without changing known ratings", async ({
+  page,
+  request,
+}) => {
+  const state = await seed(request);
+  const created = await request.post(`${apiBase}/${state.id}/proposals`, {
+    data: {
+      expected_revision: state.revision,
+      details: {
+        name: "Evening clinic",
+        planning_date: state.planning_date,
+        start_hour: 10,
+        end_hour: 15,
+        equipment_ids: ["new-light"],
+        additional_equipment: [
+          {
+            id: "new-light",
+            name: "Campaign light",
+            category: "critical",
+            required_hours: [10, 11],
+          },
+        ],
+      },
+    },
+  });
+  expect(created.ok(), await created.text()).toBe(true);
+  await open(page, await created.json());
+  await expect(proposal(page)).toContainText("power rating from the label");
+  await proposal(page)
+    .getByLabel("Power rating on the label (W)", { exact: true })
+    .fill("200");
+  await proposal(page)
+    .getByRole("button", { name: "Save draft for review", exact: true })
+    .click();
+  await expect(
+    proposal(page).getByRole("button", { name: "Confirm", exact: true }),
+  ).toBeEnabled();
+  await confirm(page);
+  const after = await read(request, state.id);
+  expect(after.equipment_inventory.find((e) => e.id === "fridge")).toEqual(
+    state.equipment_inventory.find((e) => e.id === "fridge"),
+  );
+  expect(
+    after.computed_plan!.simulation.optimized.metrics.critical_requested_kwh,
+  ).toBeCloseTo(2.8, 8);
+});
+
+test("local-model failure leaves deterministic calculation and manual activity review available", async ({
+  page,
+  request,
+}) => {
+  const state = await seed(request);
+  await page.route("**/api/planning/sessions/*/agent", (route) =>
     route.fulfill({
       json: {
-        available: true,
-        mode: "local_tool_agent",
-        model: "llama3.1:8b",
-        provider: "Ollama on localhost",
-        cloud_ai: false,
-        note: "Synthetic browser-test provider",
+        mode: "local_agent_unavailable",
+        model: null,
+        message:
+          "The local model is unavailable. Use the manual activity editor or retry.",
+        needs_clarification: true,
+        clarification_fields: [],
+        tool_calls: [],
+        state,
       },
     }),
   );
-}
-async function mockAgent(
-  page: Page,
-  tool = "plan_forecast",
-  args: object = { day: "tomorrow" },
-  failure?: number,
-) {
-  await page.route("**/api/agent/ask", (route) => {
-    const result = JSON.parse(
-      execFileSync(
-        testPython,
-        ["backend/tests/agent_browser_fixture.py"],
-        {
-          cwd: resolve(".."),
-          input: JSON.stringify({
-            body: route.request().postDataJSON(),
-            tool,
-            arguments: args,
-            failure,
-          }),
-          encoding: "utf8",
-        },
-      ),
-    );
-    return route.fulfill({ status: result.status, json: result.body });
-  });
-}
-async function panel(page: Page) {
-  await available(page);
-  await page.goto("/");
-  await page
-    .locator("#clinic-question")
-    .fill(
-      "We expect cloudy weather tomorrow. Will we have enough electricity?",
-    );
-  await page.getByRole("button", { name: "Make a plan", exact: true }).click();
-  const panel = page.locator("#live-forecast");
-  await expect(
-    panel.getByLabel("Planning assistant", { exact: true }),
-  ).toHaveValue("local");
-  await panel
-    .getByRole("checkbox", {
-      name: "Confirm midnight battery assumption",
-      exact: true,
-    })
-    .check();
-  return panel;
-}
-
-test("local AI selection returns a computed forecast schedule and visible safeguards", async ({
-  page,
-}) => {
-  await mockAgent(page);
-  const p = await panel(page);
-  await p
-    .getByRole("button", {
-      name: "Calculate forecast-backed plan",
-      exact: true,
-    })
-    .click();
-  await expect(p.getByTestId("agent-answer")).toContainText(
-    "Local AI tool selection: llama3.1:8b",
-  );
-  await expect(p.getByTestId("forecast-plan-result")).toBeVisible();
-  await expect(p.getByTestId("agent-answer")).toContainText(
-    "plan_forecast (completed)",
-  );
-  await expect(p).toContainText("Synthetic example clinic");
-  await expect(p).toContainText("not a safety or availability guarantee");
-  await expect(p).not.toContainText("INVENTED ANSWER");
-});
-
-test("local provider failure uses the explicitly labeled computed fallback", async ({
-  page,
-}) => {
-  await mockAgent(page, "plan_forecast", {}, 500);
-  const p = await panel(page);
-  await p
-    .locator("#forecast-question")
-    .fill("Can our clinic safely operate tomorrow given the weather forecast?");
-  await p
-    .getByRole("button", {
-      name: "Calculate forecast-backed plan",
-      exact: true,
-    })
-    .click();
-  await expect(p.getByTestId("agent-answer")).toContainText(
-    "Guided fallback active",
-  );
-  await expect(p.getByTestId("forecast-plan-result")).toBeVisible();
-});
-
-test("fixed requirement is a hypothetical consecutive demand check, not a silent inventory change", async ({
-  page,
-}) => {
-  await mockAgent(page, "evaluate_fixed_requirement", {
-    name: "Sterilizer",
-    power_kw: 1,
-    duration_hours: 2,
-    earliest_start: 8,
-    deadline: 12,
-  });
-  const p = await panel(page);
-  await p
-    .locator("#forecast-question")
-    .fill(
-      "Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.",
-    );
-  await p
-    .getByRole("button", {
-      name: "Calculate forecast-backed plan",
-      exact: true,
-    })
-    .click();
-  await expect(p.getByTestId("agent-answer")).toContainText(
-    "Additional requirement · hypothetical",
-  );
-  await expect(p.getByTestId("agent-answer")).toContainText(
-    "has not changed the clinic inventory",
-  );
-  await expect(p.getByTestId("forecast-plan-result")).toBeVisible();
-  await p
-    .getByRole("button", {
-      name: "Add fixed requirement to inventory",
-      exact: true,
-    })
-    .click();
-  await expect(p.getByTestId("forecast-plan-result")).toHaveCount(0);
-  await expect(
-    p.getByRole("checkbox", {
-      name: "Confirm midnight battery assumption",
-      exact: true,
-    }),
-  ).not.toBeChecked();
-  await page
-    .getByRole("button", { name: "Detailed mode", exact: true })
-    .click();
-  await expect(page.locator("#equipment")).toContainText(
-    "Sterilizer (fixed hourly energy check)",
-  );
-});
-
-test("mobile local AI capacity search renders computed samples with internal table scrolling", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await mockAgent(page, "explore_battery_capacity", {
-    day: "tomorrow",
-    sunshine_factor: 0.5,
-    target: "all_work",
-  });
-  const p = await panel(page);
-  await p
-    .locator("#forecast-question")
-    .fill(
-      "How much additional battery capacity would we need with 50% less sunlight?",
-    );
-  await p
-    .getByRole("button", {
-      name: "Calculate forecast-backed plan",
-      exact: true,
-    })
-    .click();
-  await expect(p.getByTestId("agent-capacity")).toBeVisible();
-  await expect(
-    p.getByRole("table", { name: "Computed battery capacity search" }),
-  ).toContainText("200.000");
-  await expect(p).toContainText(
-    "Increasing storage alone did not meet this target",
-  );
-  await page.waitForTimeout(300);
-  expect(
-    await page.evaluate(() => document.documentElement.scrollWidth),
-  ).toBeLessThanOrEqual(375);
-});
-
-test("competing-window example calculates an actual unequal-work comparison", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await page
-    .getByRole("button", { name: "Detailed mode", exact: true })
-    .click();
-  const response = page.waitForResponse(
-    (r) => r.url().endsWith("/api/simulate") && r.status() === 200,
+  await open(page, state);
+  await say(page, "Calculate the energy plan.");
+  await expect(page.locator(".assistant-text").last()).toContainText(
+    "local model is unavailable",
   );
   await page
-    .getByRole("button", { name: "Load competing-window example", exact: true })
+    .getByRole("button", { name: "Calculate plan", exact: true })
     .click();
-  const d = await (await response).json();
-  expect(d.optimized.metrics.flexible_deferred_kwh).toBe(0);
-  expect(d.heuristic.metrics.flexible_deferred_kwh).toBeGreaterThan(0.3);
-  expect(d.comparison.same_flexible_work_completed).toBe(false);
   await expect(
-    page.getByText("Plan calculated from current inputs.", { exact: true }),
+    page.getByTestId("current-plan-summary").filter({ visible: true }),
   ).toBeVisible();
-  await expect(
-    page.getByLabel("Weather for this plan", { exact: true }),
-  ).toHaveValue("kisumu-2025-01-14");
-});
-
-test("a failed re-run does not leave the previous answer or adopt button on screen", async ({
-  page,
-}) => {
-  let calls = 0;
-  await page.route("**/api/agent/ask", async (route) => {
-    calls += 1;
-    if (calls === 1) {
-      const result = JSON.parse(
-        execFileSync(testPython, ["backend/tests/agent_browser_fixture.py"], {
-          cwd: resolve(".."),
-          input: JSON.stringify({
-            body: route.request().postDataJSON(),
-            tool: "evaluate_fixed_requirement",
-            arguments: {
-              name: "Sterilizer",
-              power_kw: 1,
-              duration_hours: 2,
-              earliest_start: 8,
-              deadline: 12,
-            },
-          }),
-          encoding: "utf8",
-        }),
-      );
-      return route.fulfill({ status: result.status, json: result.body });
-    }
-    await new Promise((r) => setTimeout(r, 800));
-    return route.fulfill({
-      status: 503,
-      json: {
-        error: {
-          code: "FORECAST_UNAVAILABLE",
-          message: "Weather provider unavailable.",
-          details: [],
-        },
-      },
-    });
-  });
-  const p = await panel(page);
-  await p
-    .locator("#forecast-question")
-    .fill(
-      "Run an additional 1 kW sterilizer for 2 hours from 08:00 before noon.",
-    );
-  const calculate = p.getByRole("button", {
-    name: "Calculate forecast-backed plan",
-    exact: true,
-  });
-  await calculate.click();
-  await expect(p.getByTestId("agent-answer")).toContainText(
-    "evaluate_fixed_requirement (completed)",
-  );
-  await calculate.click();
-  await expect(p.getByText("Working on your request…")).toBeVisible();
-  await expect(p.getByTestId("agent-answer")).toHaveCount(0);
-  await expect(p.getByText("Forecast plan unavailable")).toBeVisible();
-  await expect(p.getByTestId("agent-answer")).toHaveCount(0);
-  await expect(
-    p.getByRole("button", { name: "Add fixed requirement to inventory" }),
-  ).toHaveCount(0);
+  expect((await read(request, state.id)).computed_plan).not.toBeNull();
 });
