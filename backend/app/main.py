@@ -110,7 +110,8 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None):
             'updated_at': None}, 'timezone': 'Africa/Nairobi'}
 
     @app.post('/api/simulate', response_model=SimulationResponse, responses={
-        422: {'model': ApiErrorResponse}, 503: {'model': ApiErrorResponse}, 500: {'model': ApiErrorResponse}})
+        422: {'model': ApiErrorResponse, 'description': 'Unprocessable Entity'},
+        503: {'model': ApiErrorResponse}, 500: {'model': ApiErrorResponse}})
     async def simulate(body: SimulationRequest, request: Request):
         catalog = request.app.state.catalog
         try:

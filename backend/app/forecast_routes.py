@@ -9,7 +9,11 @@ from .planner_tools import execute_tool, guided_intent, tool_definitions
 from .models import ApiErrorResponse
 
 router = APIRouter()
-ERRORS = {422: {'model':ApiErrorResponse}, 503: {'model':ApiErrorResponse}, 500: {'model':ApiErrorResponse}}
+ERRORS = {
+    422: {'model': ApiErrorResponse, 'description': 'Unprocessable Entity'},
+    503: {'model': ApiErrorResponse},
+    500: {'model': ApiErrorResponse},
+}
 LOCATIONS = [
     {'id':'kisumu', 'name':'Kisumu, Kenya (representative location)', 'latitude':-.0917, 'longitude':34.768},
     {'id':'kampala', 'name':'Kampala, Uganda (representative location)', 'latitude':.3476, 'longitude':32.5825},
