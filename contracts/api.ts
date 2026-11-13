@@ -187,7 +187,7 @@ export interface SimulationResponse {
     optimistic_energy_deficit_kwh: number;
     window_limited_tasks: string[];
   };
-  timezone: "Africa/Nairobi";
+  timezone: string;
   horizon_hours: 24;
   dt_hours: 1;
   pv_performance_ratio: number;
@@ -211,7 +211,11 @@ export interface ApiErrorResponse {
       | "SOLVER_UNAVAILABLE"
       | "SOLVER_TIME_LIMIT"
       | "NUMERICAL_ERROR"
-      | "INTERNAL_ERROR";
+      | "INTERNAL_ERROR"
+      | "FORECAST_UNAVAILABLE"
+      | "FORECAST_DATA_INVALID"
+      | "UNSUPPORTED_FORECAST_DAY"
+      | "AGENT_UNAVAILABLE";
     message: string;
     /** Empty unless individual request fields need correction. */
     details: Array<{

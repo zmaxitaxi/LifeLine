@@ -39,7 +39,7 @@ export function SimplePlan({
         ? `Battery may run too low. It reaches ${num(m.min_soc_kwh)} kWh, below the ${num(result.effective_config.reserve_kwh)} kWh reserve target. First below target at ${clock(m.reserve_breach_boundaries[0])}.`
         : deferred
           ? `${num(m.flexible_deferred_kwh)} kWh of requested work cannot be completed in the available hours. Unfinished equipment is marked below.`
-          : "Tomorrow’s live forecast is unavailable. This plan uses an example day, so tomorrow’s electricity supply is still uncertain.";
+          : "This plan uses an example day, not a live forecast. Open live weather planning above to assess tomorrow’s forecast conditions.";
   const actions = shortage
     ? [
         "Arrange another power source for the shortage hours before relying on this plan.",

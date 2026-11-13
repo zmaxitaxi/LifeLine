@@ -15,6 +15,8 @@ The slide is not a complete judging rubric: scoring weights, required submission
 - [x] Source code, setup instructions, research, data-source notes, product-validation limits, benchmark, and demo script.
 - [x] Backend, build, mobile/desktop, failure-recovery, and offline browser checks executed; see the verification documents for actual results.
 - [x] UI uses shadcn/ui + Tailwind, Recharts, and Lucide while preserving the working workflow.
+- [x] Live Open-Meteo forecast retrieval, timezone/unit conversion, same-input lower-sunshine comparisons, explicit cache/failure behavior, and validated agent-callable tools. See [live weather](LIVE_WEATHER.md).
+- [x] Current guided assistant is explicitly non-LLM. Hosted LLM setup and real-provider validation remain open; tool-interface tests are not LLM validation.
 
 ## Before submission
 

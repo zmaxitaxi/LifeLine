@@ -1,5 +1,7 @@
 # Data sources, units, and provenance
 
+Live forecasting is an additional, separate source: the [Open-Meteo Forecast API](https://open-meteo.com/en/docs) supplies numerical weather-model forecasts, not observations or measured clinic generation. Source, requested/model-grid coordinates, local dates, IANA timezone, retrieval time and cache status are returned and displayed. Preceding-hour mean radiation in W/m² is interval-aligned and converted using the existing PV assumptions. See [LIVE_WEATHER.md](LIVE_WEATHER.md) for precise conversion, DST limitations, cache/failure behavior, [CC BY 4.0 attribution](https://open-meteo.com/en/licence), and a dated real validation run. Synthetic and historical sources below remain distinct.
+
 The application distinguishes synthetic examples, unverified user inputs, published equipment ratings, and historical satellite-derived irradiance. None is a measured whole-clinic electricity profile.
 
 ## NASA POWER historical irradiance — incorporated

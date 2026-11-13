@@ -1,5 +1,7 @@
 # Interactive application verification
 
+Latest integrated release: **241 backend tests and 17 Chromium journeys**, including 37 forecast-specific checks and four forecast browser journeys. The completed simplified UI is preserved; live Open-Meteo forecasts, explicit midnight battery assumptions, source/timezone provenance, uncertainty comparisons and structured planning tools are now integrated. [Weather details and dated evidence](../LIVE_WEATHER.md). Earlier milestone descriptions below are historical where they differ. No hosted LLM, field validation or clinical-safety guarantee is claimed.
+
 The tested flow is: configure clinic → calculate actual schedules → compare outcomes → edit equipment → test adverse weather → explore capacity.
 
 ## Environment and results

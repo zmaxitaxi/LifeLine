@@ -8,7 +8,7 @@ from pydantic import Field, field_validator, model_validator
 from .energy_types import BatteryConfig, FlexibleTask, ModelInput
 from .models import (ConfigOverrides, CriticalEquipment, EffectiveConfig, FlexibleEquipment,
                      Hour, RiskStatus, ScenarioId, SimulationRequest, StrictModel)
-from .solar_forecast import forecast_solar
+from .solar_forecast import forecast_solar, pv_from_irradiance
 
 WEATHER_PATH = Path(__file__).resolve().parents[2] / 'data/kisumu_weather.json'
 
@@ -114,7 +114,7 @@ class ScenarioCatalog(StrictModel):
         if request.weather_dataset != "synthetic":
             weather = load_weather()
             factors = request.cloud_factors if request.cloud_factors is not None else preset.cloud_factors
-            pv = tuple(config.pv_capacity_kw*self.pv_model.performance_ratio*v*f for v,f in zip(weather["irradiance_kwh_m2"],factors))
+            pv = pv_from_irradiance(config.pv_capacity_kw, tuple(v*f for v,f in zip(weather["irradiance_kwh_m2"],factors)), self.pv_model.performance_ratio)
         critical = [0.] * 24
         tasks = []
         for equipment in self.equipment_for(request, config):

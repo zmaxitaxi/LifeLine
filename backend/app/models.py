@@ -264,7 +264,7 @@ class SimulationResponse(StrictModel):
     input_provenance: dict[str, str]
     weather_dataset: str
     diagnosis: Diagnosis
-    timezone: Literal['Africa/Nairobi'] = 'Africa/Nairobi'
+    timezone: str = 'Africa/Nairobi'
     horizon_hours: Literal[24] = 24
     dt_hours: Literal[1] = 1
     pv_performance_ratio: Efficiency
@@ -293,7 +293,8 @@ class ErrorDetail(StrictModel):
 
 
 class ErrorBody(StrictModel):
-    code: Literal['INVALID_REQUEST', 'SOLVER_UNAVAILABLE', 'SOLVER_TIME_LIMIT', 'NUMERICAL_ERROR', 'INTERNAL_ERROR']
+    code: Literal['INVALID_REQUEST', 'SOLVER_UNAVAILABLE', 'SOLVER_TIME_LIMIT', 'NUMERICAL_ERROR', 'INTERNAL_ERROR',
+                  'FORECAST_UNAVAILABLE', 'FORECAST_DATA_INVALID', 'UNSUPPORTED_FORECAST_DAY', 'AGENT_UNAVAILABLE']
     message: str
     details: list[ErrorDetail] = Field(default_factory=list)
 

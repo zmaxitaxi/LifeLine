@@ -67,7 +67,7 @@ test("first-time clinic worker chooses a clinic, asks, understands, and changes 
     page.getByRole("heading", { name: "When to run equipment", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".plan-limitation")).toContainText(
-    "live forecast is unavailable",
+    "not a live forecast",
   );
   await expect(
     page.getByRole("button", {
@@ -227,13 +227,11 @@ test("detailed mode preserves custom equipment, all three schedules, and compute
   await page
     .getByRole("button", { name: "Add equipment", exact: true })
     .click();
-  const row = page
-    .locator(".equipment-editor")
-    .filter({
-      has: page.locator(".equipment-toggle strong", {
-        hasText: "New equipment",
-      }),
-    });
+  const row = page.locator(".equipment-editor").filter({
+    has: page.locator(".equipment-toggle strong", {
+      hasText: "New equipment",
+    }),
+  });
   await row.locator(".equipment-toggle").click();
   await row
     .locator("label")
@@ -255,14 +253,12 @@ test("detailed mode preserves custom equipment, all three schedules, and compute
   await expect(hour).not.toBeChecked();
   await ready(page);
   await expect(
-    page
-      .locator(".task-group")
-      .filter({
-        has: page.getByRole("heading", {
-          name: "Custom field pump",
-          exact: true,
-        }),
+    page.locator(".task-group").filter({
+      has: page.getByRole("heading", {
+        name: "Custom field pump",
+        exact: true,
       }),
+    }),
   ).toContainText("1.082");
   await expect(page.locator(".comparison-card")).toContainText(
     "Sunshine-first",
@@ -422,7 +418,7 @@ test("initial failure can be retried and forecast failure is visibly unavailable
   await page.unroute("**/api/scenarios");
   await page.getByRole("button", { name: "Retry", exact: true }).click();
   await expect(page.locator(".weather-context")).toContainText(
-    "Forecast availability could not be checked",
+    "Planner status could not be checked",
   );
   await plan(page);
 });

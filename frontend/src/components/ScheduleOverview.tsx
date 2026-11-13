@@ -28,16 +28,22 @@ function hours(
         .join(" · ")
     : "No operation scheduled";
 }
-export function ScheduleOverview({ result }: { result: SimulationResponse }) {
+export function ScheduleOverview({
+  result,
+  id = "schedule",
+}: {
+  result: SimulationResponse;
+  id?: string;
+}) {
   const tasks = result.equipment.filter((e) => e.category === "flexible");
   return (
-    <Card className="schedule-overview" id="schedule">
+    <Card className="schedule-overview" id={id}>
       <CardHeader>
         <CardTitle>
           <h2>Your recommended operating schedule</h2>
         </CardTitle>
         <CardDescription>
-          Before → After · local time, Africa/Nairobi. Partial-hour energy is
+          Before → After · local time, {result.timezone}. Partial-hour energy is
           shown in parentheses.
         </CardDescription>
       </CardHeader>

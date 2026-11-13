@@ -23,10 +23,16 @@ const labels = {
   heuristic: "Sunshine-first",
   optimized: "LifeLine",
 };
-export function Schedules({ result }: { result: SimulationResponse }) {
+export function Schedules({
+  result,
+  id = "detailed-schedule",
+}: {
+  result: SimulationResponse;
+  id?: string;
+}) {
   const tasks = result.equipment.filter((e) => e.category === "flexible");
   return (
-    <Card className="section schedule-section" id="detailed-schedule">
+    <Card className="section schedule-section" id={id}>
       <CardHeader>
         <div className="section-heading">
           <div>
@@ -35,12 +41,15 @@ export function Schedules({ result }: { result: SimulationResponse }) {
               <h2>Same clinic. Three schedules.</h2>
             </CardTitle>
           </div>
-          <span className="small muted">Local time · Africa/Nairobi</span>
+          <span className="small muted">Local time · {result.timezone}</span>
         </div>
         <CardDescription>
           Colored blocks show work actually served; dashed outlines show
           existing work requested but not supplied. Hover for energy and
-          duration. Night is shaded.
+          duration.{" "}
+          {result.weather_dataset === "open-meteo-forecast"
+            ? "Hours are local; daylight follows the forecast rather than a fixed clock window."
+            : "Night is shaded."}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -101,7 +110,7 @@ export function Schedules({ result }: { result: SimulationResponse }) {
                           return (
                             <div
                               key={h}
-                              className={`time-cell ${h < 6 || h >= 18 ? "night" : ""}`}
+                              className={`time-cell ${result.weather_dataset !== "open-meteo-forecast" && (h < 6 || h >= 18) ? "night" : ""}`}
                               title={`${clock(h)}: ${num(energy)} kWh served (${num(requested)} requested), ${num(energy / (task.category === "flexible" ? task.max_power_kw : 1), 2)} h equivalent runtime`}
                             >
                               {requested > energy + 1e-6 ? (

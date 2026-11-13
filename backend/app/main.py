@@ -23,6 +23,8 @@ from .models import (ApiErrorResponse, HealthResponse, ScenarioListResponse,
 from .optimizer import SolverError
 from .scenarios import CONFIG_PATH, load_catalog, load_weather
 from .assistant import AssistantRequest, AssistantResponse, prepare, summarize
+from .forecast_routes import router as forecast_router
+from .weather_forecast import ForecastError, ForecastService
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +40,14 @@ def validation_details(errors, prefix=()):
     return [dict(loc=list(prefix)+list(e['loc']), message=e['msg'], type=e['type']) for e in errors]
 
 
-def create_app(config_path: Path = CONFIG_PATH):
+def create_app(config_path: Path = CONFIG_PATH, forecast_service=None):
     @asynccontextmanager
     async def lifespan(app):
         app.state.catalog = load_catalog(config_path)
         load_weather()
         importlib.import_module('scipy.optimize')  # preload before accepting requests
         app.state.solve_lock = asyncio.Lock()
+        app.state.forecasts = forecast_service or ForecastService()
         yield
 
     app = FastAPI(title='LifeLine API', version='1.0', lifespan=lifespan,
@@ -64,6 +67,10 @@ def create_app(config_path: Path = CONFIG_PATH):
     async def numerical_error(request, exc):
         logger.error('Numerical verification failed: %s', exc)
         return error_response(503, 'NUMERICAL_ERROR', 'The numerical result could not be verified. Please retry.')
+
+    @app.exception_handler(ForecastError)
+    async def forecast_error(request, exc):
+        return error_response(exc.status, exc.code, exc.message)
 
     @app.exception_handler(HTTPException)
     async def http_error(request, exc):
@@ -93,10 +100,11 @@ def create_app(config_path: Path = CONFIG_PATH):
 
     @app.get('/api/planning-status')
     async def planning_status():
-        # No forecast provider is configured in this offline application. Do not
-        # present bundled historical data as tomorrow's weather or a live check.
+        # This describes the offline assistant's default example context. No
+        # forecast is fetched without coordinates; it is not a provider health check.
         return {'assistant': 'offline', 'forecast': {'available': False,
-            'reason': 'No live forecast provider is connected.', 'source': None,
+            'reason': 'No forecast is selected for this offline example. Use the live-weather planner to retrieve Open-Meteo data.', 'source': None,
+            'provider_configured': True, 'provider': 'Open-Meteo Forecast API',
             'forecast_date': None,
             'requested_date': (datetime.now(ZoneInfo('Africa/Nairobi')) + timedelta(days=1)).date().isoformat(),
             'updated_at': None}, 'timezone': 'Africa/Nairobi'}
@@ -182,6 +190,8 @@ def create_app(config_path: Path = CONFIG_PATH):
             message += f' The added equipment was checked as a fixed hourly load from {min(item.required_hours):02d}:00 to {max(item.required_hours)+1:02d}:00. Actual sterilization cycles still require validation.'
         return AssistantResponse(message=message, request=selected, result=result,
             tools_used=['energy_simulator', 'schedule_optimizer', 'schedule_comparison'])
+
+    app.include_router(forecast_router)
 
     @app.api_route('/api/{path:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], include_in_schema=False)
     async def invalid_api_path(path: str, request: Request):

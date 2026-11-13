@@ -206,4 +206,4 @@ def summarize(result: SimulationResponse):
         answer = 'Essential equipment receives power in this model, but some other work cannot be completed.'
     else:
         answer = 'Essential equipment and the requested work have enough power in this model.'
-    return answer + ' Live forecasting is unavailable; this checks an example day, not tomorrow’s actual conditions.'
+    return answer + ' This offline calculation uses an example day, not tomorrow’s actual conditions. Open the live-weather planner to use actual Open-Meteo forecasts.'

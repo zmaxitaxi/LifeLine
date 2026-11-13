@@ -11,13 +11,23 @@ export function Disclosure({
   title,
   children,
   className = "",
+  keepMounted = true,
+  open,
+  onOpenChange,
 }: {
   title: ReactNode;
   children: ReactNode;
   className?: string;
+  keepMounted?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   return (
-    <Collapsible className={`disclosure ${className}`}>
+    <Collapsible
+      className={`disclosure ${className}`}
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <CollapsibleTrigger
         render={
           <Button
@@ -31,7 +41,9 @@ export function Disclosure({
         <span>{title}</span>
         <ChevronDown data-icon="inline-end" />
       </CollapsibleTrigger>
-      <CollapsibleContent keepMounted>{children}</CollapsibleContent>
+      <CollapsibleContent keepMounted={keepMounted}>
+        {children}
+      </CollapsibleContent>
     </Collapsible>
   );
 }

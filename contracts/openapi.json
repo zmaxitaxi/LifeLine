@@ -169,6 +169,282 @@
           }
         }
       }
+    },
+    "/api/forecast/locations": {
+      "get": {
+        "summary": "Locations",
+        "operationId": "locations_api_forecast_locations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/forecast": {
+      "get": {
+        "summary": "Forecast",
+        "operationId": "forecast_api_forecast_get",
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Latitude"
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Longitude"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolarForecast"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/forecast/plan": {
+      "post": {
+        "summary": "Forecast Plan",
+        "operationId": "forecast_plan_api_forecast_plan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForecastPlanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastPlanResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/planner/tools": {
+      "get": {
+        "summary": "Planner Tools",
+        "operationId": "planner_tools_api_planner_tools_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/planner/tool": {
+      "post": {
+        "summary": "Planner Tool",
+        "operationId": "planner_tool_api_planner_tool_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlannerToolRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/planner/ask": {
+      "post": {
+        "summary": "Guided Plan",
+        "operationId": "guided_plan_api_planner_ask_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuidedPlanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuidedForecastResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -486,7 +762,11 @@
               "SOLVER_UNAVAILABLE",
               "SOLVER_TIME_LIMIT",
               "NUMERICAL_ERROR",
-              "INTERNAL_ERROR"
+              "INTERNAL_ERROR",
+              "FORECAST_UNAVAILABLE",
+              "FORECAST_DATA_INVALID",
+              "UNSUPPORTED_FORECAST_DAY",
+              "AGENT_UNAVAILABLE"
             ],
             "title": "Code"
           },
@@ -645,6 +925,339 @@
           "allocations"
         ],
         "title": "FlexibleTaskResult"
+      },
+      "ForecastDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "hours": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastHour"
+            },
+            "type": "array",
+            "title": "Hours"
+          },
+          "simulation_supported": {
+            "type": "boolean",
+            "title": "Simulation Supported"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "date",
+          "hours",
+          "simulation_supported",
+          "warnings"
+        ],
+        "title": "ForecastDay"
+      },
+      "ForecastHour": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "shortwave_radiation_w_m2": {
+            "type": "number",
+            "title": "Shortwave Radiation W M2"
+          },
+          "irradiance_kwh_m2": {
+            "type": "number",
+            "title": "Irradiance Kwh M2"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "shortwave_radiation_w_m2",
+          "irradiance_kwh_m2"
+        ],
+        "title": "ForecastHour"
+      },
+      "ForecastLocation": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "title": "ForecastLocation"
+      },
+      "ForecastPlanRequest": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "clinic": {
+            "$ref": "#/components/schemas/SimulationRequest"
+          },
+          "day": {
+            "type": "string",
+            "enum": [
+              "today",
+              "tomorrow"
+            ],
+            "title": "Day",
+            "default": "tomorrow"
+          },
+          "midnight_battery_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Midnight Battery Kwh"
+          },
+          "reduced_sunshine_factors": {
+            "items": {
+              "type": "number",
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Reduced Sunshine Factors",
+            "default": [
+              0.75,
+              0.5
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "clinic",
+          "midnight_battery_kwh"
+        ],
+        "title": "ForecastPlanRequest"
+      },
+      "ForecastPlanResponse": {
+        "properties": {
+          "forecast": {
+            "$ref": "#/components/schemas/SolarForecast"
+          },
+          "planning_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Planning Date"
+          },
+          "midnight_battery_kwh": {
+            "type": "number",
+            "title": "Midnight Battery Kwh"
+          },
+          "initial_battery_basis": {
+            "type": "string",
+            "title": "Initial Battery Basis"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SimulationResponse"
+          },
+          "uncertainty_cases": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastStressCase"
+            },
+            "type": "array",
+            "title": "Uncertainty Cases"
+          },
+          "assessment": {
+            "type": "string",
+            "title": "Assessment"
+          },
+          "actions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Actions"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limitations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "forecast",
+          "planning_date",
+          "midnight_battery_kwh",
+          "initial_battery_basis",
+          "plan",
+          "uncertainty_cases",
+          "assessment",
+          "actions",
+          "limitations"
+        ],
+        "title": "ForecastPlanResponse"
+      },
+      "ForecastStressCase": {
+        "properties": {
+          "sunshine_factor": {
+            "type": "number",
+            "title": "Sunshine Factor"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SimulationResponse"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sunshine_factor",
+          "plan"
+        ],
+        "title": "ForecastStressCase"
+      },
+      "GuidedForecastResponse": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "const": "deterministic_guided_fallback",
+            "title": "Mode",
+            "default": "deterministic_guided_fallback"
+          },
+          "needs_clarification": {
+            "type": "boolean",
+            "title": "Needs Clarification"
+          },
+          "tool_calls": {
+            "items": {
+              "$ref": "#/components/schemas/PlannerToolCall"
+            },
+            "type": "array",
+            "title": "Tool Calls"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ForecastPlanResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "needs_clarification",
+          "tool_calls",
+          "message",
+          "result"
+        ],
+        "title": "GuidedForecastResponse"
+      },
+      "GuidedPlanRequest": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "clinic": {
+            "$ref": "#/components/schemas/SimulationRequest"
+          },
+          "day": {
+            "type": "string",
+            "enum": [
+              "today",
+              "tomorrow"
+            ],
+            "title": "Day",
+            "default": "tomorrow"
+          },
+          "midnight_battery_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Midnight Battery Kwh"
+          },
+          "reduced_sunshine_factors": {
+            "items": {
+              "type": "number",
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Reduced Sunshine Factors",
+            "default": [
+              0.75,
+              0.5
+            ]
+          },
+          "question": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Question"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "clinic",
+          "midnight_battery_kwh",
+          "question"
+        ],
+        "title": "GuidedPlanRequest"
       },
       "HTTPValidationError": {
         "properties": {
@@ -885,6 +1498,74 @@
           "flexible_tasks"
         ],
         "title": "PlanResult"
+      },
+      "PlannerToolCall": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "get_clinic_configuration",
+              "get_solar_forecast",
+              "plan_forecast"
+            ],
+            "title": "Name"
+          },
+          "arguments": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Arguments"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "arguments"
+        ],
+        "title": "PlannerToolCall"
+      },
+      "PlannerToolRequest": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "clinic": {
+            "$ref": "#/components/schemas/SimulationRequest"
+          },
+          "midnight_battery_kwh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Midnight Battery Kwh"
+          },
+          "tool_call": {
+            "$ref": "#/components/schemas/PlannerToolCall"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "clinic",
+          "tool_call"
+        ],
+        "title": "PlannerToolRequest"
       },
       "PlanningQuestion": {
         "properties": {
@@ -1319,7 +2000,6 @@
           },
           "timezone": {
             "type": "string",
-            "const": "Africa/Nairobi",
             "title": "Timezone",
             "default": "Africa/Nairobi"
           },
@@ -1464,6 +2144,98 @@
           "message"
         ],
         "title": "SimulationWarning"
+      },
+      "SolarForecast": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "const": "Open-Meteo Forecast API",
+            "title": "Source",
+            "default": "Open-Meteo Forecast API"
+          },
+          "data_kind": {
+            "type": "string",
+            "const": "weather_model_forecast",
+            "title": "Data Kind",
+            "default": "weather_model_forecast"
+          },
+          "requested_location": {
+            "$ref": "#/components/schemas/ForecastLocation"
+          },
+          "model_grid_location": {
+            "$ref": "#/components/schemas/ForecastLocation"
+          },
+          "timezone": {
+            "type": "string",
+            "title": "Timezone"
+          },
+          "retrieved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrieved At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "cache_status": {
+            "type": "string",
+            "enum": [
+              "live",
+              "cached",
+              "stale"
+            ],
+            "title": "Cache Status"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "attribution_url": {
+            "type": "string",
+            "title": "Attribution Url",
+            "default": "https://open-meteo.com/"
+          },
+          "licence_url": {
+            "type": "string",
+            "title": "Licence Url",
+            "default": "https://creativecommons.org/licenses/by/4.0/"
+          },
+          "interval_convention": {
+            "type": "string",
+            "title": "Interval Convention",
+            "default": "Open-Meteo preceding-hour mean, aligned to local interval starts by overlap integration."
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastDay"
+            },
+            "type": "array",
+            "title": "Days"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "requested_location",
+          "model_grid_location",
+          "timezone",
+          "retrieved_at",
+          "expires_at",
+          "cache_status",
+          "source_url",
+          "days",
+          "warnings"
+        ],
+        "title": "SolarForecast"
       },
       "TaskAllocation": {
         "properties": {

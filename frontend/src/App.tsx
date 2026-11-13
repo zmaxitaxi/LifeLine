@@ -54,6 +54,11 @@ export default function App() {
   const [status, setStatus] = useState<PlanningStatus | null>(null);
   const [statusError, setStatusError] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [forecastQuestion, setForecastQuestion] = useState<{
+    text: string;
+    id: number;
+  } | null>(null);
+  const [usingForecast, setUsingForecast] = useState(false);
   const [pending, setPending] = useState<PlanningQuestion | null>(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -137,6 +142,7 @@ export default function App() {
   }, []);
 
   function edit(next: Draft) {
+    setUsingForecast(false);
     invalidate();
     setDraft(next);
     setDirty(true);
@@ -147,6 +153,7 @@ export default function App() {
       timer.current = setTimeout(() => void run(next), 650);
   }
   function choose(id: string) {
+    setUsingForecast(false);
     const selected = presets.find((p) => p.id === id);
     if (!selected) return;
     invalidate();
@@ -173,6 +180,22 @@ export default function App() {
     const abort = new AbortController();
     controller.current = abort;
     const question = followup ? pending : null;
+    if (!question && (/\bforecasts?\b/i.test(message) || (usingForecast && /sunshine|weather|cloud|tomorrow|today|electricity/i.test(message)))) {
+      setBusy(false);
+      setError("");
+      setView("simple");
+      setPending(null);
+      setForecastQuestion({ text: message, id: Date.now() });
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", text: message },
+        {
+          role: "assistant",
+          text: "I can check the actual weather forecast for the configured equipment. In the live-weather panel, choose the location and confirm the assumed battery energy at tomorrow’s local midnight, then calculate the forecast-backed plan. This is a guided tool workflow, not a connected language model.",
+        },
+      ]);
+      return;
+    }
     setBusy(true);
     setError("");
     setView("simple");
@@ -214,9 +237,10 @@ export default function App() {
   }
   function changeView(next: View) {
     setView(next);
-    requestAnimationFrame(() =>
-      document.getElementById(`${next}-view`)?.focus(),
-    );
+    requestAnimationFrame(() => {
+      const panel = document.getElementById(`${next}-view`);
+      if (panel && !panel.contains(document.activeElement)) panel.focus();
+    });
   }
   const valid = draft ? validDraft(draft) : false;
   const problem = draft ? draftProblem(draft) : null;
@@ -326,6 +350,18 @@ export default function App() {
               statusError={statusError}
               result={currentResult}
               onChange={edit}
+              forecastQuestion={forecastQuestion}
+              onForecastAnswer={(answer) => {
+            setUsingForecast(true);
+                setResult(null);
+                setLastRequest(null);
+                setDirty(false);
+                setPending(null);
+                setMessages((prev) => [
+                  ...prev,
+                  { role: "assistant", text: answer },
+                ]);
+              }}
             />
             {problem ? (
               <Alert variant="destructive" className="requirements-error">
@@ -369,7 +405,7 @@ export default function App() {
                   onAsk={(text, followup) => void ask(text, followup)}
                   onCancel={() => {
                     setPending(null);
-                setMessages([]);
+                    setMessages([]);
                     if (result) void run(draft);
                   }}
                 />
@@ -476,15 +512,17 @@ export default function App() {
               <Disclosure title="Assumptions and data sources">
                 <p>
                   All example clinics and equipment are illustrative. Entered
-                  values are unverified. Live weather and live AI are
-                  unavailable; the local assistant uses supported requests and
-                  the same simulator and optimizer as Detailed mode.
+                  values are unverified. Live weather planning uses Open-Meteo;
+                  a hosted AI model is not connected. The local assistant uses
+                  supported requests and the same simulator and optimizer as
+                  Detailed mode.
                 </p>
                 <p>
                   Historical weather: NASA POWER satellite-derived irradiance
                   for Kisumu, 14 January 2025. It is not a clinic measurement or
                   a forecast. Synthetic sunshine uses a fixed daylight curve.
-                  Last live forecast update: unavailable.
+                  Live forecast dates, retrieval times and timezone are
+                  displayed in the live-weather planner when retrieved.
                 </p>
                 <p>
                   <a
