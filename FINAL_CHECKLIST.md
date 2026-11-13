@@ -27,6 +27,10 @@ The user subsequently assigned the comprehensive 12-scenario local-LLM evaluatio
 - Stronger benchmark: [computed input, schedules and metrics](docs/evidence/competing-windows.json). Runtime endpoints do not read the result fixture.
 - Credentials: ignored local configuration only. Tracked/untracked release files, bundles and Git history were checked against the actual local key: no matches; `.env.local` is ignored, untracked and mode 0600. [Scan evidence](docs/evidence/credential-check.json). No credential values were printed.
 
+## Main-branch integration
+
+Caden’s commits through `edcea98` were merged with the local-agent work. The committed snapshot `9aa223f` passed 266 backend tests, the production build and all 22 browser tests in an isolated checkout on separate ports. The other UI chat’s in-progress battery/activity changes were excluded and preserved in the shared workspace. [Integration evidence](docs/evidence/merged-release-validation.json).
+
 ## What remains before presentation/submission
 
 1. Recheck fresh Open-Meteo retrieval on the presentation network. Run `.venv/bin/python scripts/check_local_agent.py --midnight-battery-kwh 6`; it must report local-tool-agent results, not fallback. If unavailable, disclose it and deliberately present historical/synthetic mode. Recorded tests are never described as current live weather.

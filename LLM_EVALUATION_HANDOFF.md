@@ -10,6 +10,8 @@ Ownership confirmed by the user: **the two teammates own evaluation; this chat o
 - Existing smoke script: `scripts/check_local_agent.py`. This is not the comprehensive harness. It supports fresh weather or an explicitly recorded actual forecast replay; never label replayed or synthetic weather as live.
 - Relevant modules: `local_agent.py`, `agent_tools.py`, `agent_models.py`, `planner_tools.py`, `forecast_planner.py`, and the unchanged simulator/optimizer. Existing tests use injected transport; the requested evaluation must call the real installed model.
 
+The integrated baseline `9aa223f` passed 266 backend tests, 22 browser journeys and the build in an isolated committed checkout. Separate chat-first UI/battery-playback work is in progress and excluded from this baseline. Pin the evaluated commit and rerun affected cases after that work merges.
+
 ## Caden: harness and real-model execution
 
 Use a branch such as `codex/local-llm-evaluation`. Own the evaluation script, `LLM_EVALUATION.md`, `LLM_EVALUATION_RESULTS.json` and evaluation-specific regression tests. Preserve the existing architecture and tool permissions.

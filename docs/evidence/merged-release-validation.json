@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-11-13T20:17:13.251307+00:00",
+  "tested_commit": "9aa223fb3315d60b2577c6a85fe7194cc2c62869",
+  "merged_remote_main": "edcea98",
+  "scope": "Committed snapshot exported with git archive; shared in-progress UI changes excluded. Existing installed dependencies reused.",
+  "backend": {
+    "passed": 266,
+    "warnings": "One upstream Starlette/AnyIO deprecation",
+    "seconds": 3.49
+  },
+  "frontend": {
+    "typescript": "passed",
+    "production_build": "passed",
+    "chromium_passed": 22,
+    "seconds": 26.4,
+    "api_port": 8059,
+    "vite_port": 5179
+  },
+  "comprehensive_local_llm_evaluation": "Assigned to teammates; not run here and no score claimed",
+  "fresh_weather": "Earlier actual retrieval and separate Caden Windows verification; latest check from this Mac failed. No new live success claimed."
+}
