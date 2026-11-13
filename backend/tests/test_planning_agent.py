@@ -166,3 +166,26 @@ def test_new_equipment_clarification_preserves_specs_and_accepts_explicit_hour_r
         assert proposal['missing_fields']==[]
         s=confirm(c,s)
         assert s['computed_plan']['simulation']['optimized']['metrics']['critical_requested_kwh']==pytest.approx(3.4)
+
+
+def test_native_confirmed_activity_correction_stages_reviewed_version_not_duplicate():
+    agent,calls=agent_with([])
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        s=confirm(c,propose(c,create(c)))
+        aid=s['confirmed_activities'][0]['id']
+        # A real LocalAgent transport with target-specific native arguments.
+        replacement,_=agent_with([{'name':'propose_activity_revision','arguments':{'target_activity_id':aid,'start_hour':11}}])
+        c.app.state.agent=replacement
+        d=ask(c,s,'Change the confirmed campaign start to 11 AM.');s=d['state']
+        assert d['tool_calls']==['propose_activity_revision']
+        assert len(s['confirmed_activities'])==1
+        assert s['confirmed_activities'][0]['details']['start_hour']==10
+        assert s['proposals'][-1]['target_activity_id']==aid
+        assert s['proposals'][-1]['details']['start_hour']==11
+        s=confirm(c,s,key='confirmed-revision')
+        assert len(s['confirmed_activities'])==1
+        assert s['confirmed_activities'][0]['id']==aid
+        assert s['confirmed_activities'][0]['version']==2
+        assert s['confirmed_activities'][0]['details']['start_hour']==11
+        assert s['computed_plan']['simulation']['optimized']['metrics']['critical_requested_kwh']==pytest.approx(2.4)

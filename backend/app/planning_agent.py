@@ -41,7 +41,7 @@ Known equipment_ids reference physical inventory IDs; associations add no demand
 additional_equipment must retain missing specs as null. Never infer a power rating, category or electrical runtime.
 Explicit equipment constraints require explicit operator instructions; essential hours/specifications cannot be removed.
 If an active draft exists, update it for corrections, not a new proposal. For a new unrelated activity use propose_activity.
-For Confirm or review, use review_activity_proposal. The model is unable to confirm or reject; the operator uses the explicit review API.
+To change an already CONFIRMED activity use propose_activity_revision with its exact target_activity_id and ONLY the changed fields; this stages a reviewed revision instead of adding another activity. For Confirm or review, use review_activity_proposal. The model is unable to confirm or reject; the operator uses the explicit review API.
 Use recompute_clinic_plan for weather/electricity/recovery; it ALWAYS includes confirmed activities. Never turn a confirmed activity into a new hypothetical load.
 For cloudier without a percentage, use factor 1 actual current live weather; ask for a percentage only when an explicit sensitivity is required.
 Use include_recovery true when asked about recovery/shortages/hardware. Keep previous sunshine_factor unless explicitly changed.
@@ -79,6 +79,11 @@ def definitions(state=None, latest_fields=None):
             tools.append(dict(name='correct_last_activity_time', description=f'Correct the last entered {latest_fields[0]} on the SAME draft. Supply only the newly stated hour.', parameters=CorrectTimeTool.model_json_schema()))
     elif state:
         tools = [t for t in tools if t['name'] not in ('update_activity_draft','review_activity_proposal')]
+        if state.confirmed_activities:
+            revision = dict(draft)
+            revision['properties'] = dict(draft['properties']) | {'target_activity_id':{'type':'string','minLength':1}}
+            revision['required'] = ['target_activity_id']
+            tools.append(dict(name='propose_activity_revision',description='Stage a reviewed change to an existing confirmed activity using its exact ID and only changed flat fields. Does not mutate confirmed state or create a duplicate activity.', parameters=revision))
     return tools
 
 
@@ -232,7 +237,13 @@ async def ask_session_agent(session_id, body, store, catalog, service, lock, age
             if name in ('inspect_planning_state', 'review_activity_proposal'):
                 EmptyArguments.model_validate(arguments)
                 state = store.check(session_id, body.expected_revision)
-            elif name in ('propose_activity', 'update_activity_draft', 'correct_last_activity_time'):
+            elif name in ('propose_activity', 'update_activity_draft', 'correct_last_activity_time', 'propose_activity_revision'):
+                revision_target = None
+                if name == 'propose_activity_revision':
+                    revision_target = arguments.get('target_activity_id')
+                    if revision_target not in {a.id for a in state.confirmed_activities}:
+                        raise PlanningError('INVALID_ACTIVITY', 'Choose the ID of an existing confirmed activity to revise.')
+                    arguments = {k:v for k,v in arguments.items() if k != 'target_activity_id'}
                 if name == 'correct_last_activity_time':
                     corrected = CorrectTimeTool.model_validate(arguments)
                     if len(latest_fields) != 1 or latest_fields[0] not in ('start_hour','end_hour','deadline_hour'):
@@ -284,7 +295,11 @@ async def ask_session_agent(session_id, body, store, catalog, service, lock, age
                     state = await store.update(session_id, state.active_proposal_id,
                         UpdateActivityProposal(expected_revision=state.revision, details=tool.details))
                 else:
-                    state = await store.propose(session_id, CreateActivityProposal(expected_revision=state.revision, details=tool.details))
+                    if name == 'propose_activity' and tool.details.name:
+                        matches = [a for a in state.confirmed_activities if a.details.name.casefold() == tool.details.name.casefold()]
+                        if len(matches) == 1:
+                            revision_target = matches[0].id
+                    state = await store.propose(session_id, CreateActivityProposal(expected_revision=state.revision, details=tool.details, target_activity_id=revision_target))
             elif name == 'recompute_clinic_plan':
                 args = RecomputeTool.model_validate(normalize_model_arguments(arguments))
                 explicit_factor = requested_sunshine_factor(body.question)
