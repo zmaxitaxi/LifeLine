@@ -10,6 +10,7 @@ import re
 from time import monotonic
 import httpx
 from pydantic import ValidationError
+from .agent_telemetry import measured, record_model
 from .agent_models import (AgentResponse, CapacityArguments, ClarifyArguments,
                            FixedRequirementArguments, ToolTrace)
 from .agent_tools import explicit_requirement, evaluate_fixed_requirement, explore_capacity, SnapshotService
@@ -211,38 +212,50 @@ class LocalAgent:
                 raise AgentUnavailable('LOCAL_AGENT_UNAVAILABLE') from None
 
     async def session_turn(self, messages, *, toolset):
-        """Native session choice: ordinary authored content OR one actual tool.
-
-        Legacy decide() remains tool-only. Session callers must validate prose
-        against their current context before exposing computed claims.
-        """
+        """Native content/tool choice, bounded output and actual provider telemetry."""
         if self.lock.locked():
             raise AgentUnavailable('LOCAL_AGENT_BUSY')
+        payload={'model':self.model,'messages':messages,'stream':False,'think':False,'keep_alive':'10m',
+            'options':{'temperature':0,'num_ctx':8192,'num_predict':384},
+            'tools':[{'type':'function','function':tool} for tool in toolset]}
+        metrics={'request_chars':len(json.dumps(payload,separators=(',',':'))),
+            'message_chars':len(json.dumps(messages,separators=(',',':'))),
+            'tool_schema_chars':len(json.dumps(payload['tools'],separators=(',',':')))}
         async with self.lock:
+            started=monotonic()
             try:
-                async with httpx.AsyncClient(transport=self.transport,timeout=httpx.Timeout(45.,connect=2.),trust_env=False) as client:
-                    response = await client.post(OLLAMA_URL+'/api/chat',json={
-                        'model':self.model,'messages':messages,'stream':False,'think':False,'keep_alive':'10m',
-                        'options':{'temperature':0,'num_ctx':8192,'num_predict':800},
-                        'tools':[{'type':'function','function':tool} for tool in toolset]})
-                    response.raise_for_status()
-                    message=response.json()['message']
-                if not isinstance(message,dict):
-                    raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                with measured('model'):
+                    async with httpx.AsyncClient(transport=self.transport,timeout=httpx.Timeout(45.,connect=2.),trust_env=False) as client:
+                        response=await client.post(OLLAMA_URL+'/api/chat',json=payload)
+                        response.raise_for_status()
+                        data=response.json()
+                for key in ('prompt_eval_count','eval_count'):
+                    if key in data:metrics[key]=data[key]
+                for key in ('total_duration','load_duration','prompt_eval_duration','eval_duration'):
+                    if key in data:metrics[key+'_ns']=data[key]
+                if data.get('done_reason')=='length':
+                    raise AgentUnavailable('MODEL_OUTPUT_TRUNCATED')
+                message=data['message']
+                if not isinstance(message,dict):raise AgentUnavailable('INVALID_AGENT_RESPONSE')
                 calls=message.get('tool_calls',[])
-                if not isinstance(calls,list) or len(calls)>1:
-                    raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                if not isinstance(calls,list) or len(calls)>1:raise AgentUnavailable('INVALID_AGENT_RESPONSE')
                 if calls:
                     call=calls[0]['function']
-                    if not isinstance(call['name'],str) or not isinstance(call['arguments'],dict):
-                        raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                    if not isinstance(call['name'],str) or not isinstance(call['arguments'],dict):raise AgentUnavailable('INVALID_AGENT_RESPONSE')
                     return {'type':'tool_call','call':call,'content':message.get('content','')}
                 content=message.get('content')
-                if not isinstance(content,str) or not content.strip() or len(content)>6000:
-                    raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                if not isinstance(content,str) or not content.strip() or len(content)>6000:raise AgentUnavailable('INVALID_AGENT_RESPONSE')
                 return {'type':'message','content':content}
-            except (httpx.HTTPError, ValueError, KeyError, TypeError):
+            except httpx.TimeoutException:
+                raise AgentUnavailable('MODEL_TIMEOUT') from None
+            except httpx.HTTPError:
                 raise AgentUnavailable('LOCAL_AGENT_UNAVAILABLE') from None
+            except (ValueError,KeyError,TypeError):
+                raise AgentUnavailable('INVALID_AGENT_RESPONSE') from None
+            finally:
+                metrics['http_seconds']=monotonic()-started
+                self.last_session_diagnostics=metrics
+                record_model(metrics)
 
 
 def answer(context, *, mode='local_tool_agent', model=None, **fields):

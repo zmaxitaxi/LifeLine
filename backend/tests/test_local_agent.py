@@ -35,7 +35,7 @@ def agent_with(calls=None, *, failure=None, remote=False, syntheses=None, synthe
         body=json.loads(request.content)
         assert body['model']=='llama3.1:8b' and body['stream'] is False
         assert not any(t['function']['name'] in ('send_email','run_python','update_clinic') for t in body['tools'])
-        session=body['options']['num_predict']==800
+        session=body['options']['num_predict']!=600
         results=[]
         for message in body['messages']:
             if message['role']=='tool':

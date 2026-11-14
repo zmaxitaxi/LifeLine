@@ -68,6 +68,7 @@ class OllamaTransport(httpx.AsyncBaseTransport):
                 'message_chars':sum(len(json.dumps(m,separators=(',',':'))) for m in body['messages']),
                 'tool_schema_chars':len(json.dumps(body.get('tools',[]),separators=(',',':'))),
                 'options':body['options'],'native_message':native,
+                'prior_rejections':[m['content'] for m in body['messages'] if m['role']=='user' and m['content'].startswith('That attempt was rejected:')],
                 'ollama':{key:data.get(key) for key in ('total_duration','load_duration','prompt_eval_count','prompt_eval_duration','eval_count','eval_duration','done_reason')}}
             self.calls.append(call);self.metrics.add('model_http',elapsed)
         else:self.metrics.add('model_status_http',elapsed)
@@ -129,10 +130,10 @@ def main():
                 text=data.get('message','');success=response.status_code==200 and data.get('mode')=='local_tool_agent'
                 if name=='conversation':correct=success and current==before and not data.get('tool_calls')
                 elif name=='assessment':correct=success and current['plan_status']=='current' and 'recompute_clinic_plan' in data.get('tool_calls',[])
-                elif name=='vaccination':correct=success and current==before and ('today' in text.lower() or 'date' in text.lower()) and 'power rating' not in text.lower()
+                elif name=='vaccination':correct=success and current==before and (('today' in text.lower() and 'tomorrow' in text.lower()) or (datetime.now(ZoneInfo('Africa/Nairobi')).date().isoformat() in text and before['planning_date'] in text)) and 'power rating' not in text.lower()
                 elif name=='recovery':correct=success and current.get('computed_plan') is not None and current['computed_plan'].get('recovery') is not None
                 elif name=='followup':correct=success and current==before and 'recompute_clinic_plan' not in data.get('tool_calls',[])
-                else:correct=success and 'power rating' not in text.lower() and 'midnight' not in text.lower()
+                else:correct=success and any(word in text.lower() for word in ('end','finish','duration','how long','window')) and any(word in text.lower() for word in ('equipment','device','appliance')) and 'power rating' not in text.lower() and 'midnight' not in text.lower()
                 phases={phase:sum(e['seconds'] for e in metrics.events if e['phase']==phase) for phase in {e['phase'] for e in metrics.events}}
                 item={'name':name,'question':question,'total_seconds':total,'first_visible_seconds':total,
                     'model_calls':deepcopy(transport.calls),'phases_seconds':phases,'events':deepcopy(metrics.events),

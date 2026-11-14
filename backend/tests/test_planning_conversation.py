@@ -334,7 +334,9 @@ def test_effective_confirmed_runtime_replaces_baseline_in_read_only_fact_context
         assert reply['mode']=='local_tool_agent' and reply['message']==message
         assert reply['state']==state and len(weather)==count
         wire=json.loads(next(call.content for call in calls if call.method=='POST'))
-        assert 'explicit confirmed minimum total daily device runtime 3 hours' in wire['messages'][1]['content']
+        context=json.loads(wire['messages'][1]['content'].split('Canonical clinic data: ')[1])
+        assert next(item for item in context['equipment_inventory'] if item['id']=='pump')['required_energy_kwh']==1.5
+        assert context['confirmed_activities'][0]['details']['equipment_constraints'][0]['required_duration_hours']==3
 
 
 def test_truthful_pending_settings_update_is_not_mistaken_for_adoption():
@@ -413,5 +415,5 @@ def test_failed_live_calculation_supplies_error_and_unavailable_read_can_recover
         assert 'underlying cause is not established' in result['facts']['calculation_status']
         assert 'private upstream diagnosis' not in json.dumps(wire)
         initial=json.loads(wire['messages'][1]['content'].split('Canonical clinic data: ')[1])
-        assert 'weather_dataset' not in initial['clinic']
+        assert 'clinic' not in initial  # No duplicate baseline SimulationRequest in model context.
         assert any('No current calculated plan' in m['content'] for m in wire['messages'] if m['role']=='tool')

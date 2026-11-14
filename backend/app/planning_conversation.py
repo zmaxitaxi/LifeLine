@@ -367,6 +367,11 @@ def synthesis_data(state, facts):
 def collect_reply_facts(state, calls=(), question=''):
     """Facts constrain claims; they do not prescribe which topics to discuss."""
     facts={}
+    if state.timezone:
+        from datetime import datetime, timedelta
+        from zoneinfo import ZoneInfo
+        today=datetime.now(ZoneInfo(state.timezone)).date()
+        facts['clinic_calendar']=f'Clinic local today: {today.isoformat()}. Tomorrow: {(today+timedelta(days=1)).isoformat()}. Selected planning date: {state.planning_date.isoformat()}.'
     if state.plan_status=='failed':
         facts['calculation_status']=('The latest calculation failed. No current verified result is available. '
             +('Live forecast retrieval is unavailable; its underlying cause is not established by this status. ' if state.plan_error=='FORECAST_UNAVAILABLE' else 'The calculation failure code is '+str(state.plan_error)+'. ')
