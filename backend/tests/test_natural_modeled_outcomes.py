@@ -73,6 +73,22 @@ def test_pending_percentage_reading_is_sourced_but_not_adopted():
         assert '2.4 kWh' in collect_reply_facts(parsed)['energy_proposal']
 
 
+@pytest.mark.parametrize('message', [
+    'The model covers essential demand.',
+    'In this model, essential needs are not met.',
+])
+def test_empty_new_clinic_has_unknown_essential_requirements_not_proven_coverage_or_shortage(message):
+    service, _ = service_for()
+    with TestClient(create_app(forecast_service=service)) as client:
+        body = initial();body['clinic']['equipment'] = []
+        state = checked_state(client, post(client, BASE, body))
+        facts = collect_reply_facts(state)
+        assert 'cannot be assessed' in facts['requirements_status']
+        assert 'unknown' in facts['model_outcome_baseline']
+        with pytest.raises(PlanningError):
+            validate_reply_content(message, state, 'Check this clinic.', ['recompute_clinic_plan'])
+
+
 @pytest.mark.parametrize('shortage', [False, True])
 def test_negative_qualified_coverage_matches_actual_model_not_just_coverage_vocabulary(shortage):
     service, _ = service_for()

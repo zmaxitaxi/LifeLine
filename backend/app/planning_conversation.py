@@ -381,6 +381,9 @@ def collect_reply_facts(state, calls=(), question=''):
         f'Discharge efficiency: {config.discharge_efficiency*100:g}%.')
     inventory=[]
     effective_equipment=compile_clinic(state).equipment or []
+    if not any(item.category=='critical' and item.power_kw>0 and item.required_hours for item in effective_equipment):
+        facts['requirements_status']=('No essential-equipment requirements are configured. Essential coverage and clinic reliability cannot be assessed from zero demand. '
+            'Ask the operator to add and review required equipment, ratings and operating hours; do not infer missing devices or priorities.')
     runtime={}
     for activity in state.confirmed_activities:
         for constraint in activity.details.equipment_constraints:
@@ -429,6 +432,9 @@ def collect_reply_facts(state, calls=(), question=''):
             f'essential shortfall is {optimized.critical_unserved_kwh:.3f} kWh; flexible work unfinished is {optimized.flexible_deferred_kwh:.3f} kWh.')
         facts['optimized_battery']=f'The optimized schedule lowest battery level is {optimized.min_soc_kwh:.3f} kWh.'
         for label,metrics in (('baseline',baseline),('optimized',optimized)):
+            if metrics.critical_requested_kwh<=1e-6:
+                facts['model_outcome_'+label]='No essential-equipment demand is configured; essential coverage is unknown, not a finding of met needs or an energy shortage.'
+                continue
             essential=metrics.critical_unserved_kwh<=1e-6
             all_work=essential and metrics.flexible_deferred_kwh<=1e-6
             facts['model_outcome_'+label]=(f'For the {label} schedule under the modeled forecast and assumptions: '
@@ -499,6 +505,8 @@ def _qualified_coverage(state,sentence,message,calls):
         else:
             essential,unfinished=metrics.critical_unserved_kwh,metrics.flexible_deferred_kwh
         return essential<=1e-6 and (essential_only or unfinished<=1e-6)
+    if any(getattr(metrics,'essential_requested_kwh',getattr(metrics,'critical_requested_kwh',0.))<=1e-6 for metrics in contexts):
+        return False  # Missing requirements do not establish coverage or shortage.
     negative=bool(re.search(r'\bnot\s+(?:have\s+)?(?:fully\s+)?(?:met|covered|supplied|sufficient|enough)\b|\b(?:does not|cannot|can.t)\s+(?:meet|cover|supply)\b',sentence,re.I))
     return bool(contexts) and all(covered(metrics)!=negative for metrics in contexts)
 
