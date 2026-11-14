@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { apiBase, open, seed, read, calculate, overview, assistant } from "./support/planning";
+import { apiBase, open, seed, read, calculate, overview, assistant, say } from "./support/planning";
 
 async function addActivity(page:import('@playwright/test').Page,name="Vaccination campaign") {
   await overview(page).click();await page.getByRole('button',{name:'Add activity',exact:true}).click();
@@ -28,6 +28,7 @@ test('Overview creates and edits an activity without requiring Llama or applying
   await page.getByRole('dialog',{name:'Review clinic activity',exact:true}).getByRole('button',{name:'Confirm',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0);
   const updated=await read(request,initial.id);expect(updated.confirmed_activities).toHaveLength(1);expect(updated.confirmed_activities[0].details.start_hour).toBe(10);expect(updated.computed_plan!.simulation.optimized.metrics.critical_requested_kwh).toBeCloseTo(2.4,8);expect(agentCalls).toBe(0);
   await assistant(page).click();await expect(page.locator('.chat-transcript')).toContainText('Activity confirmed.');await expect(page.getByTestId('current-plan-summary')).toHaveCount(1);
+  await say(page,'What are the confirmed activities?');await expect(page.locator('.assistant-message').last()).toContainText('Vaccination campaign');expect((await read(request,initial.id)).computed_plan!.generation).toBe(updated.computed_plan!.generation);
 });
 
 test('a staged Overview activity can be edited or rejected from either page',async({page,request})=>{
@@ -54,6 +55,7 @@ test('editing an activity changes the real daily pump work budget without duplic
   await editor.getByRole('checkbox',{name:'Water pump · up to 500 W',exact:true}).check();await editor.getByRole('spinbutton',{name:'Water pump: required daily operating hours',exact:true}).fill('3');await editor.getByRole('button',{name:'Review activity',exact:true}).click();
   await page.getByRole('dialog',{name:'Review clinic activity',exact:true}).getByRole('button',{name:'Confirm',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0);
   const after=await read(request,state.id);expect(after.equipment_inventory).toHaveLength(2);expect(after.computed_plan!.simulation.optimized.metrics.flexible_requested_kwh).toBe(1.5);expect(after.computed_plan!.simulation.optimized.metrics.critical_requested_kwh).toBeCloseTo(2.4,8);
+  const pump=page.locator('.equipment-item').filter({hasText:'Water pump'});await pump.locator('summary').click();await expect(pump).toContainText('1.500 kWh');await expect(pump).toContainText('3 total daily operating hours');
 });
 
 test('an incomplete equipment draft can be completed manually before confirmation',async({page,request})=>{

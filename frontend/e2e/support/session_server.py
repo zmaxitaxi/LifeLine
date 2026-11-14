@@ -51,7 +51,9 @@ def natural_session(payload):
     result=next(((m.get('tool_name'),json.loads(m['content'])) for m in reversed(messages) if m.get('role')=='tool' and '"facts"' in m.get('content','')),None)
     if result and messages[-1]['role']=='tool':
         action,data=result;facts=data['facts'];ids=[];refs=[];schedule=False;kind='conversation'
-        if data.get('active_energy_proposal') and action in ('propose_energy_settings','update_energy_settings_draft'):
+        if action=='inspect_planning_state' and question.lower() in ('what are the confirmed activities?','which activities are confirmed?'):
+            names=[a['details']['name'] for a in context.get('confirmed_activities',[])];message='The confirmed activities are '+', '.join(names)+'.' if names else 'There are no confirmed activities yet.'
+        elif data.get('active_energy_proposal') and action in ('propose_energy_settings','update_energy_settings_draft'):
             message='The power settings are ready for review. They stay proposed until you explicitly confirm.';kind='energy_review'
         elif data.get('active_draft') and action not in ('recompute_clinic_plan','explain_current_plan'):
             draft=data['active_draft'];kind='activity_review';message='Your activity remains a draft. '+(facts.get('missing_detail','Please review and confirm its requirements.'))
