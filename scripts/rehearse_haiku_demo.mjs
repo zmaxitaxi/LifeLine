@@ -22,6 +22,7 @@ try{
  if(restore)report=JSON.parse(await readFile(reportPath,'utf8'));
  const context=await browser.newContext({viewport:{width:1280,height:1000},...(restore?{storageState:join(dir,'browser-state.json')}: {})});
  const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
+ report.console_errors??=[];page.on('console',m=>{if(m.type()==='error')report.console_errors.push(m.text());});
  const getState=async()=>{const id=await page.evaluate(()=>localStorage.getItem('lifeline.planning-session.v1'));const r=await page.request.get(`${base}/api/planning/sessions/${id}`);expect(r.ok()).toBe(true);return r.json();};
  const screenshot=name=>page.screenshot({path:join(dir,`${name}.png`),fullPage:false});
  const readOnlyFields=s=>({clinic:s.clinic,energy:s.energy_settings,inventory:s.equipment_inventory,activities:s.confirmed_activities,reading:s.current_battery_reading});
@@ -59,7 +60,7 @@ try{
   }else{
   const conversation=await(await page.request.get(`${base}/api/planning/sessions/${report.final_state.id}/conversation`)).json();
   expect(conversation).toEqual(report.final_conversation);
-  report.restart_verified=true;report.steps.push({name:'backend_restart_restores_exact_state_and_conversation',passed:true});await save();
+  expect(report.console_errors).toEqual([]);report.restart_verified=true;report.steps.push({name:'backend_restart_restores_exact_state_and_conversation',passed:true});await save();
   await screenshot('restored-after-backend-restart');console.log(JSON.stringify({passed:true,restart_verified:true,report:reportPath}));
   }
  }else{
@@ -125,7 +126,7 @@ try{
   expect(state.energy_settings.pv_capacity_kw).toBe(solarKw);expect(state.energy_settings.initial_battery_kwh).toBe(initial.energy_settings.initial_battery_kwh);expect(state.current_battery_reading).toBe(initial.current_battery_reading);expect(state.equipment_inventory).toEqual(initial.equipment_inventory);expect(state.confirmed_activities).toEqual(confirmedBeforeRevision.confirmed_activities);expect(state.plan_status).toBe('current');
   await reloadAndVerify(state,'confirmed_power_settings_and_activity_survive_reload');
   report.final_state=state;report.final_conversation=await(await page.request.get(`${base}/api/planning/sessions/${state.id}/conversation`)).json();
-  expect(report.errors).toEqual([]);report.total_flow_seconds=(performance.now()-started)/1000;report.passed=true;
+  expect(report.errors).toEqual([]);expect(report.console_errors).toEqual([]);report.total_flow_seconds=(performance.now()-started)/1000;report.passed=true;
   await context.storageState({path:join(dir,'browser-state.json')});await save();await screenshot('final-saved-clinic');
   console.log(JSON.stringify({passed:true,seconds:report.total_flow_seconds,report:reportPath,solar_kw:solarKw,activity_count:state.confirmed_activities.length,model_steps:report.steps.filter(s=>s.question).map(s=>({name:s.name,seconds:s.seconds}))}));
  }

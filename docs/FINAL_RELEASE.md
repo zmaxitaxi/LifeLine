@@ -33,7 +33,7 @@ model and manual configuration remain available without the assistant.
 
 | Check | Result / scope |
 |---|---|
-| Backend | 524 tests pass, Python 3.12; one upstream deprecation warning |
+| Backend | 525 tests pass, Python 3.12; one upstream deprecation warning |
 | Frontend | 56/56 Chromium journeys pass, including mobile/keyboard/source/state checks |
 | TypeScript / production build | Pass |
 | Genuine Haiku API | Seven journey types have successful targeted evidence; the final seven-case batch was 6/7, followed by a passing corrected recovery rerun |
@@ -100,3 +100,20 @@ clinic/date requires a deliberate new dated session; the assistant never silentl
 moves confirmed work. Field calibration, clinical approval, measured impact,
 certified hardware sizing and official hackathon submission remain outside these
 engineering checks.
+
+## Full demo rehearsal follow-up
+
+The [two-minute presentation](../DEMO_2_MINUTES.md) was exercised with actual Haiku
+in a separate persistent clinic. The full flow verified vaccination drafting,
+confirmation, revision/cancellation, one shared refrigerator, idempotent receipt,
+50%-sunshine recovery, exact selected-plan explanation, reviewed solar settings,
+reload and real backend restart. A separate short run uses only the three
+presentation prompts. Actual hourly schedule facts now reach Haiku, so it can
+explain the simulator's laundry slots instead of claiming no times were supplied.
+
+The repeat uncovered a source guard confusing essential coverage with unfinished
+flexible work. It now checks both claims independently against the same option,
+includes actual option reserve targets, and distinguishes hardware capacity from
+battery metrics. A contradictory minimum-battery direction is rejected. The
+physical engine and operator confirmation requirements are unchanged. The final
+backend suite has 525 tests; model requests and external services can still fail.

@@ -50,3 +50,21 @@ commits were 2225.7ms and 6647.7ms. No clinic changes were adopted, hourly chart
 values matched the backend, and there were no page errors. These are actual DOM
 commit proxies, not pixel-paint or token timings.
 [Full evidence](evidence/claude-genuine-browser.json).
+
+## Full vaccination-to-recovery presentation rehearsal
+
+The subsequent full browser workflow uses a fresh scheduling example with actual
+Haiku, sample weather and private persistent test state. It covers explicit
+activity and energy confirmations, rejected revisions, shared devices, recovery
+selection, exact schedule explanation, page reload and backend-restart recovery.
+See [the three-prompt two-minute guide](../DEMO_2_MINUTES.md) for the exact setup,
+words, clicks, expected computed values and remaining network/model risks.
+
+A repeated short path failed on a true statement that essential demand was met
+while flexible work remained unfinished. Source verification now separates these
+clauses, retains per-option reserve targets, disambiguates minimum battery from
+storage changes, and preserves parenthetical original capacities. Both true and
+false cases are regression-tested, including incorrect all-work coverage and
+wrong battery-direction language. Existing schedule allocations are now passed
+through as source facts; no schedule is invented by Haiku. This follow-up does
+not retroactively turn the earlier seven-case batch into a perfect result.

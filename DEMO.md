@@ -1,5 +1,7 @@
 # LifeLine demonstration
 
+**Presenting now? Follow [the rehearsed two-minute guide](DEMO_2_MINUTES.md)** for the exact clinic setup, three copy-paste Haiku prompts, clicks, expected results and recovery steps.
+
 LifeLine is a clinic electricity planning prototype, aligned with SDGs 7 and 3.
 Claude Haiku (`claude-haiku-5-5`) authors conversation and selects native tools through the Anthropic API; Python
 uses explicit sample weather and computes every energy result. A server-side Anthropic API key and internet are required for the assistant.

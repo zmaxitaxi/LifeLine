@@ -24,7 +24,7 @@ There is no implicit migration of activities between clinics or dates.
 
 ## Verification record
 
-- Final assembled backend: **524 tests passed**, including settings, restart
+- Final assembled backend: **525 tests passed**, including settings, restart
   recovery, source/unit validation, shared-device runtime, migration and all
   existing numerical/API checks.
 - Final assembled frontend: **56/56 browser journeys**, TypeScript and production
@@ -49,6 +49,8 @@ There is no implicit migration of activities between clinics or dates.
 - Earlier remote CI passed on `c98d6a7`:
   [Python 3.11/3.12 and frontend checks](https://github.com/zmaxitaxi/LifeLine/actions/runs/43522478094).
   That result is retained as dated history.
+
+The [two-minute guide](DEMO_2_MINUTES.md) includes exact genuine-Haiku prompts and a fresh-clinic preflight. Extended rehearsal verifies vaccination confirmation/revision/rejection, actual equipment slots, recovery comparisons, reviewed solar changes, reload and backend restart without changing the presentation clinic.
 
 ## Demonstrated value
 
