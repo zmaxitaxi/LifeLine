@@ -1,10 +1,10 @@
 # LifeLine
 
-LifeLine helps clinic staff compare electricity schedules and understand shortages before making decisions. It combines clearly labeled weather inputs, the existing physical battery simulator and MILP, and a local Llama assistant. It supports SDG 7 and SDG 3 through energy-planning decision support; it does not guarantee electricity or control medical equipment.
+LifeLine helps clinic staff compare electricity schedules and understand shortages before making decisions. It combines clearly labeled weather inputs, the existing physical battery simulator and MILP, and a Claude Haiku assistant. It supports SDG 7 and SDG 3 through energy-planning decision support; it does not guarantee electricity or control medical equipment.
 
-**Ready-to-demo mode:** launch with `LIFELINE_WEATHER_MODE=demo` to use explicit synthetic sample weather offline. Llama and all numerical calculations remain real. The user authorized this mode after the Mac's Open-Meteo TLS route failed again. Use `live` for actual forecasts when reachable; there is no hidden substitution. [Sample assumptions](docs/DEMO_WEATHER.md), [network evidence](WEATHER_NETWORK.md), [final release checks](docs/FINAL_RELEASE.md).
+**Ready-to-demo mode:** launch with `LIFELINE_WEATHER_MODE=demo` to use explicit synthetic sample weather offline. Claude Haiku still needs internet; all numerical calculations remain real. The user authorized this mode after the Mac's Open-Meteo TLS route failed again. Use `live` for actual forecasts when reachable; there is no hidden substitution. [Sample assumptions](docs/DEMO_WEATHER.md), [network evidence](WEATHER_NETWORK.md), [final release checks](docs/FINAL_RELEASE.md).
 
-**Local AI is implemented:** Llama 3.1 8B through Ollama authors conversation, selects validated tools and explains their results. Python computes all schedules and energy figures. No cloud AI key is required. See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).
+**Claude Haiku is the primary assistant:** `claude-haiku-5-5` authors conversation, selects validated tools and explains computed results. Python computes all schedules and energy figures. Put `ANTHROPIC_API_KEY` in the server’s git-ignored `.env.local`; it is never sent to the browser. No automatic local-model fallback is used. See [Claude setup and limitations](docs/CLAUDE_DEMO.md). See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).
 
 Live weather planning still retrieves today's/tomorrow's Open-Meteo forecasts when reachable; historical NASA and synthetic APIs remain available. Earlier live success and the later TLS-handshake failure are dated separately in [the network investigation](WEATHER_NETWORK.md). Sample weather and recorded forecasts are never presented as a newly fetched live forecast.
 
@@ -21,7 +21,7 @@ zero configured demand is not evidence of reliable electricity.
 
 Before → After scheduling, battery forecasts and relevant tested alternatives explain what changes. Full fixed/sunshine-first/MILP calculations remain available through the numerical contracts. Recovery compares scheduling, solar, storage and battery output with the same weather and absolute starting energy. The seven-day weather outlook is weather information; electrical calculations cover the selected supported 24-hour day, not a week-long reliability prediction.
 
-The primary local assistant uses **Llama 3.1 8B through Ollama** for conversation and native tool selection. Python owns weather retrieval, unit conversion, schedules and numerical verification. Activity and energy-setting changes require explicit operator confirmation. Hypothetical recovery hardware is not installed or adopted by selecting a comparison. The primary chat reports model failure with a retry; legacy rule-based/guided APIs remain separate. Forecasts require internet; explicitly selected historical/synthetic simulation works offline after installation. See [recovery](RECOVERY_PLANNER.md), [activity contracts](docs/ACTIVITY_PLANNING.md), [local conversation](docs/LOCAL_CONVERSATION.md), and [settings/persistence](docs/ENERGY_SETTINGS_AND_LOCAL_STATE.md).
+The primary assistant uses **Claude Haiku through the Anthropic API** for conversation and native tool selection. Python owns weather retrieval, unit conversion, schedules and numerical verification. Activity and energy-setting changes require explicit operator confirmation. Hypothetical recovery hardware is not installed or adopted by selecting a comparison. The primary chat reports model failure with a retry; legacy rule-based/guided APIs remain separate. Forecasts require internet; explicitly selected historical/synthetic simulation works offline after installation. See [recovery](RECOVERY_PLANNER.md), [activity contracts](docs/ACTIVITY_PLANNING.md), [local conversation](docs/LOCAL_CONVERSATION.md), and [settings/persistence](docs/ENERGY_SETTINGS_AND_LOCAL_STATE.md).
 
 ## Run the complete demo
 
@@ -40,13 +40,22 @@ On Windows PowerShell, create the environment with `python -m venv .venv`. Skip 
 
 Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it serves `frontend/dist` and the API from one local origin. Synthetic/historical planning works offline after installation; fresh forecasts require internet. The optional Swagger explorer uses external assets.
 
-For local AI, install/start Ollama and ensure `ollama list` includes `llama3.1:8b` (already installed on this Mac). If it is not running, use a separate terminal:
+For the assistant, create a git-ignored `.env.local` in the repository root:
 
-```bash
-OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 ollama serve
+```dotenv
+LIFELINE_AI_PROVIDER=claude
+LIFELINE_CLAUDE_MODEL=claude-haiku-5-5
+ANTHROPIC_API_KEY=your_key_here
 ```
 
-On a fresh machine, `ollama pull llama3.1:8b` downloads the model first. The app accepts only an installed local model with tool capability; cloud records are rejected. `LIFELINE_LOCAL_MODEL` in the backend process environment can select another installed tool-capable model, requiring separate validation. Weights are not bundled in Git. Check `GET /api/agent/status` and **Local AI ready** in the weather panel. Local inference needs memory and may have a slow cold start. No Anthropic setup is needed.
+Restart the backend after changing its configuration. `GET /api/agent/status`
+reports the actual provider/model and checks authenticated model availability.
+For a different checkout, point `LIFELINE_ENV_FILE` to the absolute settings file.
+Claude requires network access; manual configuration and installed numerical
+simulation remain usable without it. Credentials stay on the server.
+[Public progress and timing](docs/AGENT_RESPONSE_PIPELINE.md) distinguish accepted
+requests from completed, validated replies. A failed stream is never replayed
+automatically, and no different model is silently substituted.
 
 For development, run the backend as above and `npm --prefix frontend run dev` in another terminal; open [localhost:5173](http://127.0.0.1:5173/). `npm --prefix frontend run preview` serves the build on port 4173 with an API proxy.
 

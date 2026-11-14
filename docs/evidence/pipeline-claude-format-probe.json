@@ -1,0 +1,1168 @@
+{
+  "implementation_commit": "c1e4668d3d2b11d58be5bfab9ef8698123e80d53",
+  "started_at": "2026-11-14T04:12:09.110542+00:00",
+  "model": "claude-haiku-5-5",
+  "provider": "claude",
+  "basis": "SYNTHETIC DEMO WEATHER; actual selected AI provider; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.",
+  "first_visible_basis": "Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.",
+  "cases": [
+    {
+      "name": "conversation",
+      "question": "Hello",
+      "total_seconds": 1.4578858749009669,
+      "first_visible_seconds": 1.4578858749009669,
+      "model_calls": [
+        {
+          "seconds": 1.098504790570587,
+          "request_bytes": 10161,
+          "message_chars": 1115,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "Hello! I'm LifeLine, and I'm here to help with your clinic's energy and activity planning. What would you like to work on today?"
+            }
+          ],
+          "usage": {
+            "input_tokens": 4219,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 45,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "model_http": 1.098504790570587,
+        "response_serialization": 0.00013845833018422127,
+        "conversation_persistence": 0.0003459588624536991,
+        "agent_total": 1.4561258750036359,
+        "model_status_http": 0.33440375002101064
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.33440375002101064
+        },
+        {
+          "phase": "model_http",
+          "seconds": 1.098504790570587
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 1.4561258750036359
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0003459588624536991
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00013845833018422127
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": true,
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "Hello! I'm LifeLine, and I'm here to help with your clinic's energy and activity planning. What would you like to work on today?",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "c18f67e0-c9bc-4cf1-aadd-f9fd6479cb67",
+        "user_message_id": "53670be6-ff50-44f8-a6dd-14379cb734d8",
+        "failure": null,
+        "timings": {
+          "total_seconds": 1.4566451669670641,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.0006873747333884239,
+            "model": 1.0997959999367595,
+            "persistence": 0.0003597498871386051
+          },
+          "model_calls": 1,
+          "model_metrics": [
+            {
+              "request_chars": 10164.0,
+              "message_chars": 1105.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 4219.0,
+              "eval_count": 45.0,
+              "http_seconds": 1.0998229999095201
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "assessment",
+      "question": "Can our clinic safely operate tomorrow given the weather forecast?",
+      "total_seconds": 10.17539200000465,
+      "first_visible_seconds": 10.17539200000465,
+      "model_calls": [
+        {
+          "seconds": 1.3238645000383258,
+          "request_bytes": 10280,
+          "message_chars": 1234,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_01C4CeUPn2155Sv1WYXczXvj",
+              "name": "recompute_clinic_plan",
+              "input": {
+                "include_recovery": false
+              },
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 4259,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 151,
+            "output_tokens_details": {
+              "thinking_tokens": 94
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        },
+        {
+          "seconds": 3.188763582613319,
+          "request_bytes": 13573,
+          "message_chars": 4548,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "The model does not show the clinic meeting its essential electrical demand tomorrow, 2026-11-15, even on the modeled clear-day forecast. The essential evening equipment needs 2 kWh over 19:00 and 20:00, and about 1.2 kWh of that stays unserved in both the baseline and optimized schedules. The main limit is the battery output cap of 0.4 kW, which is below the equipment's 1 kW draw, and the battery never drops below its 6 kWh starting level, so the 1 kWh reserve is not the constraint.\n\nThe weather is LifeLine synthetic demo weather, assuming clear-day irradiation at 100% rather than a live forecast, so these results do not reflect real conditions. This is an electrical planning estimate only and does not establish clinical safety or guarantee availability.\n\nI haven't tested any alternatives yet. If you want, I can model a higher battery output power or a larger battery capacity to see whether either closes the 1.2 kWh gap."
+            }
+          ],
+          "usage": {
+            "input_tokens": 5464,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 562,
+            "output_tokens_details": {
+              "thinking_tokens": 237
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        },
+        {
+          "seconds": 2.6875044577755034,
+          "request_bytes": 14837,
+          "message_chars": 5826,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "You're right to flag that. I shouldn't have framed the answer around safe operation, and I can't offer a clinical or availability guarantee. The model results are electrical planning estimates only, based on synthetic demo weather for 2026-11-15, not a live forecast.\n\nFor that day, the model shows a 1.2 kWh shortfall in essential electrical demand in both the baseline and optimized schedules. I have not tested any alternatives yet. If you want, I can model a hypothetical change, such as a higher battery output power, and compare the result against the current plan."
+            }
+          ],
+          "usage": {
+            "input_tokens": 5862,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 489,
+            "output_tokens_details": {
+              "thinking_tokens": 310
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [
+            "That attempt was rejected: Do not give clinical or availability guarantees. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        },
+        {
+          "seconds": 2.9160212920978665,
+          "request_bytes": 14775,
+          "message_chars": 5764,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "The model's electrical result for 2026-11-15 shows an essential electrical shortfall of 1.200 kWh in both the baseline and optimized schedules, with 2.000 kWh of essential energy requested. The battery stays at or above 6.000 kWh, and the 1.000 kWh reserve target is not the limiting factor in this run. Flexible work is fully completed, and the optimizer does not reduce the shortfall. This comes from synthetic demo weather with 100% irradiation, not a live forecast.\n\nThis is an electrical planning result only. It does not decide whether the clinic can provide clinical services safely, and it cannot guarantee availability. Those decisions belong to the clinical team, who would need to weigh the shortfall against their own clinical requirements and backup arrangements."
+            }
+          ],
+          "usage": {
+            "input_tokens": 5810,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 547,
+            "output_tokens_details": {
+              "thinking_tokens": 290
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [
+            "That attempt was rejected: An electrical model cannot establish clinical safety. Do not assert safety. Distinguish electrical shortfalls from clinical safety decisions. Use the current modeled result if one exists; otherwise the configured inputs already suffice for the calculator. Do not ask for known settings or replace the requested electrical assessment with a disclaimer. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "model_http": 10.116153832525015,
+        "forecast_case_including_milp": 0.012949750293046236,
+        "response_serialization": 0.0003664582036435604,
+        "conversation_persistence": 0.002065541222691536,
+        "weather": 0.00029374985024333,
+        "milp": 0.010806667152792215,
+        "agent_total": 10.168883417267352
+      },
+      "events": [
+        {
+          "phase": "model_http",
+          "seconds": 1.3238645000383258
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.00029374985024333
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.010806667152792215
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.012949750293046236
+        },
+        {
+          "phase": "model_http",
+          "seconds": 3.188763582613319
+        },
+        {
+          "phase": "model_http",
+          "seconds": 2.6875044577755034
+        },
+        {
+          "phase": "model_http",
+          "seconds": 2.9160212920978665
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 10.168883417267352
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.002065541222691536
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0003664582036435604
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "9ca9cd9a-c1be-4524-a9c4-ddcbc7d40e24",
+        "user_message_id": "48b1cc38-8b51-4142-8c53-d4b69d1d8240",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 10.173045167233795,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.0002977494150400162,
+            "model": 10.121382916346192,
+            "weather": 0.0003127921372652054,
+            "simulation": 0.013411791995167732,
+            "persistence": 0.0020843329839408398
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 10283.0,
+              "message_chars": 1224.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 4259.0,
+              "eval_count": 151.0,
+              "http_seconds": 1.3249084171839058
+            },
+            {
+              "request_chars": 13576.0,
+              "message_chars": 4517.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 5464.0,
+              "eval_count": 562.0,
+              "http_seconds": 3.1899541672319174
+            },
+            {
+              "request_chars": 14840.0,
+              "message_chars": 5781.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 5862.0,
+              "eval_count": 489.0,
+              "http_seconds": 2.6890820837579668
+            },
+            {
+              "request_chars": 14778.0,
+              "message_chars": 5719.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 5810.0,
+              "eval_count": 547.0,
+              "http_seconds": 2.917518542148173
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "vaccination",
+      "question": "What if I wanted to plan a vaccination clinic today at 10 AM?",
+      "total_seconds": 2.263576584402472,
+      "first_visible_seconds": 2.263576584402472,
+      "model_calls": [
+        {
+          "seconds": 2.252362959086895,
+          "request_bytes": 10274,
+          "message_chars": 1228,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "Today is 2026-11-14, but the selected planning date is 2026-11-15, so I can't set up a 10:00 AM vaccination clinic for today yet. Could you review the planning date and confirm whether you want it on 2026-11-14 or 2026-11-15? Once the date is settled, I can ask about the equipment and timing for the clinic."
+            }
+          ],
+          "usage": {
+            "input_tokens": 4261,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 311,
+            "output_tokens_details": {
+              "thinking_tokens": 195
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "conversation_persistence": 0.00021804077550768852,
+        "model_http": 2.252362959086895,
+        "response_serialization": 0.00011529121547937393,
+        "agent_total": 2.2618961250409484
+      },
+      "events": [
+        {
+          "phase": "model_http",
+          "seconds": 2.252362959086895
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 2.2618961250409484
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.00021804077550768852
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00011529121547937393
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": true,
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "Today is 2026-11-14, but the selected planning date is 2026-11-15, so I can't set up a 10:00 AM vaccination clinic for today yet. Could you review the planning date and confirm whether you want it on 2026-11-14 or 2026-11-15? Once the date is settled, I can ask about the equipment and timing for the clinic.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "c1dba396-6cfd-4f83-b3cd-ac978cc6374b",
+        "user_message_id": "74d93959-5ba2-4e71-9536-7580dbf86fef",
+        "failure": {
+          "code": "DATE_MISMATCH",
+          "retryable": false,
+          "suggested_action": "review_date",
+          "selected_date": "2026-11-15",
+          "requested_date": "2026-11-14"
+        },
+        "timings": {
+          "total_seconds": 2.2622753330506384,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.00020225020125508308,
+            "model": 2.253353374544531,
+            "persistence": 0.00022795796394348145
+          },
+          "model_calls": 1,
+          "model_metrics": [
+            {
+              "request_chars": 10277.0,
+              "message_chars": 1218.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 4261.0,
+              "eval_count": 311.0,
+              "http_seconds": 2.2533685420639813
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "recovery",
+      "question": "What changes could resolve our modeled essential electricity shortfall? Please compare tested recovery alternatives.",
+      "total_seconds": 10.240837582852691,
+      "first_visible_seconds": 10.240837582852691,
+      "model_calls": [
+        {
+          "seconds": 1.1054089586250484,
+          "request_bytes": 10272,
+          "message_chars": 1226,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_01Rr2DzhFJkxxhCQdgekWuJ1",
+              "name": "recompute_clinic_plan",
+              "input": {
+                "include_recovery": true
+              },
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 4251,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 131,
+            "output_tokens_details": {
+              "thinking_tokens": 74
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        },
+        {
+          "seconds": 4.153146666940302,
+          "request_bytes": 19539,
+          "message_chars": 10514,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "Under the modeled baseline for 2026-11-15, essential equipment still has a 1.200 kWh shortfall, and flexible work is fully completed. The model uses synthetic demo weather with assumed clear-day irradiation (100%), not a live forecast. Rescheduling within the allowed hours does not change the shortfall.\n\nThe most effective tested change is a battery output test: raising maximum battery output from 0.4 kW to 1.4 kW would meet the modeled essential demand, with the lowest stored energy at 5.895 kWh. A smaller output test of 0.9 kW would still leave 0.200 kWh unmet. A battery storage capacity test of 10 kWh would leave the 1.200 kWh shortfall unchanged, and a solar test of 2 kW would also leave it unchanged.\n\nThese are hypothetical comparisons only and have not been adopted. They are electrical model results, not confirmation of real-world availability or clinical safety."
+            }
+          ],
+          "usage": {
+            "input_tokens": 7935,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 715,
+            "output_tokens_details": {
+              "thinking_tokens": 401
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        },
+        {
+          "seconds": 3.4731795000843704,
+          "request_bytes": 20788,
+          "message_chars": 11777,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "The modeled result for 2026-11-15 is a shortfall of 1.200 kWh in essential equipment energy under the current settings. Flexible work is completed in the model. Rescheduling within the allowed hours does not change that shortfall.\n\nIn one tested alternative, a battery output test raising maximum battery output from 0.4 kW to 1.4 kW leaves 0.000 kWh unmet in the model, with the lowest stored energy at 5.895 kWh. This result comes from synthetic demo weather with assumed clear-day irradiation, so it is not a live forecast and does not establish real-world availability or clinical safety. The other tests did not clear the shortfall: a 0.9 kW output test left 0.200 kWh unmet, while the 10 kWh battery storage test and 2 kW solar test each left 1.200 kWh unmet. None of these changes has been adopted."
+            }
+          ],
+          "usage": {
+            "input_tokens": 8332,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 608,
+            "output_tokens_details": {
+              "thinking_tokens": 318
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [
+            "That attempt was rejected: Do not make an affirmative availability claim without a sourced qualified calculation. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        },
+        {
+          "seconds": 1.3096937919035554,
+          "request_bytes": 20721,
+          "message_chars": 11710,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_0162j8De5v1qPX2iJavkLwMM",
+              "name": "inspect_planning_state",
+              "input": {},
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 8314,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 184,
+            "output_tokens_details": {
+              "thinking_tokens": 154
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [
+            "That attempt was rejected: The pending activity is unconfirmed. Distinguish previously confirmed activities from this draft. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "recovery_forecast_case_including_milp": 0.061019251588732004,
+        "model_http": 10.041428917553276,
+        "forecast_case_including_milp": 0.012485041748732328,
+        "response_serialization": 0.000978291966021061,
+        "conversation_persistence": 0.005561583209782839,
+        "weather": 0.000262250192463398,
+        "milp": 0.06601941538974643,
+        "agent_total": 10.223708082921803
+      },
+      "events": [
+        {
+          "phase": "model_http",
+          "seconds": 1.1054089586250484
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.000262250192463398
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.011420167051255703
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.012485041748732328
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.008387207984924316
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.010686833411455154
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.006340665742754936
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006893209181725979
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005940208211541176
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006556082982569933
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005335125140845776
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005794166121631861
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0052073341794312
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.0056518749333918095
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005034332629293203
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005505583249032497
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0048249997198581696
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.00524070905521512
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004518582951277494
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.004944667220115662
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004538374952971935
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.0049194591119885445
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004472416825592518
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.004826666321605444
+        },
+        {
+          "phase": "model_http",
+          "seconds": 4.153146666940302
+        },
+        {
+          "phase": "model_http",
+          "seconds": 3.4731795000843704
+        },
+        {
+          "phase": "model_http",
+          "seconds": 1.3096937919035554
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 10.223708082921803
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.005561583209782839
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.000978291966021061
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan",
+          "inspect_planning_state"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "0669afa2-7c12-4f47-89f5-15a2c943e26b",
+        "user_message_id": "b9b81d7c-fdda-45b3-9f03-13d79486cb02",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 10.235615666024387,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.0007311245426535606,
+            "model": 10.046634542290121,
+            "weather": 0.00027849990874528885,
+            "simulation": 0.07394400238990784,
+            "persistence": 0.005566250067204237
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 10275.0,
+              "message_chars": 1216.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 4251.0,
+              "eval_count": 131.0,
+              "http_seconds": 1.1070118327625096
+            },
+            {
+              "request_chars": 19542.0,
+              "message_chars": 10483.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 7935.0,
+              "eval_count": 715.0,
+              "http_seconds": 4.154334458056837
+            },
+            {
+              "request_chars": 20791.0,
+              "message_chars": 11732.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8332.0,
+              "eval_count": 608.0,
+              "http_seconds": 3.474238459020853
+            },
+            {
+              "request_chars": 20724.0,
+              "message_chars": 11665.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8314.0,
+              "eval_count": 184.0,
+              "http_seconds": 1.3111194581724703
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "followup",
+      "question": "Please explain my exact selected plan against the existing baseline without recalculating or refreshing weather.",
+      "total_seconds": 6.331274500116706,
+      "first_visible_seconds": 6.331274500116706,
+      "model_calls": [
+        {
+          "seconds": 1.7515071667730808,
+          "request_bytes": 18126,
+          "message_chars": 9080,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_01DvLymQDj3wujyaLRzjHEAR",
+              "name": "explain_current_plan",
+              "input": {},
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 7410,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 28,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        },
+        {
+          "seconds": 4.49457437498495,
+          "request_bytes": 21885,
+          "message_chars": 12859,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "For the 2026-11-15 plan, the existing baseline schedule leaves 1.200 kWh of essential energy unserved and completes all flexible work (0.000 kWh unfinished). Its lowest stored battery level is 6.000 kWh against a 1.000 kWh reserve target. The optimized schedule matches it: no change in final battery level, and the same flexible work completed.\n\nThe selected result is a hypothetical test of raising battery output from 0.4 kW to 2.4 kW. In that test, the modeled essential demand is met with no unserved essential energy, and the lowest stored battery level is 5.895 kWh. This change is not adopted.\n\nThe weather is LifeLine synthetic demo weather for Africa/Nairobi, assuming 100% clear-day irradiation, not a live forecast. These results are modeled electrical comparisons only and do not establish real-world availability or clinical safety."
+            },
+            {
+              "type": "tool_use",
+              "id": "toolu_015L7YwV4Gq5QWqW2sBRrYyf",
+              "name": "respond_to_user",
+              "input": {
+                "message": "For the 2026-11-15 plan, the existing baseline leaves 1.200 kWh of essential energy unserved and completes all flexible work. Its lowest stored battery level is 6.000 kWh against a 1.000 kWh reserve target. The optimized schedule matches it, with no change in final battery level and the same flexible work completed.\n\nThe selected result is a hypothetical test of raising battery output from 0.4 kW to 2.4 kW. In that test, modeled essential demand is met with no unserved essential energy, and the lowest stored battery level is 5.895 kWh. This change is not adopted.\n\nThe weather is LifeLine synthetic demo weather for Africa/Nairobi, assuming 100% clear-day irradiation, not a live forecast. These are modeled electrical comparisons only and do not establish real-world availability or clinical safety.",
+                "presentation": {
+                  "kind": "explanation"
+                }
+              },
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 8779,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 1047,
+            "output_tokens_details": {
+              "thinking_tokens": 393
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "conversation_persistence": 0.006710499990731478,
+        "model_http": 6.246081541758031,
+        "response_serialization": 0.0011034999042749405,
+        "agent_total": 6.310807208996266
+      },
+      "events": [
+        {
+          "phase": "model_http",
+          "seconds": 1.7515071667730808
+        },
+        {
+          "phase": "model_http",
+          "seconds": 4.49457437498495
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 6.310807208996266
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.006710499990731478
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0011034999042749405
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": true,
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "For the 2026-11-15 plan, the existing baseline leaves 1.200 kWh of essential energy unserved and completes all flexible work. Its lowest stored battery level is 6.000 kWh against a 1.000 kWh reserve target. The optimized schedule matches it, with no change in final battery level and the same flexible work completed.\n\nThe selected result is a hypothetical test of raising battery output from 0.4 kW to 2.4 kW. In that test, modeled essential demand is met with no unserved essential energy, and the lowest stored battery level is 5.895 kWh. This change is not adopted.\n\nThe weather is LifeLine synthetic demo weather for Africa/Nairobi, assuming 100% clear-day irradiation, not a live forecast. These are modeled electrical comparisons only and do not establish real-world availability or clinical safety.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "explain_current_plan"
+        ],
+        "presentation": {
+          "kind": "explanation",
+          "input_revision": 0,
+          "generation": 1,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "c4a4cc95-aae0-4842-aadd-b382a0d84292",
+        "user_message_id": "73e6d5b6-4154-4474-9e48-d876c4e152ac",
+        "failure": null,
+        "timings": {
+          "total_seconds": 6.325585042126477,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.00041629234328866005,
+            "model": 6.248665707651526,
+            "persistence": 0.006717917043715715
+          },
+          "model_calls": 2,
+          "model_metrics": [
+            {
+              "request_chars": 18129.0,
+              "message_chars": 9070.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 7410.0,
+              "eval_count": 28.0,
+              "http_seconds": 1.7527599586173892
+            },
+            {
+              "request_chars": 21888.0,
+              "message_chars": 12829.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8779.0,
+              "eval_count": 1047.0,
+              "http_seconds": 4.4959327089600265
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 3,
+        "revision_after": 3,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "history",
+      "question": "Actually, I mean tomorrow at 10 AM. What else do you need to plan that vaccination campaign?",
+      "total_seconds": 2.680540082976222,
+      "first_visible_seconds": 2.680540082976222,
+      "model_calls": [
+        {
+          "seconds": 2.4244770421646535,
+          "request_bytes": 10947,
+          "message_chars": 1943,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "Tomorrow is 2026-11-15, which matches the selected planning date, so no date change is needed. To plan the campaign, I need the end time for the 10:00 AM start, and which equipment it will use, such as a refrigerator or cold-chain device. For any device not already configured, I also need its power rating, how long it will run, and its priority (critical or flexible). The event alone adds no electrical demand until devices are linked to it."
+            }
+          ],
+          "usage": {
+            "input_tokens": 4363,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 340,
+            "output_tokens_details": {
+              "thinking_tokens": 201
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "model_http": 2.4244770421646535,
+        "response_serialization": 0.00039745913818478584,
+        "conversation_persistence": 0.00027737533673644066,
+        "agent_total": 2.678680249955505,
+        "model_status_http": 0.24050229182466865
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.24050229182466865
+        },
+        {
+          "phase": "model_http",
+          "seconds": 2.4244770421646535
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 2.678680249955505
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.00027737533673644066
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00039745913818478584
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "Tomorrow is 2026-11-15, which matches the selected planning date, so no date change is needed. To plan the campaign, I need the end time for the 10:00 AM start, and which equipment it will use, such as a refrigerator or cold-chain device. For any device not already configured, I also need its power rating, how long it will run, and its priority (critical or flexible). The event alone adds no electrical demand until devices are linked to it.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "1d122c77-b2c4-4294-9493-179251709354",
+        "user_message_id": "892d8ad3-99fb-4d3f-a7b0-9bd3dc4e9f54",
+        "failure": null,
+        "timings": {
+          "total_seconds": 2.6791436253115535,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.0005798749625682831,
+            "model": 2.4257498336955905,
+            "persistence": 0.00029362505301833153
+          },
+          "model_calls": 1,
+          "model_metrics": [
+            {
+              "request_chars": 10950.0,
+              "message_chars": 1891.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 4363.0,
+              "eval_count": 340.0,
+              "http_seconds": 2.425767875276506
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    }
+  ],
+  "completed_at": "2026-11-14T04:12:42.578653+00:00"
+}

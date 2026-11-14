@@ -1,8 +1,8 @@
 # LifeLine demonstration
 
 LifeLine is a clinic electricity planning prototype, aligned with SDGs 7 and 3.
-Llama 3.1 8B authors conversation and selects native tools locally; Python
-uses explicit sample weather and computes every energy result. No provider API key is needed.
+Claude Haiku (`claude-haiku-5-5`) authors conversation and selects native tools through the Anthropic API; Python
+uses explicit sample weather and computes every energy result. A server-side Anthropic API key and internet are required for the assistant.
 Do not claim clinical validation, guaranteed electricity or measured clinic savings.
 
 ## Exact startup commands
@@ -10,19 +10,16 @@ Do not claim clinical validation, guaranteed electricity or measured clinic savi
 From the repository root, with dependencies already installed:
 
 ```bash
-ollama list
 npm --prefix frontend run build
 LIFELINE_WEATHER_MODE=demo .venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
+Save `ANTHROPIC_API_KEY=...` in the repository's git-ignored `.env.local` first.
+Use `LIFELINE_AI_PROVIDER=claude` and `LIFELINE_CLAUDE_MODEL=claude-haiku-5-5`.
 Open [LifeLine](http://127.0.0.1:8000/) and check
-[agent status](http://127.0.0.1:8000/api/agent/status): `available` must be true.
-On a fresh machine, install Ollama and run `ollama pull llama3.1:8b` first.
-If Ollama is not running, start it in another terminal:
-
-```bash
-OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 ollama serve
-```
+[agent status](http://127.0.0.1:8000/api/agent/status): `available` and `cloud_ai`
+must be true, with the Anthropic provider and Haiku model. No Llama process or
+model download is needed. [Full Claude setup and verification](docs/CLAUDE_DEMO.md).
 
 The production app saves sessions and recent chat in `.local/planning-state.json`.
 For a stable location when launching different checkouts, set
@@ -56,10 +53,10 @@ See [README](README.md) for first-time dependency installation.
    the newly calculated deficit/reserve. If extra supply or output is needed,
    say so. More empty battery capacity cannot repair every shortage.
 
-Allow time for local inference; live mode also needs network retrieval. Simple greetings and
+Claude uses the network; live weather additionally requires Open-Meteo access. Simple greetings and
 discussion do not require a calculation. Ideas remain unevaluated until a tool
 calculates them. Primary chat model failures show a retry and retain the state;
-do not present a template or prerecorded answer as a genuine model reply.
+do not present a template or prerecorded answer as a genuine model reply. The primary demo never silently substitutes Llama.
 
 The current default scheduling demo completes all **2.1 kWh** flexible work and
 all **5.34 kWh** essential demand in every schedule. MILP preserves **1.115 kWh**
@@ -76,8 +73,7 @@ work budget, not extra work per activity. Shared references preserve the largest
 confirmed requirement and the original baseline work, using one physical device.
 Event duration alone never changes electrical demand.
 
-The four Overview panels show activities/equipment, battery energy, plan choices
-and real current/seven-day weather. Only the selected supported planning day has
+Overview puts the current outlook and recommended action first, followed by the hourly energy chart with its battery, editable requirements, and labeled weather. Other computed alternatives remain expandable. Only the selected supported planning day has
 calculated hourly energy. Other dates remain weather information, not invented
 seven-day electricity predictions.
 
@@ -123,9 +119,9 @@ work offline after installation. Never describe them as a live forecast. Histori
 evidence and recorded Llama replays retain their original dates and provenance.
 No presentation video or official submission is implied by these checks.
 
-## Reproduce primary native conversation checks
+## Historical local-inference checks (not the current demo)
 
-With Ollama running, use an isolated sample-weather test session:
+The older Llama runner and evidence are retained for provenance. Do not use it for the Claude-only presentation. To verify the current provider, run the six-case command in [Claude setup](docs/CLAUDE_DEMO.md). The legacy command below is historical:
 
 ```bash
 .venv/bin/python scripts/check_conversation_agent.py \

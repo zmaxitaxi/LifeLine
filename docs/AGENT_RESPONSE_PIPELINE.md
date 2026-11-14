@@ -1,10 +1,10 @@
 # Local assistant response pipeline
 
-LifeLine uses actual local `llama3.1:8b` inference. For the offline demonstration,
+LifeLine uses the Claude Haiku API (`claude-haiku-5-5`) for the current demo. For the offline demonstration,
 start with `LIFELINE_WEATHER_MODE=demo`: weather is explicitly synthetic; the
 existing photovoltaic model, battery simulator, scheduling heuristic and MILP
 still calculate all energy results. This mode needs no weather network access
-or paid model API key. It does not demonstrate live forecast availability.
+for numerical simulation. Claude still requires internet and a server-side Anthropic API key. This mode does not demonstrate live forecast availability.
 
 ## Public progress and completed responses
 
@@ -43,8 +43,7 @@ not additive. Unmeasured model counts remain null rather than claiming zero.
 Provider diagnostics allow only finite nonnegative numerical timing/token/size
 fields. Prompts, provider content and private reasoning are excluded. Actual
 model prompt evaluation, generation and loading durations are recorded in
-nanoseconds; HTTP and phase wall times are seconds. A reproducible genuine-model
-benchmark separates these from numerical solver runtime and serialization.
+nanoseconds; HTTP and phase wall times are seconds. Ollama-only duration fields are not fabricated for Claude: only actual HTTP wall time and reported token counts are available there. A reproducible genuine-model benchmark separates model calls from numerical solver runtime and serialization.
 
 Structured failures distinguish model timeout, busy/unavailable providers,
 invalid or rejected output, unavailable weather and a date mismatch. A date

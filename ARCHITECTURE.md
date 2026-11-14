@@ -1,6 +1,6 @@
 # LifeLine architecture
 
-The original numerical architecture is retained: React/Vite + shadcn/Tailwind → FastAPI → validated model inputs → baseline/heuristic/MILP → independent physical checks → typed results. The primary session assistant uses local Llama for native tool selection and natural conversation; numerical facts always originate in Python. Legacy stateless endpoints retain their existing deterministic renderers.
+The original numerical architecture is retained: React/Vite + shadcn/Tailwind → FastAPI → validated model inputs → baseline/heuristic/MILP → independent physical checks → typed results. The primary session assistant uses Claude Haiku for native tool selection and natural conversation; numerical facts always originate in Python. Legacy stateless endpoints retain their existing deterministic renderers.
 
 ## Data paths
 
@@ -19,7 +19,8 @@ All three methods within a comparison receive the exact same immutable `ModelInp
 | `backend/app/forecast_models.py` | Strict public forecast/plan/tool contracts |
 | `backend/app/forecast_planner.py` | Adapt forecasts to existing inputs, serialize calculations, generate computed assessments |
 | `backend/app/planner_tools.py` | Read-only configuration/forecast and validated simulation dispatch; constrained non-LLM fallback |
-| `backend/app/local_agent.py`, `agent_models.py`, `agent_routes.py` | Local Ollama native tool selection, bounded requests, cloud-model rejection, strict model-argument validation and explicit fallback |
+| `backend/app/claude_agent.py`, `agent_provider.py`, `agent_telemetry.py` | Explicit Claude Haiku provider, server-only settings/key, fixed Anthropic host, bounded native tool calls, sanitized failures and measured public phases |
+| `backend/app/local_agent.py`, `agent_models.py`, `agent_routes.py` | Preserved legacy local adapter and stateless contracts; not the demo provider or an automatic fallback |
 | `backend/app/agent_tools.py` | Single-snapshot consecutive fixed-load proposals and battery-capacity searches; no saved configuration mutation |
 | `backend/app/simulation.py` | Shared serialization around the original baseline/heuristic/MILP; used by the existing simulate route and explicit scenario recovery |
 | `backend/app/recovery_models.py`, `recovery_planner.py`, `recovery_routes.py` | Typed, bounded comparisons of scheduling, solar, storage, output limits and explicitly designated optional postponement; same weather and absolute initial energy |
@@ -29,7 +30,7 @@ All three methods within a comparison receive the exact same immutable `ModelInp
 | `backend/app/energy_simulator.py`, `optimizer.py`, `heuristic.py` | Existing dispatch, optimization and comparator; unchanged |
 | `backend/app/planning_models.py`, `planning_state.py`, `planning_routes.py` | Canonical revisioned sessions, staged activities/settings, confirmation, result freshness and recovery selection |
 | `backend/app/energy_settings_models.py`, `energy_settings_agent.py` | Reviewed energy settings, separate timestamped current reading, native source guards and Python percentage conversion |
-| `backend/app/planning_agent.py`, `planning_conversation.py` | Primary session-based natural local-model conversation and numerical grounding |
+| `backend/app/planning_agent.py`, `planning_conversation.py` | Primary session-based natural model conversation and numerical grounding |
 | `backend/app/planning_persistence.py` | Atomic private local snapshots for single-process restart recovery |
 | `backend/app/weather_outlook.py` | Independent current and seven-day weather adapter, distinct from hourly energy forecasts |
 | `frontend/src/features/planning/` | Two-page assistant/Overview, activity and energy review forms, scoped results and restored chat |
@@ -38,9 +39,9 @@ Forecast calls run asynchronously; the existing solve lock and worker thread ser
 
 ## Assistant boundary
 
-The primary UI calls `/api/planning/sessions/{id}/agent`. Canonical inputs and
+The primary UI calls `/api/planning/sessions/{id}/agent/stream`; the nonstreaming endpoint remains compatible. Only fixed public phases and a final validated result are exposed. Canonical inputs and
 recent user/assistant messages provide context; ordinary conversation may return
-genuine direct model prose. Llama chooses among state-valid native tools without
+genuine direct model prose. Claude chooses among state-valid native tools without
 keyword-forced social/explanation subsets. Planning tools provide actual weather,
 staged requirements and computed results. Relevant option IDs and schedule
 presentation are explicit metadata, bound to the actual input revision and
@@ -63,7 +64,19 @@ distributed database. [Settings and persistence details](docs/ENERGY_SETTINGS_AN
 
 ## Preserved stateless APIs
 
-The selected provider is **local Ollama with Llama 3.1 8B**. `GET /api/agent/status` verifies an installed model with tool capability and rejects cloud/remote model records. `POST /api/agent/ask` receives the operator's reviewed clinic, location, explicit midnight charge, question and bounded user-question history. It reads the current configuration, asks the local model for a native tool call, validates its name/arguments, and executes existing Python planning functions. Model requests use a fixed loopback URL, no provider key, a bounded context/output, at most three selections and an overall request timeout. Generated prose is never rendered as an energy answer; assessments/actions/numbers are generated from actual tool results. This is genuine LLM tool selection with a deterministic result renderer, not free-form model reasoning presented as numerical evidence.
+The selected provider is **Anthropic Claude Haiku**, `claude-haiku-5-5`.
+`GET /api/agent/status` reports its actual model/provider and authenticated
+availability. Both session and preserved stateless requests use the selected
+provider; legacy stateless responses retain their computed result renderers.
+The Messages adapter converts native tool-use/result identities and permits one
+tool call at a time. Private thinking blocks never enter public text. The fixed
+HTTPS host receives clinic configuration and bounded conversation, never patient
+records by design. A 35-second HTTP timeout, four-turn session budget and existing
+100-second outer limit bound requests. No automatic provider fallback occurs.
+
+The local adapter and historical Llama evidence remain in source for provenance;
+they are not part of the current demo. [Claude setup](docs/CLAUDE_DEMO.md) and
+[public response pipeline](docs/AGENT_RESPONSE_PIPELINE.md) document current use.
 
 The operator context remains authoritative. New fixed-equipment proposals require explicit user evidence for power, consecutive whole-hour runtime, earliest start and deadline. Existing protected equipment cannot be edited through agent tools. A hypothetical appliance is checked at every allowed start as fixed hourly demand; this does not validate clinical cycles. Capacity search holds initial stored kWh, forecast, reserve, efficiencies, equipment and output limits fixed. It brackets a modeled transition to within 0.25 kWh, up to 200 kWh; no charged new battery, price or certified sizing is inferred.
 
@@ -71,6 +84,6 @@ The recovery tool computes alternatives through those same numerical functions. 
 
 Native local templates sometimes encode numeric/list arguments as JSON strings. A narrow provider adapter decodes only known numeric/list fields before strict validation. HTTP user inputs remain strict. Unknown tools, unsupported arguments and malformed responses cannot execute code or adopt configuration. The primary session chat uses model-authored missing-input questions; preserved stateless endpoints can return their existing structured clarifications.
 
-The original `/api/assistant` offline rule-based editor and `/api/planner/ask` guided forecast workflow remain unchanged. Their fallback behavior is separate from primary session chat, where local-model failure returns a retry with completed state preserved. Weather errors propagate as unavailable rather than inventing a forecast. Historical/synthetic numerical planning remains an explicit offline alternative.
+The original `/api/assistant` offline rule-based editor and `/api/planner/ask` guided forecast workflow remain unchanged. Their fallback behavior is separate from primary session chat, where provider failure returns a retry with completed state preserved. Weather errors propagate as unavailable rather than inventing a forecast. Historical/synthetic numerical planning remains an explicit offline alternative.
 
-Wajo authenticated discovery and a harmless greeting were tested separately. The application neither loads its credential nor invokes Fo. No Claude integration or hosted-LLM validation is claimed. See [architecture decision and proof](WAJO_INVESTIGATION.md).
+Wajo authenticated discovery and a harmless greeting were tested separately. The application neither loads its credential nor invokes Fo. Claude integration and genuine validation are documented separately in [the current demo](docs/CLAUDE_DEMO.md). See [architecture decision and proof](WAJO_INVESTIGATION.md).

@@ -1,0 +1,532 @@
+{
+  "implementation_commit": "e36a0a50548ba869a05e1a02e5499cc85a8f14c5",
+  "started_at": "2026-11-14T04:08:56.783382+00:00",
+  "model": "claude-haiku-5-5",
+  "provider": "claude",
+  "basis": "SYNTHETIC DEMO WEATHER; actual selected AI provider; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.",
+  "first_visible_basis": "Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.",
+  "cases": [
+    {
+      "name": "recovery",
+      "question": "What changes could resolve our modeled essential electricity shortfall? Please compare tested recovery alternatives.",
+      "total_seconds": 13.255393291823566,
+      "first_visible_seconds": 13.255393291823566,
+      "model_calls": [
+        {
+          "seconds": 1.0368325421586633,
+          "request_bytes": 10272,
+          "message_chars": 1226,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_01RBo6F16pH3Tzc3M1t17uq5",
+              "name": "recompute_clinic_plan",
+              "input": {
+                "include_recovery": true
+              },
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 4251,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 56,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        },
+        {
+          "seconds": 4.43875391734764,
+          "request_bytes": 19539,
+          "message_chars": 10514,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "The modeled shortfall is 1.200 kWh of essential energy in the baseline schedule for 2026-11-15, against 2.000 kWh requested. The model uses synthetic demo weather with assumed clear-day irradiation, not a live forecast, so these results are illustrative only.\n\nAmong the tested alternatives, raising battery output power to 1.4 kW (a test output change from 0.4 kW) met the modeled essential demand with no unserved essential energy, and the lowest stored energy was 5.895 kWh. Raising output to 0.9 kW left 0.200 kWh unserved. Adding battery storage capacity to 10 kWh, 12 kWh, or 16 kWh did not resolve the shortfall, because the battery never fell below its 6.000 kWh starting level and the limit was discharge power, not stored energy. Adding solar capacity to 2 kW, 2.5 kW, or 3.5 kW also left the 1.200 kWh shortfall unchanged. Rescheduling within the allowed hours did not reduce the shortfall either.\n\nThese results are hypothetical and nothing has been adopted. They do not establish real-world availability or clinical safety, and the output change would need operator review before any hardware decision."
+            }
+          ],
+          "usage": {
+            "input_tokens": 7935,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 844,
+            "output_tokens_details": {
+              "thinking_tokens": 439
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        },
+        {
+          "seconds": 2.99002870824188,
+          "request_bytes": 21022,
+          "message_chars": 12011,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "You're right to reject that. The 1.4 kW output result is only a modeled electrical comparison under synthetic demo weather and the configured settings. It is not evidence that the clinic will have power or that the setup is safe, so I shouldn't have framed it as resolving the shortfall. Nothing has been changed or adopted. The modeled baseline still shows a 1.200 kWh essential shortfall for 2026-11-15, and that is the only result I can stand behind from this calculation. I can explain the current plan in more detail, or run a fresh calculation if you give me new settings to test."
+            }
+          ],
+          "usage": {
+            "input_tokens": 8423,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 516,
+            "output_tokens_details": {
+              "thinking_tokens": 327
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [
+            "That attempt was rejected: Do not make an affirmative availability claim without a sourced qualified calculation. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        },
+        {
+          "seconds": 4.276392666157335,
+          "request_bytes": 20754,
+          "message_chars": 11743,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "For 2026-11-15, the current modeled baseline leaves 1.200 kWh of essential demand unmet across the configured 19:00 and 20:00 evening slots, with the battery never falling below 6.000 kWh. This is an electrical shortfall in the model, not a clinical safety decision, and the model does not establish real-world availability. The weather is labeled synthetic demo weather, not a live forecast.\n\nAmong the tested alternatives, a test battery output of 1.4 kW (raising maximum battery discharge from 0.4 kW) meets the modeled essential demand, with the battery falling to 5.895 kWh. A test output of 0.9 kW still leaves 0.200 kWh unmet. A test storage capacity of 10 kWh, 12 kWh, or 16 kWh leaves the full 1.200 kWh unmet, as does a test solar array of 2 kW, 2.5 kW, or 3.5 kW. Rescheduling within the allowed hours also leaves 1.200 kWh unmet. None of these alternatives has been adopted, and no alternative is selected."
+            }
+          ],
+          "usage": {
+            "input_tokens": 8291,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 807,
+            "output_tokens_details": {
+              "thinking_tokens": 446
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [
+            "That attempt was rejected: An electrical model cannot establish clinical safety. Do not assert safety. Distinguish electrical shortfalls from clinical safety decisions. Use the current modeled result if one exists; otherwise the configured inputs already suffice for the calculator. Do not ask for known settings or replace the requested electrical assessment with a disclaimer. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "agent_total": 13.213571249973029,
+        "model_status_http": 0.3203865420073271,
+        "model_http": 12.742007833905518,
+        "weather": 0.0002820421941578388,
+        "conversation_persistence": 0.005719334352761507,
+        "recovery_forecast_case_including_milp": 0.061165543738752604,
+        "response_serialization": 0.0009479583241045475,
+        "milp": 0.06742537720128894,
+        "forecast_case_including_milp": 0.01324683427810669
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.3203865420073271
+        },
+        {
+          "phase": "model_http",
+          "seconds": 1.0368325421586633
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.0002820421941578388
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.011187625117599964
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.01324683427810669
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.007816958241164684
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.008487042039632797
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0074636670760810375
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.008118375204503536
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005725624971091747
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006208083126693964
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005918541923165321
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006480417214334011
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005476917140185833
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005932792089879513
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0049715000204741955
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005422874819487333
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004982000216841698
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005402917042374611
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004679374862462282
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005140209104865789
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004342667292803526
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.004701999947428703
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.00486050033941865
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005270833149552345
+        },
+        {
+          "phase": "model_http",
+          "seconds": 4.43875391734764
+        },
+        {
+          "phase": "model_http",
+          "seconds": 2.99002870824188
+        },
+        {
+          "phase": "model_http",
+          "seconds": 4.276392666157335
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 13.213571249973029
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.005719334352761507
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0009479583241045475
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "3b413c9d-d4b8-469d-bb59-2be461163f42",
+        "user_message_id": "0fd52683-72d7-4019-9a2c-662f78a96573",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 13.250007750000805,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.0008538332767784595,
+            "model": 12.745328333694488,
+            "weather": 0.00029904069378972054,
+            "simulation": 0.07506591686978936,
+            "persistence": 0.00572841614484787
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 10275.0,
+              "message_chars": 1216.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 4251.0,
+              "eval_count": 56.0,
+              "http_seconds": 1.0378757920116186
+            },
+            {
+              "request_chars": 19542.0,
+              "message_chars": 10483.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 7935.0,
+              "eval_count": 844.0,
+              "http_seconds": 4.439245417248458
+            },
+            {
+              "request_chars": 21025.0,
+              "message_chars": 11966.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8423.0,
+              "eval_count": 516.0,
+              "http_seconds": 2.9905314589850605
+            },
+            {
+              "request_chars": 20757.0,
+              "message_chars": 11698.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8291.0,
+              "eval_count": 807.0,
+              "http_seconds": 4.277731291949749
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "followup",
+      "question": "Please explain my exact selected plan against the existing baseline without recalculating or refreshing weather.",
+      "total_seconds": 5.402810042258352,
+      "first_visible_seconds": 5.402810042258352,
+      "model_calls": [
+        {
+          "seconds": 1.1768649998120964,
+          "request_bytes": 18126,
+          "message_chars": 9080,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_01HVJk7jV2duiSaw8wKpPLbH",
+              "name": "explain_current_plan",
+              "input": {},
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 7410,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 54,
+            "output_tokens_details": {
+              "thinking_tokens": 25
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        },
+        {
+          "seconds": 4.138116540852934,
+          "request_bytes": 21885,
+          "message_chars": 12859,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "Your selected option is the hypothetical test output of 2.4 kW, which raises the battery discharge limit from 0.4 kW to 2.4 kW for the 2026-11-15 plan. In the model, that option meets the essential demand, leaving 0.000 kWh unserved, with flexible work fully finished and a lowest stored battery level of 5.895 kWh. The existing baseline does not meet essential demand: 1.200 kWh remains unserved, flexible work is fully finished at 0.000 kWh, and the lowest stored battery level is 6.000 kWh against a 1.000 kWh reserve target.\n\nThe baseline and optimized schedules are equivalent in this run, with no change in final battery energy and the same flexible work completed. The optimized schedule still leaves 1.200 kWh of essential energy unserved, so the 2.4 kW output change is the only tested option that closes the modeled essential gap.\n\nThis uses LifeLine synthetic demo weather for Africa/Nairobi, with 100% forecast irradiation. It is not a live forecast or an observation. The result is a modeled electrical comparison only, not a guarantee of availability or clinical safety, and it has not been adopted."
+            }
+          ],
+          "usage": {
+            "input_tokens": 8779,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 670,
+            "output_tokens_details": {
+              "thinking_tokens": 275
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "agent_total": 5.382935166358948,
+        "response_serialization": 0.0011157500557601452,
+        "conversation_persistence": 0.0066302502527832985,
+        "model_http": 5.3149815406650305
+      },
+      "events": [
+        {
+          "phase": "model_http",
+          "seconds": 1.1768649998120964
+        },
+        {
+          "phase": "model_http",
+          "seconds": 4.138116540852934
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 5.382935166358948
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0066302502527832985
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0011157500557601452
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": true,
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "Your selected option is the hypothetical test output of 2.4 kW, which raises the battery discharge limit from 0.4 kW to 2.4 kW for the 2026-11-15 plan. In the model, that option meets the essential demand, leaving 0.000 kWh unserved, with flexible work fully finished and a lowest stored battery level of 5.895 kWh. The existing baseline does not meet essential demand: 1.200 kWh remains unserved, flexible work is fully finished at 0.000 kWh, and the lowest stored battery level is 6.000 kWh against a 1.000 kWh reserve target.\n\nThe baseline and optimized schedules are equivalent in this run, with no change in final battery energy and the same flexible work completed. The optimized schedule still leaves 1.200 kWh of essential energy unserved, so the 2.4 kW output change is the only tested option that closes the modeled essential gap.\n\nThis uses LifeLine synthetic demo weather for Africa/Nairobi, with 100% forecast irradiation. It is not a live forecast or an observation. The result is a modeled electrical comparison only, not a guarantee of availability or clinical safety, and it has not been adopted.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "explain_current_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "a8dcd182-9da6-46ce-aecc-2edf708c997b",
+        "user_message_id": "5e76fcb5-6946-4f20-ba86-468f15878ec6",
+        "failure": null,
+        "timings": {
+          "total_seconds": 5.396536499727517,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.0006738328374922276,
+            "model": 5.317210124339908,
+            "persistence": 0.006639084313064814
+          },
+          "model_calls": 2,
+          "model_metrics": [
+            {
+              "request_chars": 18129.0,
+              "message_chars": 9070.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 7410.0,
+              "eval_count": 54.0,
+              "http_seconds": 1.1779967499896884
+            },
+            {
+              "request_chars": 21888.0,
+              "message_chars": 12829.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8779.0,
+              "eval_count": 670.0,
+              "http_seconds": 4.139245500322431
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 3,
+        "revision_after": 3,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    }
+  ],
+  "completed_at": "2026-11-14T04:09:15.900447+00:00"
+}

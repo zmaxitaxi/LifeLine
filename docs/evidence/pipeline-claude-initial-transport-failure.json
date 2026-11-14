@@ -1,0 +1,424 @@
+{
+  "implementation_commit": "9e82064ae87b24da4de2e3db54f45226d1f1dcf8",
+  "started_at": "2026-11-14T04:01:53.962443+00:00",
+  "model": "claude-haiku-5-5",
+  "provider": "claude",
+  "basis": "SYNTHETIC DEMO WEATHER; actual selected AI provider; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.",
+  "first_visible_basis": "Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.",
+  "cases": [
+    {
+      "name": "conversation",
+      "question": "Hello",
+      "total_seconds": 0.3880658750422299,
+      "first_visible_seconds": 0.3880658750422299,
+      "model_calls": [],
+      "phases_seconds": {
+        "response_serialization": 0.00013695796951651573,
+        "conversation_persistence": 0.00032845791429281235,
+        "agent_total": 0.3862392078153789,
+        "model_status_http": 0.3856545421294868
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.3856545421294868
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 0.3862392078153789
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.00032845791429281235
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00013695796951651573
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model is unavailable. Your planning state is preserved; retry when it is available.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "d92c8617-a828-4afa-ac4e-7eb31c2b36ee",
+        "user_message_id": "fe7dad51-816a-422d-8aea-2cd817b51d49",
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "retryable": true,
+          "suggested_action": "retry",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 0.38678533397614956,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "persistence": 0.0003464575856924057
+          },
+          "model_calls": null,
+          "model_metrics": []
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "assessment",
+      "question": "Can our clinic safely operate tomorrow given the weather forecast?",
+      "total_seconds": 0.00321974977850914,
+      "first_visible_seconds": 0.00321974977850914,
+      "model_calls": [],
+      "phases_seconds": {
+        "response_serialization": 9.212503209710121e-05,
+        "agent_total": 0.0005427091382443905,
+        "conversation_persistence": 0.0001821247860789299
+      },
+      "events": [
+        {
+          "phase": "agent_total",
+          "seconds": 0.0005427091382443905
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0001821247860789299
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 9.212503209710121e-05
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model is unavailable. Your planning state is preserved; retry when it is available.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "fd648ad5-3732-434e-9457-2ad5bae6e838",
+        "user_message_id": "caf72aba-18e3-4acf-8e18-d0e4b6c6e40a",
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "retryable": true,
+          "suggested_action": "retry",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 0.0008872090838849545,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "persistence": 0.0001920829527080059
+          },
+          "model_calls": null,
+          "model_metrics": []
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "vaccination",
+      "question": "What if I wanted to plan a vaccination clinic today at 10 AM?",
+      "total_seconds": 0.0014598746784031391,
+      "first_visible_seconds": 0.0014598746784031391,
+      "model_calls": [],
+      "phases_seconds": {
+        "response_serialization": 0.00011100014671683311,
+        "agent_total": 0.00014358293265104294,
+        "conversation_persistence": 0.00011495780199766159
+      },
+      "events": [
+        {
+          "phase": "agent_total",
+          "seconds": 0.00014358293265104294
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.00011495780199766159
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00011100014671683311
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model is unavailable. Your planning state is preserved; retry when it is available.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "bd48a071-1f50-4388-af97-b87dae44e9e6",
+        "user_message_id": "6376c25e-0beb-400c-a517-5766c41733ad",
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "retryable": true,
+          "suggested_action": "retry",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 0.00034958403557538986,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "persistence": 0.00011966610327363014
+          },
+          "model_calls": null,
+          "model_metrics": []
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "recovery",
+      "question": "What changes could resolve our modeled essential electricity shortfall? Please compare tested recovery alternatives.",
+      "total_seconds": 0.0027431673370301723,
+      "first_visible_seconds": 0.0027431673370301723,
+      "model_calls": [],
+      "phases_seconds": {
+        "response_serialization": 3.758398815989494e-05,
+        "agent_total": 0.00013545900583267212,
+        "conversation_persistence": 0.0016154590994119644
+      },
+      "events": [
+        {
+          "phase": "agent_total",
+          "seconds": 0.00013545900583267212
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0016154590994119644
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 3.758398815989494e-05
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model is unavailable. Your planning state is preserved; retry when it is available.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "dc2ee2f1-e0ec-4070-9b4f-fd3e8b73d535",
+        "user_message_id": "ca063ccd-9d25-4e96-924b-27d81b2d2f9a",
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "retryable": true,
+          "suggested_action": "retry",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 0.001839666161686182,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "persistence": 0.0016206246800720692
+          },
+          "model_calls": null,
+          "model_metrics": []
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "followup",
+      "question": "Please explain my exact selected plan against the existing baseline without recalculating or refreshing weather.",
+      "total_seconds": 0.03813554206863046,
+      "first_visible_seconds": 0.03813554206863046,
+      "model_calls": [],
+      "phases_seconds": {
+        "response_serialization": 0.0008262908086180687,
+        "agent_total": 0.0048548332415521145,
+        "conversation_persistence": 0.005168500356376171
+      },
+      "events": [
+        {
+          "phase": "agent_total",
+          "seconds": 0.0048548332415521145
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.005168500356376171
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0008262908086180687
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model is unavailable. Your planning state is preserved; retry when it is available.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "8774cf79-731d-4462-a257-9217cb3e3da0",
+        "user_message_id": "be7e40b4-02de-4ce4-985f-910acccc8b3b",
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "retryable": true,
+          "suggested_action": "retry",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 0.0335290408693254,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "persistence": 0.005176167003810406
+          },
+          "model_calls": null,
+          "model_metrics": []
+        }
+      },
+      "state_summary": {
+        "revision_before": 3,
+        "revision_after": 3,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "history",
+      "question": "Actually, I mean tomorrow at 10 AM. What else do you need to plan that vaccination campaign?",
+      "total_seconds": 0.000595832709223032,
+      "first_visible_seconds": 0.000595832709223032,
+      "model_calls": [],
+      "phases_seconds": {
+        "response_serialization": 1.99158675968647e-05,
+        "agent_total": 6.445823237299919e-05,
+        "conversation_persistence": 4.416611045598984e-05
+      },
+      "events": [
+        {
+          "phase": "agent_total",
+          "seconds": 6.445823237299919e-05
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 4.416611045598984e-05
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 1.99158675968647e-05
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The AI model is unavailable. Your planning state is preserved; retry when it is available.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "0c65cee2-4e72-40d5-bd73-5ec4139fe3a0",
+        "user_message_id": "edef14b2-9a55-43ba-8298-2b05d5febe3c",
+        "failure": {
+          "code": "MODEL_UNAVAILABLE",
+          "retryable": true,
+          "suggested_action": "retry",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 0.00014466745778918266,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "persistence": 4.591699689626694e-05
+          },
+          "model_calls": null,
+          "model_metrics": []
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    }
+  ],
+  "completed_at": "2026-11-14T04:01:54.812890+00:00"
+}

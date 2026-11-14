@@ -1,4 +1,6 @@
-# Natural local conversation and scoped results
+# Native conversation and scoped results
+
+**Current demo:** Claude Haiku (`claude-haiku-5-5`) uses the same session tools, source checks and explicit confirmation boundary. The Llama descriptions and runs below are retained as dated implementation/evaluation history, not the current provider or an automatic fallback. See [Claude setup and latest verification](CLAUDE_DEMO.md).
 
 Session chat uses the existing local `llama3.1:8b`. The model may return ordinary authored content or one native tool call. There is no greeting/help keyword router, explanation-only tool subset, mandatory synthesis tool, or fixed number of options to discuss. All tools valid for the current state remain available. Direct replies can greet, clarify or discuss unevaluated ideas without fetching weather, calculating, staging changes or displaying result cards.
 

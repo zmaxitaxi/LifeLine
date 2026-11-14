@@ -1,0 +1,2853 @@
+{
+  "passed": true,
+  "base": "http://127.0.0.1:8038",
+  "model": "claude-haiku-5-5",
+  "note": "Actual provider inference. Browser timings are DOM commit proxies, not pixel-paint or model first-token timings. Isolated in-memory clinic; no production state changes.",
+  "cases": [
+    {
+      "scenario": "greeting",
+      "question": "Hello",
+      "observed_total_seconds": 2.272208208,
+      "client_dom_commit_proxies": [
+        {
+          "name": "lifeline.first_progress_commit",
+          "duration_ms": 34.80000019073486
+        },
+        {
+          "name": "lifeline.answer_commit",
+          "duration_ms": 2225.7000002861023
+        }
+      ],
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "Hello! I'm LifeLine, here to help you plan your clinic's electricity use and activities. What would you like to look at today?",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "03f4dd3c-ea08-493e-9959-811189254a1e",
+        "user_message_id": "3a4b0c84-de0d-4d83-b008-7b837f64ad51",
+        "state": {
+          "id": "cded21c6-2533-4794-b6bf-f137d1dcb3ea",
+          "revision": 0,
+          "input_revision": 0,
+          "selected_clinic_id": "scheduling",
+          "clinic_name": "Haiku browser verification clinic",
+          "location": {
+            "latitude": -0.0917,
+            "longitude": 34.768
+          },
+          "planning_date": "2026-11-15",
+          "timezone": "Africa/Nairobi",
+          "clinic": {
+            "initial_battery_kwh": 6,
+            "scenario": "scheduling",
+            "equipment": [
+              {
+                "id": "vaccine_refrigerator",
+                "name": "Vaccine refrigerator (constant average approximation)",
+                "category": "critical",
+                "power_kw": 0.12,
+                "required_hours": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ]
+              },
+              {
+                "id": "communications",
+                "name": "Communications",
+                "category": "critical",
+                "power_kw": 0.04,
+                "required_hours": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ]
+              },
+              {
+                "id": "essential_lighting",
+                "name": "Essential lighting",
+                "category": "critical",
+                "power_kw": 0.15,
+                "required_hours": [
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17
+                ]
+              },
+              {
+                "id": "device_charging",
+                "name": "Nonessential device charging",
+                "category": "flexible",
+                "max_power_kw": 0.3,
+                "required_energy_kwh": 0.9,
+                "allowed_hours": [
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20
+                ],
+                "baseline_allocations": [
+                  {
+                    "hour": 18,
+                    "requested_kwh": 0.3
+                  },
+                  {
+                    "hour": 19,
+                    "requested_kwh": 0.3
+                  },
+                  {
+                    "hour": 20,
+                    "requested_kwh": 0.3
+                  }
+                ],
+                "divisible": true
+              },
+              {
+                "id": "auxiliary_laundry",
+                "name": "Auxiliary laundry (divisible energy approximation)",
+                "category": "flexible",
+                "max_power_kw": 0.6,
+                "required_energy_kwh": 1.2,
+                "allowed_hours": [
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19
+                ],
+                "baseline_allocations": [
+                  {
+                    "hour": 18,
+                    "requested_kwh": 0.6
+                  },
+                  {
+                    "hour": 19,
+                    "requested_kwh": 0.6
+                  }
+                ],
+                "divisible": true
+              }
+            ],
+            "weather_dataset": "synthetic"
+          },
+          "equipment_inventory": [
+            {
+              "id": "vaccine_refrigerator",
+              "name": "Vaccine refrigerator (constant average approximation)",
+              "category": "critical",
+              "power_kw": 0.12,
+              "required_hours": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+              ]
+            },
+            {
+              "id": "communications",
+              "name": "Communications",
+              "category": "critical",
+              "power_kw": 0.04,
+              "required_hours": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+              ]
+            },
+            {
+              "id": "essential_lighting",
+              "name": "Essential lighting",
+              "category": "critical",
+              "power_kw": 0.15,
+              "required_hours": [
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17
+              ]
+            },
+            {
+              "id": "device_charging",
+              "name": "Nonessential device charging",
+              "category": "flexible",
+              "max_power_kw": 0.3,
+              "required_energy_kwh": 0.9,
+              "allowed_hours": [
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+              ],
+              "baseline_allocations": [
+                {
+                  "hour": 18,
+                  "requested_kwh": 0.3
+                },
+                {
+                  "hour": 19,
+                  "requested_kwh": 0.3
+                },
+                {
+                  "hour": 20,
+                  "requested_kwh": 0.3
+                }
+              ],
+              "divisible": true
+            },
+            {
+              "id": "auxiliary_laundry",
+              "name": "Auxiliary laundry (divisible energy approximation)",
+              "category": "flexible",
+              "max_power_kw": 0.6,
+              "required_energy_kwh": 1.2,
+              "allowed_hours": [
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19
+              ],
+              "baseline_allocations": [
+                {
+                  "hour": 18,
+                  "requested_kwh": 0.6
+                },
+                {
+                  "hour": 19,
+                  "requested_kwh": 0.6
+                }
+              ],
+              "divisible": true
+            }
+          ],
+          "energy_settings": {
+            "battery_capacity_kwh": 8,
+            "initial_battery_kwh": 6,
+            "reserve_kwh": 4.8,
+            "pv_capacity_kw": 1.5,
+            "charge_efficiency": 0.95,
+            "discharge_efficiency": 0.95,
+            "max_charge_kw": 4,
+            "max_discharge_kw": 4,
+            "additional_critical_kw": 0
+          },
+          "current_battery_reading": null,
+          "energy_proposals": [],
+          "active_energy_proposal_id": null,
+          "confirmed_activities": [],
+          "proposals": [],
+          "active_proposal_id": null,
+          "forecast_reference": null,
+          "computed_plan": null,
+          "plan_status": "not_computed",
+          "plan_error": null,
+          "selected_recovery_intervention_id": null,
+          "sunshine_factor": 1
+        },
+        "failure": null,
+        "timings": {
+          "total_seconds": 2.2148877498693764,
+          "first_progress_seconds": 0.000013416167348623276,
+          "stages_seconds": {
+            "serialization": 0.0006664581596851349,
+            "model": 2.1979225832037628,
+            "persistence": 0.00033449986949563026
+          },
+          "model_calls": 1,
+          "model_metrics": [
+            {
+              "request_chars": 11418,
+              "message_chars": 1993,
+              "tool_schema_chars": 5423,
+              "prompt_eval_count": 4735,
+              "eval_count": 43,
+              "http_seconds": 2.197946457657963
+            }
+          ]
+        }
+      },
+      "public_events": [
+        {
+          "type": "progress",
+          "stage": "request",
+          "status": "running",
+          "elapsed_seconds": 0.000013416167348623276
+        },
+        {
+          "type": "progress",
+          "stage": "serialization",
+          "status": "running",
+          "elapsed_seconds": 0.0003765411674976349
+        },
+        {
+          "type": "progress",
+          "stage": "serialization",
+          "status": "completed",
+          "elapsed_seconds": 0.001038040965795517
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "running",
+          "elapsed_seconds": 0.00617691595107317
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "completed",
+          "elapsed_seconds": 2.204080750234425
+        },
+        {
+          "type": "progress",
+          "stage": "persistence",
+          "status": "running",
+          "elapsed_seconds": 2.2145510828122497
+        },
+        {
+          "type": "progress",
+          "stage": "persistence",
+          "status": "completed",
+          "elapsed_seconds": 2.214881957974285
+        }
+      ]
+    },
+    {
+      "scenario": "assessment",
+      "question": "Will we have enough electricity tomorrow for our confirmed clinic equipment?",
+      "observed_total_seconds": 6.685123333000001,
+      "client_dom_commit_proxies": [
+        {
+          "name": "lifeline.first_progress_commit",
+          "duration_ms": 23.40000009536743
+        },
+        {
+          "name": "lifeline.answer_commit",
+          "duration_ms": 6647.699999809265
+        }
+      ],
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "In the model, essential demand for 2026-11-15 is met and all flexible charging and laundry work completes, under both the existing baseline and the optimized schedule. The existing baseline drops to a lowest battery level of 4.585 kWh, below the 4.8 kWh reserve target. The optimized schedule keeps the lowest level at 4.953 kWh.\n\nThese results assume a 6 kWh starting charge at midnight and synthetic demo weather with clear-day sunshine, not a live forecast. This is a planning estimate, not a guarantee of real-world availability.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "237d41a2-c5bf-438d-a8a6-e6b2bfada42f",
+        "user_message_id": "967a5604-9057-42c6-bbf0-5749bad0e018",
+        "state": {
+          "id": "cded21c6-2533-4794-b6bf-f137d1dcb3ea",
+          "revision": 2,
+          "input_revision": 0,
+          "selected_clinic_id": "scheduling",
+          "clinic_name": "Haiku browser verification clinic",
+          "location": {
+            "latitude": -0.0917,
+            "longitude": 34.768
+          },
+          "planning_date": "2026-11-15",
+          "timezone": "Africa/Nairobi",
+          "clinic": {
+            "initial_battery_kwh": 6,
+            "scenario": "scheduling",
+            "equipment": [
+              {
+                "id": "vaccine_refrigerator",
+                "name": "Vaccine refrigerator (constant average approximation)",
+                "category": "critical",
+                "power_kw": 0.12,
+                "required_hours": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ]
+              },
+              {
+                "id": "communications",
+                "name": "Communications",
+                "category": "critical",
+                "power_kw": 0.04,
+                "required_hours": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23
+                ]
+              },
+              {
+                "id": "essential_lighting",
+                "name": "Essential lighting",
+                "category": "critical",
+                "power_kw": 0.15,
+                "required_hours": [
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17
+                ]
+              },
+              {
+                "id": "device_charging",
+                "name": "Nonessential device charging",
+                "category": "flexible",
+                "max_power_kw": 0.3,
+                "required_energy_kwh": 0.9,
+                "allowed_hours": [
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20
+                ],
+                "baseline_allocations": [
+                  {
+                    "hour": 18,
+                    "requested_kwh": 0.3
+                  },
+                  {
+                    "hour": 19,
+                    "requested_kwh": 0.3
+                  },
+                  {
+                    "hour": 20,
+                    "requested_kwh": 0.3
+                  }
+                ],
+                "divisible": true
+              },
+              {
+                "id": "auxiliary_laundry",
+                "name": "Auxiliary laundry (divisible energy approximation)",
+                "category": "flexible",
+                "max_power_kw": 0.6,
+                "required_energy_kwh": 1.2,
+                "allowed_hours": [
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19
+                ],
+                "baseline_allocations": [
+                  {
+                    "hour": 18,
+                    "requested_kwh": 0.6
+                  },
+                  {
+                    "hour": 19,
+                    "requested_kwh": 0.6
+                  }
+                ],
+                "divisible": true
+              }
+            ],
+            "weather_dataset": "synthetic"
+          },
+          "equipment_inventory": [
+            {
+              "id": "vaccine_refrigerator",
+              "name": "Vaccine refrigerator (constant average approximation)",
+              "category": "critical",
+              "power_kw": 0.12,
+              "required_hours": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+              ]
+            },
+            {
+              "id": "communications",
+              "name": "Communications",
+              "category": "critical",
+              "power_kw": 0.04,
+              "required_hours": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+              ]
+            },
+            {
+              "id": "essential_lighting",
+              "name": "Essential lighting",
+              "category": "critical",
+              "power_kw": 0.15,
+              "required_hours": [
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17
+              ]
+            },
+            {
+              "id": "device_charging",
+              "name": "Nonessential device charging",
+              "category": "flexible",
+              "max_power_kw": 0.3,
+              "required_energy_kwh": 0.9,
+              "allowed_hours": [
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+              ],
+              "baseline_allocations": [
+                {
+                  "hour": 18,
+                  "requested_kwh": 0.3
+                },
+                {
+                  "hour": 19,
+                  "requested_kwh": 0.3
+                },
+                {
+                  "hour": 20,
+                  "requested_kwh": 0.3
+                }
+              ],
+              "divisible": true
+            },
+            {
+              "id": "auxiliary_laundry",
+              "name": "Auxiliary laundry (divisible energy approximation)",
+              "category": "flexible",
+              "max_power_kw": 0.6,
+              "required_energy_kwh": 1.2,
+              "allowed_hours": [
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19
+              ],
+              "baseline_allocations": [
+                {
+                  "hour": 18,
+                  "requested_kwh": 0.6
+                },
+                {
+                  "hour": 19,
+                  "requested_kwh": 0.6
+                }
+              ],
+              "divisible": true
+            }
+          ],
+          "energy_settings": {
+            "battery_capacity_kwh": 8,
+            "initial_battery_kwh": 6,
+            "reserve_kwh": 4.8,
+            "pv_capacity_kw": 1.5,
+            "charge_efficiency": 0.95,
+            "discharge_efficiency": 0.95,
+            "max_charge_kw": 4,
+            "max_discharge_kw": 4,
+            "additional_critical_kw": 0
+          },
+          "current_battery_reading": null,
+          "energy_proposals": [],
+          "active_energy_proposal_id": null,
+          "confirmed_activities": [],
+          "proposals": [],
+          "active_proposal_id": null,
+          "forecast_reference": {
+            "source": "LifeLine synthetic demo weather",
+            "data_kind": "synthetic_demo_weather",
+            "weather_mode": "demo",
+            "requested_location": {
+              "latitude": -0.0917,
+              "longitude": 34.768
+            },
+            "model_grid_location": {
+              "latitude": -0.0917,
+              "longitude": 34.768
+            },
+            "timezone": "Africa/Nairobi",
+            "retrieved_at": "2026-11-14T04:30:23.643132Z",
+            "expires_at": "2026-11-14T05:30:23.643132Z",
+            "cache_status": "cached",
+            "source_url": "https://github.com/zmaxitaxi/LifeLine/blob/main/docs/DEMO_WEATHER.md",
+            "attribution_url": "https://github.com/zmaxitaxi/LifeLine/blob/main/docs/DEMO_WEATHER.md",
+            "licence_url": "",
+            "interval_convention": "Assumed hourly mean W/m², zero outside 06:00–18:00 in the declared demo timezone; kWh/m² = W/m² ÷ 1000 for each one-hour slot.",
+            "days": [
+              {
+                "date": "2026-11-14",
+                "hours": [
+                  {
+                    "start": "2026-11-14T00:00:00+03:00",
+                    "end": "2026-11-14T01:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T01:00:00+03:00",
+                    "end": "2026-11-14T02:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T02:00:00+03:00",
+                    "end": "2026-11-14T03:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T03:00:00+03:00",
+                    "end": "2026-11-14T04:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T04:00:00+03:00",
+                    "end": "2026-11-14T05:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T05:00:00+03:00",
+                    "end": "2026-11-14T06:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T06:00:00+03:00",
+                    "end": "2026-11-14T07:00:00+03:00",
+                    "shortwave_radiation_w_m2": 104.42095377604126,
+                    "irradiance_kwh_m2": 0.10442095377604126
+                  },
+                  {
+                    "start": "2026-11-14T07:00:00+03:00",
+                    "end": "2026-11-14T08:00:00+03:00",
+                    "shortwave_radiation_w_m2": 306.1467458920718,
+                    "irradiance_kwh_m2": 0.3061467458920718
+                  },
+                  {
+                    "start": "2026-11-14T08:00:00+03:00",
+                    "end": "2026-11-14T09:00:00+03:00",
+                    "shortwave_radiation_w_m2": 487.00914320697655,
+                    "irradiance_kwh_m2": 0.4870091432069765
+                  },
+                  {
+                    "start": "2026-11-14T09:00:00+03:00",
+                    "end": "2026-11-14T10:00:00+03:00",
+                    "shortwave_radiation_w_m2": 634.6826722329881,
+                    "irradiance_kwh_m2": 0.6346826722329881
+                  },
+                  {
+                    "start": "2026-11-14T10:00:00+03:00",
+                    "end": "2026-11-14T11:00:00+03:00",
+                    "shortwave_radiation_w_m2": 739.1036260090294,
+                    "irradiance_kwh_m2": 0.7391036260090295
+                  },
+                  {
+                    "start": "2026-11-14T11:00:00+03:00",
+                    "end": "2026-11-14T12:00:00+03:00",
+                    "shortwave_radiation_w_m2": 793.1558890990483,
+                    "irradiance_kwh_m2": 0.7931558890990483
+                  },
+                  {
+                    "start": "2026-11-14T12:00:00+03:00",
+                    "end": "2026-11-14T13:00:00+03:00",
+                    "shortwave_radiation_w_m2": 793.1558890990483,
+                    "irradiance_kwh_m2": 0.7931558890990483
+                  },
+                  {
+                    "start": "2026-11-14T13:00:00+03:00",
+                    "end": "2026-11-14T14:00:00+03:00",
+                    "shortwave_radiation_w_m2": 739.1036260090294,
+                    "irradiance_kwh_m2": 0.7391036260090295
+                  },
+                  {
+                    "start": "2026-11-14T14:00:00+03:00",
+                    "end": "2026-11-14T15:00:00+03:00",
+                    "shortwave_radiation_w_m2": 634.6826722329881,
+                    "irradiance_kwh_m2": 0.6346826722329881
+                  },
+                  {
+                    "start": "2026-11-14T15:00:00+03:00",
+                    "end": "2026-11-14T16:00:00+03:00",
+                    "shortwave_radiation_w_m2": 487.0091432069767,
+                    "irradiance_kwh_m2": 0.4870091432069767
+                  },
+                  {
+                    "start": "2026-11-14T16:00:00+03:00",
+                    "end": "2026-11-14T17:00:00+03:00",
+                    "shortwave_radiation_w_m2": 306.1467458920719,
+                    "irradiance_kwh_m2": 0.3061467458920719
+                  },
+                  {
+                    "start": "2026-11-14T17:00:00+03:00",
+                    "end": "2026-11-14T18:00:00+03:00",
+                    "shortwave_radiation_w_m2": 104.42095377604159,
+                    "irradiance_kwh_m2": 0.10442095377604159
+                  },
+                  {
+                    "start": "2026-11-14T18:00:00+03:00",
+                    "end": "2026-11-14T19:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T19:00:00+03:00",
+                    "end": "2026-11-14T20:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T20:00:00+03:00",
+                    "end": "2026-11-14T21:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T21:00:00+03:00",
+                    "end": "2026-11-14T22:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T22:00:00+03:00",
+                    "end": "2026-11-14T23:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-14T23:00:00+03:00",
+                    "end": "2026-11-15T00:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  }
+                ],
+                "simulation_supported": true,
+                "warnings": [
+                  "SYNTHETIC DEMO WEATHER: assumed clear-day irradiation and sample temperatures, not observations or a live forecast. The declared demo timezone is Africa/Nairobi; these conditions are not a geographic weather prediction."
+                ]
+              },
+              {
+                "date": "2026-11-15",
+                "hours": [
+                  {
+                    "start": "2026-11-15T00:00:00+03:00",
+                    "end": "2026-11-15T01:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T01:00:00+03:00",
+                    "end": "2026-11-15T02:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T02:00:00+03:00",
+                    "end": "2026-11-15T03:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T03:00:00+03:00",
+                    "end": "2026-11-15T04:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T04:00:00+03:00",
+                    "end": "2026-11-15T05:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T05:00:00+03:00",
+                    "end": "2026-11-15T06:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T06:00:00+03:00",
+                    "end": "2026-11-15T07:00:00+03:00",
+                    "shortwave_radiation_w_m2": 104.42095377604126,
+                    "irradiance_kwh_m2": 0.10442095377604126
+                  },
+                  {
+                    "start": "2026-11-15T07:00:00+03:00",
+                    "end": "2026-11-15T08:00:00+03:00",
+                    "shortwave_radiation_w_m2": 306.1467458920718,
+                    "irradiance_kwh_m2": 0.3061467458920718
+                  },
+                  {
+                    "start": "2026-11-15T08:00:00+03:00",
+                    "end": "2026-11-15T09:00:00+03:00",
+                    "shortwave_radiation_w_m2": 487.00914320697655,
+                    "irradiance_kwh_m2": 0.4870091432069765
+                  },
+                  {
+                    "start": "2026-11-15T09:00:00+03:00",
+                    "end": "2026-11-15T10:00:00+03:00",
+                    "shortwave_radiation_w_m2": 634.6826722329881,
+                    "irradiance_kwh_m2": 0.6346826722329881
+                  },
+                  {
+                    "start": "2026-11-15T10:00:00+03:00",
+                    "end": "2026-11-15T11:00:00+03:00",
+                    "shortwave_radiation_w_m2": 739.1036260090294,
+                    "irradiance_kwh_m2": 0.7391036260090295
+                  },
+                  {
+                    "start": "2026-11-15T11:00:00+03:00",
+                    "end": "2026-11-15T12:00:00+03:00",
+                    "shortwave_radiation_w_m2": 793.1558890990483,
+                    "irradiance_kwh_m2": 0.7931558890990483
+                  },
+                  {
+                    "start": "2026-11-15T12:00:00+03:00",
+                    "end": "2026-11-15T13:00:00+03:00",
+                    "shortwave_radiation_w_m2": 793.1558890990483,
+                    "irradiance_kwh_m2": 0.7931558890990483
+                  },
+                  {
+                    "start": "2026-11-15T13:00:00+03:00",
+                    "end": "2026-11-15T14:00:00+03:00",
+                    "shortwave_radiation_w_m2": 739.1036260090294,
+                    "irradiance_kwh_m2": 0.7391036260090295
+                  },
+                  {
+                    "start": "2026-11-15T14:00:00+03:00",
+                    "end": "2026-11-15T15:00:00+03:00",
+                    "shortwave_radiation_w_m2": 634.6826722329881,
+                    "irradiance_kwh_m2": 0.6346826722329881
+                  },
+                  {
+                    "start": "2026-11-15T15:00:00+03:00",
+                    "end": "2026-11-15T16:00:00+03:00",
+                    "shortwave_radiation_w_m2": 487.0091432069767,
+                    "irradiance_kwh_m2": 0.4870091432069767
+                  },
+                  {
+                    "start": "2026-11-15T16:00:00+03:00",
+                    "end": "2026-11-15T17:00:00+03:00",
+                    "shortwave_radiation_w_m2": 306.1467458920719,
+                    "irradiance_kwh_m2": 0.3061467458920719
+                  },
+                  {
+                    "start": "2026-11-15T17:00:00+03:00",
+                    "end": "2026-11-15T18:00:00+03:00",
+                    "shortwave_radiation_w_m2": 104.42095377604159,
+                    "irradiance_kwh_m2": 0.10442095377604159
+                  },
+                  {
+                    "start": "2026-11-15T18:00:00+03:00",
+                    "end": "2026-11-15T19:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T19:00:00+03:00",
+                    "end": "2026-11-15T20:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T20:00:00+03:00",
+                    "end": "2026-11-15T21:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T21:00:00+03:00",
+                    "end": "2026-11-15T22:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T22:00:00+03:00",
+                    "end": "2026-11-15T23:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  },
+                  {
+                    "start": "2026-11-15T23:00:00+03:00",
+                    "end": "2026-11-16T00:00:00+03:00",
+                    "shortwave_radiation_w_m2": 0,
+                    "irradiance_kwh_m2": 0
+                  }
+                ],
+                "simulation_supported": true,
+                "warnings": [
+                  "SYNTHETIC DEMO WEATHER: assumed clear-day irradiation and sample temperatures, not observations or a live forecast. The declared demo timezone is Africa/Nairobi; these conditions are not a geographic weather prediction."
+                ]
+              }
+            ],
+            "warnings": [
+              "SYNTHETIC DEMO WEATHER: assumed clear-day irradiation and sample temperatures, not observations or a live forecast. The declared demo timezone is Africa/Nairobi; these conditions are not a geographic weather prediction."
+            ]
+          },
+          "computed_plan": {
+            "weather_mode": "demo",
+            "input_revision": 0,
+            "generation": 1,
+            "computed_at": "2026-11-14T04:30:23.676990Z",
+            "sunshine_factor": 1,
+            "simulation": {
+              "api_version": "1.0",
+              "model_version": "energy-1.0",
+              "scenario": "scheduling",
+              "scenario_name": "Scheduling improvement",
+              "data_source": "mixed",
+              "cloud_factors": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              "input_provenance": {
+                "equipment": "user_entered_unverified",
+                "weather": "LifeLine_synthetic_demo_weather",
+                "model": "Horizontal irradiance approximation; reduced-sunshine factor applied once; preset cloud curve replaced.",
+                "initial_battery": "Operator assumption at selected day’s local midnight; not a carried-forward prediction."
+              },
+              "weather_dataset": "synthetic-demo",
+              "diagnosis": {
+                "assessment": "SCHEDULING_OPPORTUNITY",
+                "explanation": "The computed operating plan improves the current schedule. Check completed work and remaining warnings before interpreting the difference.",
+                "constraints": [],
+                "discharge_limited_hours": [],
+                "optimistic_energy_deficit_kwh": 0,
+                "window_limited_tasks": []
+              },
+              "timezone": "Africa/Nairobi",
+              "horizon_hours": 24,
+              "dt_hours": 1,
+              "pv_performance_ratio": 0.8,
+              "effective_config": {
+                "battery_capacity_kwh": 8,
+                "initial_battery_kwh": 6,
+                "reserve_kwh": 4.8,
+                "pv_capacity_kw": 1.5,
+                "charge_efficiency": 0.95,
+                "discharge_efficiency": 0.95,
+                "max_charge_kw": 4,
+                "max_discharge_kw": 4,
+                "additional_critical_kw": 0
+              },
+              "equipment": [
+                {
+                  "id": "vaccine_refrigerator",
+                  "name": "Vaccine refrigerator (constant average approximation)",
+                  "category": "critical",
+                  "power_kw": 0.12,
+                  "required_hours": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23
+                  ]
+                },
+                {
+                  "id": "communications",
+                  "name": "Communications",
+                  "category": "critical",
+                  "power_kw": 0.04,
+                  "required_hours": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23
+                  ]
+                },
+                {
+                  "id": "essential_lighting",
+                  "name": "Essential lighting",
+                  "category": "critical",
+                  "power_kw": 0.15,
+                  "required_hours": [
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17
+                  ]
+                },
+                {
+                  "id": "device_charging",
+                  "name": "Nonessential device charging",
+                  "category": "flexible",
+                  "max_power_kw": 0.3,
+                  "required_energy_kwh": 0.9,
+                  "allowed_hours": [
+                    8,
+                    9,
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19,
+                    20
+                  ],
+                  "baseline_allocations": [
+                    {
+                      "hour": 18,
+                      "requested_kwh": 0.3
+                    },
+                    {
+                      "hour": 19,
+                      "requested_kwh": 0.3
+                    },
+                    {
+                      "hour": 20,
+                      "requested_kwh": 0.3
+                    }
+                  ],
+                  "divisible": true
+                },
+                {
+                  "id": "auxiliary_laundry",
+                  "name": "Auxiliary laundry (divisible energy approximation)",
+                  "category": "flexible",
+                  "max_power_kw": 0.6,
+                  "required_energy_kwh": 1.2,
+                  "allowed_hours": [
+                    10,
+                    11,
+                    12,
+                    13,
+                    14,
+                    15,
+                    16,
+                    17,
+                    18,
+                    19
+                  ],
+                  "baseline_allocations": [
+                    {
+                      "hour": 18,
+                      "requested_kwh": 0.6
+                    },
+                    {
+                      "hour": 19,
+                      "requested_kwh": 0.6
+                    }
+                  ],
+                  "divisible": true
+                }
+              ],
+              "assumptions": [
+                "24 hourly slots for 2026-11-15 in Africa/Nairobi.",
+                "LifeLine synthetic demo weather: synthetic_demo_weather; generated/retrieved at 2026-11-14T04:30:23.643132+00:00; cache status: cached.",
+                "Radiation profile multiplied by 1; identical profile supplied to all three schedules.",
+                "SYNTHETIC DEMO WEATHER: assumed clear-day irradiation and sample temperatures, not observations or a live forecast. The declared demo timezone is Africa/Nairobi; these conditions are not a geographic weather prediction.",
+                "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+                "The starting battery is the operator’s assumed stored energy at local midnight. Tomorrow’s charge is not predicted by carrying today’s simulation forward.",
+                "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+                "PV energy = rated kW × hourly horizontal irradiation (kWh/m²) ÷ 1 kW/m² × existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+                "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+                "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+                "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included."
+              ],
+              "status": "OK",
+              "baseline": {
+                "status": "RESERVE_AT_RISK",
+                "hourly": [
+                  {
+                    "hour": 0,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6,
+                    "soc_end_kwh": 5.831578947368421
+                  },
+                  {
+                    "hour": 1,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.831578947368421,
+                    "soc_end_kwh": 5.663157894736843
+                  },
+                  {
+                    "hour": 2,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.663157894736843,
+                    "soc_end_kwh": 5.494736842105264
+                  },
+                  {
+                    "hour": 3,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.494736842105264,
+                    "soc_end_kwh": 5.326315789473686
+                  },
+                  {
+                    "hour": 4,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.326315789473686,
+                    "soc_end_kwh": 5.157894736842107
+                  },
+                  {
+                    "hour": 5,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.157894736842107,
+                    "soc_end_kwh": 4.9894736842105285
+                  },
+                  {
+                    "hour": 6,
+                    "pv_kwh": 0.12530514453124952,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.03469485546875048,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.9894736842105285,
+                    "soc_end_kwh": 4.952952783717107
+                  },
+                  {
+                    "hour": 7,
+                    "pv_kwh": 0.36737609507048624,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.20737609507048624,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.952952783717107,
+                    "soc_end_kwh": 5.149960074034069
+                  },
+                  {
+                    "hour": 8,
+                    "pv_kwh": 0.5844109718483719,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.2744109718483719,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.149960074034069,
+                    "soc_end_kwh": 5.410650497290022
+                  },
+                  {
+                    "hour": 9,
+                    "pv_kwh": 0.7616192066795858,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.4516192066795858,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.410650497290022,
+                    "soc_end_kwh": 5.839688743635628
+                  },
+                  {
+                    "hour": 10,
+                    "pv_kwh": 0.8869243512108355,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.5769243512108355,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.839688743635628,
+                    "soc_end_kwh": 6.387766877285922
+                  },
+                  {
+                    "hour": 11,
+                    "pv_kwh": 0.9517870669188582,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.6417870669188581,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.387766877285922,
+                    "soc_end_kwh": 6.997464590858837
+                  },
+                  {
+                    "hour": 12,
+                    "pv_kwh": 0.9517870669188582,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.6417870669188581,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.997464590858837,
+                    "soc_end_kwh": 7.6071623044317525
+                  },
+                  {
+                    "hour": 13,
+                    "pv_kwh": 0.8869243512108355,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.4135133637560501,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0.16341098745478544,
+                    "soc_start_kwh": 7.6071623044317525,
+                    "soc_end_kwh": 8
+                  },
+                  {
+                    "hour": 14,
+                    "pv_kwh": 0.7616192066795858,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0.4516192066795858,
+                    "soc_start_kwh": 8,
+                    "soc_end_kwh": 8
+                  },
+                  {
+                    "hour": 15,
+                    "pv_kwh": 0.5844109718483721,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0.2744109718483721,
+                    "soc_start_kwh": 8,
+                    "soc_end_kwh": 8
+                  },
+                  {
+                    "hour": 16,
+                    "pv_kwh": 0.36737609507048635,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0.057376095070486355,
+                    "soc_start_kwh": 8,
+                    "soc_end_kwh": 8
+                  },
+                  {
+                    "hour": 17,
+                    "pv_kwh": 0.1253051445312499,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.18469485546875009,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 8,
+                    "soc_end_kwh": 7.805584362664473
+                  },
+                  {
+                    "hour": 18,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.8999999999999999,
+                    "flexible_served_kwh": 0.8999999999999999,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 1.06,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 7.805584362664473,
+                    "soc_end_kwh": 6.689794888980263
+                  },
+                  {
+                    "hour": 19,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.8999999999999999,
+                    "flexible_served_kwh": 0.8999999999999999,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 1.06,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.689794888980263,
+                    "soc_end_kwh": 5.574005415296052
+                  },
+                  {
+                    "hour": 20,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.3,
+                    "flexible_served_kwh": 0.3,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.45999999999999996,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.574005415296052,
+                    "soc_end_kwh": 5.089794888980263
+                  },
+                  {
+                    "hour": 21,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.089794888980263,
+                    "soc_end_kwh": 4.9213738363486845
+                  },
+                  {
+                    "hour": 22,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.9213738363486845,
+                    "soc_end_kwh": 4.752952783717106
+                  },
+                  {
+                    "hour": 23,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.752952783717106,
+                    "soc_end_kwh": 4.584531731085527
+                  }
+                ],
+                "metrics": {
+                  "total_solar_kwh": 7.354845672518775,
+                  "critical_requested_kwh": 5.34,
+                  "critical_unserved_kwh": 0,
+                  "critical_coverage_pct": 100,
+                  "min_soc_kwh": 4.584531731085527,
+                  "final_soc_kwh": 4.584531731085527,
+                  "flexible_requested_kwh": 2.1,
+                  "flexible_served_kwh": 2.0999999999999996,
+                  "flexible_deferred_kwh": 0,
+                  "curtailed_kwh": 0.9468172610532297,
+                  "conversion_loss_kwh": 0.3834966803800206,
+                  "critical_shortage_hours": [],
+                  "reserve_breach_boundaries": [
+                    23,
+                    24
+                  ]
+                },
+                "flexible_tasks": [
+                  {
+                    "task_id": "device_charging",
+                    "requested_kwh": 0.9,
+                    "served_kwh": 0.8999999999999999,
+                    "deferred_kwh": 0,
+                    "allocations": [
+                      {
+                        "hour": 18,
+                        "served_kwh": 0.3
+                      },
+                      {
+                        "hour": 19,
+                        "served_kwh": 0.3
+                      },
+                      {
+                        "hour": 20,
+                        "served_kwh": 0.3
+                      }
+                    ]
+                  },
+                  {
+                    "task_id": "auxiliary_laundry",
+                    "requested_kwh": 1.2,
+                    "served_kwh": 1.2,
+                    "deferred_kwh": 0,
+                    "allocations": [
+                      {
+                        "hour": 18,
+                        "served_kwh": 0.6
+                      },
+                      {
+                        "hour": 19,
+                        "served_kwh": 0.6
+                      }
+                    ]
+                  }
+                ]
+              },
+              "heuristic": {
+                "status": "OK",
+                "hourly": [
+                  {
+                    "hour": 0,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6,
+                    "soc_end_kwh": 5.831578947368421
+                  },
+                  {
+                    "hour": 1,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.831578947368421,
+                    "soc_end_kwh": 5.663157894736843
+                  },
+                  {
+                    "hour": 2,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.663157894736843,
+                    "soc_end_kwh": 5.494736842105264
+                  },
+                  {
+                    "hour": 3,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.494736842105264,
+                    "soc_end_kwh": 5.326315789473686
+                  },
+                  {
+                    "hour": 4,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.326315789473686,
+                    "soc_end_kwh": 5.157894736842107
+                  },
+                  {
+                    "hour": 5,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.157894736842107,
+                    "soc_end_kwh": 4.9894736842105285
+                  },
+                  {
+                    "hour": 6,
+                    "pv_kwh": 0.12530514453124952,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.03469485546875048,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.9894736842105285,
+                    "soc_end_kwh": 4.952952783717107
+                  },
+                  {
+                    "hour": 7,
+                    "pv_kwh": 0.36737609507048624,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.20737609507048624,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.952952783717107,
+                    "soc_end_kwh": 5.149960074034069
+                  },
+                  {
+                    "hour": 8,
+                    "pv_kwh": 0.5844109718483719,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.2744109718483719,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.149960074034069,
+                    "soc_end_kwh": 5.410650497290022
+                  },
+                  {
+                    "hour": 9,
+                    "pv_kwh": 0.7616192066795858,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.4516192066795858,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.410650497290022,
+                    "soc_end_kwh": 5.839688743635628
+                  },
+                  {
+                    "hour": 10,
+                    "pv_kwh": 0.8869243512108355,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.3,
+                    "flexible_served_kwh": 0.3,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.27692435121083553,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.839688743635628,
+                    "soc_end_kwh": 6.102766877285922
+                  },
+                  {
+                    "hour": 11,
+                    "pv_kwh": 0.9517870669188582,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.3,
+                    "flexible_served_kwh": 0.3,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.34178706691885813,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.102766877285922,
+                    "soc_end_kwh": 6.427464590858837
+                  },
+                  {
+                    "hour": 12,
+                    "pv_kwh": 0.9517870669188582,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.3,
+                    "flexible_served_kwh": 0.3,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.34178706691885813,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.427464590858837,
+                    "soc_end_kwh": 6.752162304431752
+                  },
+                  {
+                    "hour": 13,
+                    "pv_kwh": 0.8869243512108355,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.6,
+                    "flexible_served_kwh": 0.6,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.02307564878916446,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.752162304431752,
+                    "soc_end_kwh": 6.727872147811579
+                  },
+                  {
+                    "hour": 14,
+                    "pv_kwh": 0.7616192066795858,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.6,
+                    "flexible_served_kwh": 0.6,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.14838079332041415,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.727872147811579,
+                    "soc_end_kwh": 6.571681839053248
+                  },
+                  {
+                    "hour": 15,
+                    "pv_kwh": 0.5844109718483721,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.2744109718483721,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.571681839053248,
+                    "soc_end_kwh": 6.832372262309201
+                  },
+                  {
+                    "hour": 16,
+                    "pv_kwh": 0.36737609507048635,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.057376095070486355,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.832372262309201,
+                    "soc_end_kwh": 6.886879552626163
+                  },
+                  {
+                    "hour": 17,
+                    "pv_kwh": 0.1253051445312499,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.18469485546875009,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.886879552626163,
+                    "soc_end_kwh": 6.692463915290636
+                  },
+                  {
+                    "hour": 18,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.692463915290636,
+                    "soc_end_kwh": 6.524042862659058
+                  },
+                  {
+                    "hour": 19,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.524042862659058,
+                    "soc_end_kwh": 6.355621810027479
+                  },
+                  {
+                    "hour": 20,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.355621810027479,
+                    "soc_end_kwh": 6.1872007573959005
+                  },
+                  {
+                    "hour": 21,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.1872007573959005,
+                    "soc_end_kwh": 6.018779704764322
+                  },
+                  {
+                    "hour": 22,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.018779704764322,
+                    "soc_end_kwh": 5.850358652132743
+                  },
+                  {
+                    "hour": 23,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.850358652132743,
+                    "soc_end_kwh": 5.681937599501165
+                  }
+                ],
+                "metrics": {
+                  "total_solar_kwh": 7.354845672518775,
+                  "critical_requested_kwh": 5.34,
+                  "critical_unserved_kwh": 0,
+                  "critical_coverage_pct": 100,
+                  "min_soc_kwh": 4.952952783717107,
+                  "final_soc_kwh": 5.681937599501165,
+                  "flexible_requested_kwh": 2.1,
+                  "flexible_served_kwh": 2.0999999999999996,
+                  "flexible_deferred_kwh": 0,
+                  "curtailed_kwh": 0,
+                  "conversion_loss_kwh": 0.23290807301761263,
+                  "critical_shortage_hours": [],
+                  "reserve_breach_boundaries": []
+                },
+                "flexible_tasks": [
+                  {
+                    "task_id": "device_charging",
+                    "requested_kwh": 0.9,
+                    "served_kwh": 0.8999999999999999,
+                    "deferred_kwh": 0,
+                    "allocations": [
+                      {
+                        "hour": 10,
+                        "served_kwh": 0.3
+                      },
+                      {
+                        "hour": 11,
+                        "served_kwh": 0.3
+                      },
+                      {
+                        "hour": 12,
+                        "served_kwh": 0.3
+                      }
+                    ]
+                  },
+                  {
+                    "task_id": "auxiliary_laundry",
+                    "requested_kwh": 1.2,
+                    "served_kwh": 1.2,
+                    "deferred_kwh": 0,
+                    "allocations": [
+                      {
+                        "hour": 13,
+                        "served_kwh": 0.6
+                      },
+                      {
+                        "hour": 14,
+                        "served_kwh": 0.6
+                      }
+                    ]
+                  }
+                ]
+              },
+              "optimized": {
+                "status": "OK",
+                "hourly": [
+                  {
+                    "hour": 0,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6,
+                    "soc_end_kwh": 5.8315789473684205
+                  },
+                  {
+                    "hour": 1,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.8315789473684205,
+                    "soc_end_kwh": 5.663157894736841
+                  },
+                  {
+                    "hour": 2,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.663157894736841,
+                    "soc_end_kwh": 5.494736842105262
+                  },
+                  {
+                    "hour": 3,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.494736842105262,
+                    "soc_end_kwh": 5.326315789473682
+                  },
+                  {
+                    "hour": 4,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.326315789473682,
+                    "soc_end_kwh": 5.157894736842103
+                  },
+                  {
+                    "hour": 5,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.157894736842103,
+                    "soc_end_kwh": 4.989473684210523
+                  },
+                  {
+                    "hour": 6,
+                    "pv_kwh": 0.12530514453124952,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.03469485546875042,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.989473684210523,
+                    "soc_end_kwh": 4.952952783717102
+                  },
+                  {
+                    "hour": 7,
+                    "pv_kwh": 0.36737609507048624,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.207376095070487,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 4.952952783717102,
+                    "soc_end_kwh": 5.149960074034064
+                  },
+                  {
+                    "hour": 8,
+                    "pv_kwh": 0.5844109718483719,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.2744109718483719,
+                    "flexible_served_kwh": 0.2744109718483719,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.149960074034064,
+                    "soc_end_kwh": 5.149960074034064
+                  },
+                  {
+                    "hour": 9,
+                    "pv_kwh": 0.7616192066795858,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.3,
+                    "flexible_served_kwh": 0.3,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.15161920667958584,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.149960074034064,
+                    "soc_end_kwh": 5.2939983203796706
+                  },
+                  {
+                    "hour": 10,
+                    "pv_kwh": 0.8869243512108355,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.5769243512108355,
+                    "flexible_served_kwh": 0.5769243512108355,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.2939983203796706,
+                    "soc_end_kwh": 5.2939983203796706
+                  },
+                  {
+                    "hour": 11,
+                    "pv_kwh": 0.9517870669188582,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.6417870669188581,
+                    "flexible_served_kwh": 0.6417870669188581,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.2939983203796706,
+                    "soc_end_kwh": 5.2939983203796706
+                  },
+                  {
+                    "hour": 12,
+                    "pv_kwh": 0.9517870669188582,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0.3068776100219341,
+                    "flexible_served_kwh": 0.3068776100219341,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.33490945689692403,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.2939983203796706,
+                    "soc_end_kwh": 5.612162304431749
+                  },
+                  {
+                    "hour": 13,
+                    "pv_kwh": 0.8869243512108355,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.5769243512108355,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.612162304431749,
+                    "soc_end_kwh": 6.160240438082043
+                  },
+                  {
+                    "hour": 14,
+                    "pv_kwh": 0.7616192066795858,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.4516192066795857,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.160240438082043,
+                    "soc_end_kwh": 6.589278684427649
+                  },
+                  {
+                    "hour": 15,
+                    "pv_kwh": 0.5844109718483721,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.27441097184837204,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.589278684427649,
+                    "soc_end_kwh": 6.849969107683602
+                  },
+                  {
+                    "hour": 16,
+                    "pv_kwh": 0.36737609507048635,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0.057376095070485966,
+                    "discharge_output_kwh": 0,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.849969107683602,
+                    "soc_end_kwh": 6.904476398000564
+                  },
+                  {
+                    "hour": 17,
+                    "pv_kwh": 0.1253051445312499,
+                    "critical_requested_kwh": 0.31,
+                    "critical_served_kwh": 0.31,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.18469485546875047,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.904476398000564,
+                    "soc_end_kwh": 6.710060760665037
+                  },
+                  {
+                    "hour": 18,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.710060760665037,
+                    "soc_end_kwh": 6.5416397080334585
+                  },
+                  {
+                    "hour": 19,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.5416397080334585,
+                    "soc_end_kwh": 6.37321865540188
+                  },
+                  {
+                    "hour": 20,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.37321865540188,
+                    "soc_end_kwh": 6.204797602770301
+                  },
+                  {
+                    "hour": 21,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.204797602770301,
+                    "soc_end_kwh": 6.036376550138723
+                  },
+                  {
+                    "hour": 22,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 6.036376550138723,
+                    "soc_end_kwh": 5.867955497507143
+                  },
+                  {
+                    "hour": 23,
+                    "pv_kwh": 0,
+                    "critical_requested_kwh": 0.16,
+                    "critical_served_kwh": 0.16,
+                    "critical_unserved_kwh": 0,
+                    "flexible_planned_kwh": 0,
+                    "flexible_served_kwh": 0,
+                    "flexible_unserved_kwh": 0,
+                    "charge_input_kwh": 0,
+                    "discharge_output_kwh": 0.16,
+                    "curtailed_kwh": 0,
+                    "soc_start_kwh": 5.867955497507143,
+                    "soc_end_kwh": 5.699534444875564
+                  }
+                ],
+                "metrics": {
+                  "total_solar_kwh": 7.354845672518775,
+                  "critical_requested_kwh": 5.34,
+                  "critical_unserved_kwh": 0,
+                  "critical_coverage_pct": 100,
+                  "min_soc_kwh": 4.952952783717102,
+                  "final_soc_kwh": 5.699534444875564,
+                  "flexible_requested_kwh": 2.1,
+                  "flexible_served_kwh": 2.0999999999999996,
+                  "flexible_deferred_kwh": 0,
+                  "curtailed_kwh": 0,
+                  "conversion_loss_kwh": 0.21531122764320854,
+                  "critical_shortage_hours": [],
+                  "reserve_breach_boundaries": []
+                },
+                "flexible_tasks": [
+                  {
+                    "task_id": "device_charging",
+                    "requested_kwh": 0.9,
+                    "served_kwh": 0.9000000000000001,
+                    "deferred_kwh": 0,
+                    "allocations": [
+                      {
+                        "hour": 8,
+                        "served_kwh": 0.2744109718483719
+                      },
+                      {
+                        "hour": 9,
+                        "served_kwh": 0.3
+                      },
+                      {
+                        "hour": 11,
+                        "served_kwh": 0.04178706691885814
+                      },
+                      {
+                        "hour": 12,
+                        "served_kwh": 0.2838019612327701
+                      }
+                    ]
+                  },
+                  {
+                    "task_id": "auxiliary_laundry",
+                    "requested_kwh": 1.2,
+                    "served_kwh": 1.1999999999999997,
+                    "deferred_kwh": 0,
+                    "allocations": [
+                      {
+                        "hour": 10,
+                        "served_kwh": 0.5769243512108355
+                      },
+                      {
+                        "hour": 11,
+                        "served_kwh": 0.6
+                      },
+                      {
+                        "hour": 12,
+                        "served_kwh": 0.023075648789164016
+                      }
+                    ]
+                  }
+                ]
+              },
+              "comparison": {
+                "same_flexible_work_completed": true,
+                "battery_preserved_at_midnight_kwh": 1.1150027137900365,
+                "minimum_battery_improvement_kwh": 0.3684210526315743,
+                "evening_minimum_improvement_kwh": 1.1150027137900365,
+                "conversion_loss_reduction_kwh": 0.16818545273681207,
+                "heuristic_matches_optimizer_metrics": false
+              },
+              "warnings": [
+                {
+                  "code": "RESERVE_BELOW_TARGET",
+                  "plan": "baseline",
+                  "message": "Minimum stored energy 4.584532 kWh is below the 4.800000 kWh target; breach boundaries: [23, 24] (0–24)."
+                }
+              ],
+              "recommendations": [
+                {
+                  "severity": "info",
+                  "title": "Same flexible work completed",
+                  "explanation": "Both schedules complete 2.100000 kWh of optional work. Optimized minus baseline battery at midnight: +1.115003 kWh; daily minimum: +0.368421 kWh. Baseline minus optimized conversion losses: +0.168185 kWh. These are separate quantities and must not be added together.",
+                  "task_id": null,
+                  "hours": null
+                },
+                {
+                  "severity": "info",
+                  "title": "Schedule: Nonessential device charging",
+                  "explanation": "Serve 0.900000 of 0.900000 kWh in slots starting 08:00, 09:00, 11:00, 12:00; defer 0.000000 kWh within this horizon. Allocations respect the allowed windows and the ordered critical/reserve constraints.",
+                  "task_id": "device_charging",
+                  "hours": [
+                    8,
+                    9,
+                    11,
+                    12
+                  ]
+                },
+                {
+                  "severity": "info",
+                  "title": "Schedule: Auxiliary laundry (divisible energy approximation)",
+                  "explanation": "Serve 1.200000 of 1.200000 kWh in slots starting 10:00, 11:00, 12:00; defer 0.000000 kWh within this horizon. Allocations respect the allowed windows and the ordered critical/reserve constraints.",
+                  "task_id": "auxiliary_laundry",
+                  "hours": [
+                    10,
+                    11,
+                    12
+                  ]
+                },
+                {
+                  "severity": "info",
+                  "title": "Sunshine-first and MILP outcomes differ",
+                  "explanation": "Compare all three plans, including their work completion and warnings. The sunshine-first rule has no battery look-ahead or reserve constraint; a higher battery alone does not establish a better outcome.",
+                  "task_id": null,
+                  "hours": null
+                }
+              ]
+            },
+            "recovery": null
+          },
+          "plan_status": "current",
+          "plan_error": null,
+          "selected_recovery_intervention_id": null,
+          "sunshine_factor": 1
+        },
+        "failure": null,
+        "timings": {
+          "total_seconds": 6.635408999864012,
+          "first_progress_seconds": 0.000004624947905540466,
+          "stages_seconds": {
+            "serialization": 0.0008334997110068798,
+            "model": 6.520903416909277,
+            "weather": 0.00030470872297883034,
+            "simulation": 0.03351033292710781,
+            "persistence": 0.0008633751422166824
+          },
+          "model_calls": 3,
+          "model_metrics": [
+            {
+              "request_chars": 11791,
+              "message_chars": 2366,
+              "tool_schema_chars": 5423,
+              "prompt_eval_count": 4827,
+              "eval_count": 96,
+              "http_seconds": 0.9804404582828283
+            },
+            {
+              "request_chars": 15987,
+              "message_chars": 6562,
+              "tool_schema_chars": 5423,
+              "prompt_eval_count": 6557,
+              "eval_count": 581,
+              "http_seconds": 3.0409845001995564
+            },
+            {
+              "request_chars": 17032,
+              "message_chars": 7607,
+              "tool_schema_chars": 5423,
+              "prompt_eval_count": 6878,
+              "eval_count": 480,
+              "http_seconds": 2.4995413343422115
+            }
+          ]
+        }
+      },
+      "public_events": [
+        {
+          "type": "progress",
+          "stage": "request",
+          "status": "running",
+          "elapsed_seconds": 0.000004624947905540466
+        },
+        {
+          "type": "progress",
+          "stage": "serialization",
+          "status": "running",
+          "elapsed_seconds": 0.0003359159454703331
+        },
+        {
+          "type": "progress",
+          "stage": "serialization",
+          "status": "completed",
+          "elapsed_seconds": 0.0009370408952236176
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "running",
+          "elapsed_seconds": 0.0054097906686365604
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "completed",
+          "elapsed_seconds": 0.9858096661046147
+        },
+        {
+          "type": "progress",
+          "stage": "weather",
+          "status": "running",
+          "elapsed_seconds": 0.9874939997680485
+        },
+        {
+          "type": "progress",
+          "stage": "weather",
+          "status": "completed",
+          "elapsed_seconds": 0.9877955410629511
+        },
+        {
+          "type": "progress",
+          "stage": "simulation",
+          "status": "running",
+          "elapsed_seconds": 0.9878719998523593
+        },
+        {
+          "type": "progress",
+          "stage": "simulation",
+          "status": "completed",
+          "elapsed_seconds": 1.0213756249286234
+        },
+        {
+          "type": "progress",
+          "stage": "serialization",
+          "status": "running",
+          "elapsed_seconds": 1.022828582674265
+        },
+        {
+          "type": "progress",
+          "stage": "serialization",
+          "status": "completed",
+          "elapsed_seconds": 1.0230529997497797
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "running",
+          "elapsed_seconds": 1.026188749819994
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "completed",
+          "elapsed_seconds": 4.067137874662876
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "running",
+          "elapsed_seconds": 4.0764879998750985
+        },
+        {
+          "type": "progress",
+          "stage": "model",
+          "status": "completed",
+          "elapsed_seconds": 6.575996708124876
+        },
+        {
+          "type": "progress",
+          "stage": "persistence",
+          "status": "running",
+          "elapsed_seconds": 6.6345442910678685
+        },
+        {
+          "type": "progress",
+          "stage": "persistence",
+          "status": "completed",
+          "elapsed_seconds": 6.635405082721263
+        }
+      ]
+    }
+  ]
+}

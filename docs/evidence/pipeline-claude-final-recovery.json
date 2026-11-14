@@ -1,0 +1,456 @@
+{
+  "implementation_commit": "68ae6e2bea4f27329579dbdfe7ec674305b69af2",
+  "started_at": "2026-11-14T04:25:08.635979+00:00",
+  "model": "claude-haiku-5-5",
+  "provider": "claude",
+  "basis": "SYNTHETIC DEMO WEATHER; actual selected AI provider; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.",
+  "first_visible_basis": "Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.",
+  "cases": [
+    {
+      "name": "recovery",
+      "question": "What changes could resolve our modeled essential electricity shortfall? Please compare tested recovery alternatives.",
+      "total_seconds": 3.87381733302027,
+      "first_visible_seconds": 3.87381733302027,
+      "model_calls": [
+        {
+          "seconds": 1.1376335001550615,
+          "request_bytes": 10638,
+          "message_chars": 1226,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_01XsxRxyU1yUCuKetX9i3Hsa",
+              "name": "recompute_clinic_plan",
+              "input": {
+                "include_recovery": true
+              },
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 4357,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 145,
+            "output_tokens_details": {
+              "thinking_tokens": 88
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        },
+        {
+          "seconds": 2.268104041926563,
+          "request_bytes": 19905,
+          "message_chars": 10514,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "The modeled baseline has a 1.200 kWh essential shortfall for 2026-11-15, and the tested alternatives are hypothetical and not adopted. Raising battery output to 1.4 kW (from 0.4 kW) met the essential demand in the model, with the lowest stored energy at 5.895 kWh. Raising battery capacity to 10 kWh did not meet it, and the lowest stored energy stayed at 6.000 kWh. Raising solar to 2 kW also did not meet it, and the lowest stored energy stayed at 6.000 kWh. Rescheduling within the allowed hours did not close the gap either. This uses synthetic demo weather with assumed clear-day irradiation, not a live forecast, and it does not establish real-world availability or clinical safety."
+            }
+          ],
+          "usage": {
+            "input_tokens": 8041,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 420,
+            "output_tokens_details": {
+              "thinking_tokens": 160
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "end_turn",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "model_status_http": 0.31750375032424927,
+        "model_http": 3.4057375420816243,
+        "milp": 0.06330716889351606,
+        "conversation_persistence": 0.006699082907289267,
+        "forecast_case_including_milp": 0.012942750006914139,
+        "response_serialization": 0.0010327501222491264,
+        "recovery_forecast_case_including_milp": 0.05729095637798309,
+        "agent_total": 3.8543045418336987,
+        "weather": 0.00024025002494454384
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.31750375032424927
+        },
+        {
+          "phase": "model_http",
+          "seconds": 1.1376335001550615
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.00024025002494454384
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.010401499923318624
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.012942750006914139
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.007487084250897169
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.008107416797429323
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.006220041774213314
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006714040879160166
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005729167256504297
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006276458036154509
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005606750026345253
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006039957981556654
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0050051249563694
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005466250237077475
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004889500327408314
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005286333616822958
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004534000065177679
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.004901375155895948
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004451541695743799
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.0048027909360826015
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004661791957914829
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005033040884882212
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0043206666596233845
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.0046632918529212475
+        },
+        {
+          "phase": "model_http",
+          "seconds": 2.268104041926563
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 3.8543045418336987
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.006699082907289267
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0010327501222491264
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": true,
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "The modeled baseline has a 1.200 kWh essential shortfall for 2026-11-15, and the tested alternatives are hypothetical and not adopted. Raising battery output to 1.4 kW (from 0.4 kW) met the essential demand in the model, with the lowest stored energy at 5.895 kWh. Raising battery capacity to 10 kWh did not meet it, and the lowest stored energy stayed at 6.000 kWh. Raising solar to 2 kW also did not meet it, and the lowest stored energy stayed at 6.000 kWh. Rescheduling within the allowed hours did not close the gap either. This uses synthetic demo weather with assumed clear-day irradiation, not a live forecast, and it does not establish real-world availability or clinical safety.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "ba4a6acf-f67b-4658-b065-48cc9abe066a",
+        "user_message_id": "4e0c7c32-a410-48a4-b85a-5713f0f31222",
+        "failure": null,
+        "timings": {
+          "total_seconds": 3.8681458751671016,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.00078970892354846,
+            "model": 3.408052250277251,
+            "weather": 0.000253874808549881,
+            "simulation": 0.07080929353833199,
+            "persistence": 0.0067048328928649426
+          },
+          "model_calls": 2,
+          "model_metrics": [
+            {
+              "request_chars": 10641.0,
+              "message_chars": 1216.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 4357.0,
+              "eval_count": 145.0,
+              "http_seconds": 1.1386375408619642
+            },
+            {
+              "request_chars": 19908.0,
+              "message_chars": 10483.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8041.0,
+              "eval_count": 420.0,
+              "http_seconds": 2.2694548326544464
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "followup",
+      "question": "Please explain my exact selected plan against the existing baseline without recalculating or refreshing weather.",
+      "total_seconds": 4.580366457812488,
+      "first_visible_seconds": 4.580366457812488,
+      "model_calls": [
+        {
+          "seconds": 1.1021697497926652,
+          "request_bytes": 18492,
+          "message_chars": 9080,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "tool_use",
+              "id": "toolu_01MhjxyWZG6d6EQ89MpyPcHz",
+              "name": "explain_current_plan",
+              "input": {},
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 7516,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 83,
+            "output_tokens_details": {
+              "thinking_tokens": 54
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        },
+        {
+          "seconds": 3.3922240417450666,
+          "request_bytes": 22251,
+          "message_chars": 12859,
+          "tool_schema_chars": 5803,
+          "native_message": [
+            {
+              "type": "text",
+              "text": "For 2026-11-15, the selected test is a hypothetical output change: raising maximum battery discharge from 0.4 kW to 2.4 kW. In the existing baseline, essential demand is not met, with 1.200 kWh of essential energy unserved, and the lowest stored energy is 6.000 kWh. With the 2.4 kW test, the model shows essential demand met with 0.000 kWh unserved and a lowest stored energy of 5.895 kWh. Flexible work is 0.000 kWh unfinished in both cases.\n\nThe forecast is LifeLine synthetic demo weather at 100% irradiation, not a live forecast. This is a modeled electrical comparison only, not a clinical safety or availability guarantee, and nothing has been adopted."
+            },
+            {
+              "type": "tool_use",
+              "id": "toolu_01PxsWb78ayNzC1Fhbci2uap",
+              "name": "respond_to_user",
+              "input": {
+                "message": "For 2026-11-15, the selected test is a hypothetical output change: raising maximum battery discharge from 0.4 kW to 2.4 kW. In the existing baseline, essential demand is not met, with 1.200 kWh of essential energy unserved, and the lowest stored energy is 6.000 kWh. With the 2.4 kW test, the model shows essential demand met with 0.000 kWh unserved and a lowest stored energy of 5.895 kWh. Flexible work is 0.000 kWh unfinished in both cases. The forecast is LifeLine synthetic demo weather at 100% irradiation, not a live forecast. This is a modeled electrical comparison only, not a clinical safety or availability guarantee, and nothing has been adopted.",
+                "presentation": {
+                  "kind": "explanation",
+                  "option_ids": [
+                    "output-2.4"
+                  ],
+                  "show_schedule": false
+                }
+              },
+              "caller": {
+                "type": "direct"
+              }
+            }
+          ],
+          "usage": {
+            "input_tokens": 8885,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 794,
+            "output_tokens_details": {
+              "thinking_tokens": 191
+            },
+            "service_tier": "standard",
+            "inference_geo": "global",
+            "speed": "standard"
+          },
+          "correction": [],
+          "stop_reason": "tool_use",
+          "http_status": 200
+        }
+      ],
+      "phases_seconds": {
+        "conversation_persistence": 0.007293999660760164,
+        "response_serialization": 0.001065374817699194,
+        "agent_total": 4.559388499706984,
+        "model_http": 4.494393791537732
+      },
+      "events": [
+        {
+          "phase": "model_http",
+          "seconds": 1.1021697497926652
+        },
+        {
+          "phase": "model_http",
+          "seconds": 3.3922240417450666
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 4.559388499706984
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.007293999660760164
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.001065374817699194
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": true,
+      "response": {
+        "mode": "cloud_tool_agent",
+        "model": "claude-haiku-5-5",
+        "message": "For 2026-11-15, the selected test is a hypothetical output change: raising maximum battery discharge from 0.4 kW to 2.4 kW. In the existing baseline, essential demand is not met, with 1.200 kWh of essential energy unserved, and the lowest stored energy is 6.000 kWh. With the 2.4 kW test, the model shows essential demand met with 0.000 kWh unserved and a lowest stored energy of 5.895 kWh. Flexible work is 0.000 kWh unfinished in both cases. The forecast is LifeLine synthetic demo weather at 100% irradiation, not a live forecast. This is a modeled electrical comparison only, not a clinical safety or availability guarantee, and nothing has been adopted.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "explain_current_plan"
+        ],
+        "presentation": {
+          "kind": "explanation",
+          "input_revision": 0,
+          "generation": 1,
+          "option_ids": [
+            "output-2.4"
+          ],
+          "show_schedule": false
+        },
+        "message_id": "fdbb3db3-ad83-46fb-921f-397adfd329a8",
+        "user_message_id": "0b10034b-a71e-4102-8d6e-93dc87911753",
+        "failure": null,
+        "timings": {
+          "total_seconds": 4.574561375193298,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.0004481668584048748,
+            "model": 4.496689916588366,
+            "persistence": 0.007300625089555979
+          },
+          "model_calls": 2,
+          "model_metrics": [
+            {
+              "request_chars": 18495.0,
+              "message_chars": 9070.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 7516.0,
+              "eval_count": 83.0,
+              "http_seconds": 1.103178541176021
+            },
+            {
+              "request_chars": 22254.0,
+              "message_chars": 12829.0,
+              "tool_schema_chars": 5423.0,
+              "prompt_eval_count": 8885.0,
+              "eval_count": 794.0,
+              "http_seconds": 3.393550416920334
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 3,
+        "revision_after": 3,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    }
+  ],
+  "completed_at": "2026-11-14T04:25:17.400003+00:00"
+}

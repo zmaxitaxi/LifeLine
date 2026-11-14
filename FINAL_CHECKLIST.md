@@ -2,8 +2,7 @@
 
 This is a decision-support prototype, not clinical deployment or a power guarantee.
 The final architecture retains the existing physical simulator, MILP, baseline and
-sunshine-first comparator. The selected model is local Ollama **llama3.1:8b**;
-no Anthropic, OpenAI or Wajo credential is needed by the application.
+sunshine-first comparator. The current model is **Claude Haiku (`claude-haiku-5-5`)** through the Anthropic API. A server-side Anthropic key and internet are required for the assistant. No Llama fallback is used; numerical planning and manual review remain independent.
 
 ## Product behavior
 
@@ -11,11 +10,11 @@ no Anthropic, OpenAI or Wajo credential is needed by the application.
 |---|---|
 | Configure a clinic | Location/date and illustrative quick-start inputs; reviewed solar, storage, midnight starting energy, reserve, efficiencies and charge/output limits. A timestamped current reading is separate. Capacity changes preserve absolute stored energy unless explicitly edited. |
 | Plan clinic work | Add/edit partial activity proposals in chat or manually. Existing activities remain active until reviewed changes are confirmed. Existing devices are referenced once. Explicit flexible daily runtime is converted to energy in Python; event duration alone adds no demand. |
-| Natural local AI | Llama authors conversation and chooses state-valid native tools. Plain conversation and unevaluated ideas do not require calculations. Computed claims use actual model facts; explicit confirmation remains an operator action. The primary chat never silently replaces a failed model with a canned energy answer. |
+| Claude assistant | Haiku authors conversation and chooses state-valid native tools. Plain conversation and unevaluated ideas do not require calculations. Computed claims use actual model facts; explicit confirmation remains an operator action. The primary chat never silently replaces a failed model with a canned energy answer. |
 | Actual weather | Open-Meteo hourly irradiation for supported today/tomorrow calculations, provenance/timezone/retrieval metadata, cache and explicit failures. Independent current/seven-day weather is not a seven-day energy prediction. Historical NASA and synthetic numerical modes remain explicit offline alternatives. |
 | Actionable scheduling | Before/after operating schedules, original work completion, battery timeline, losses, essential deficits and reduced-sunshine tests. Fixed, sunshine-first and MILP comparisons use identical inputs. |
 | Recovery options | Bounded individual scheduling/solar/storage/output sensitivities, absolute initial energy held fixed, explicit remaining hourly deficits and unchanged protected demand. Smallest tested candidate is not global sizing, a cost optimum, a purchase instruction or installed hardware. |
-| Clear interface | AI Assistant and Clinic Overview, four responsive information panels, reviewed activity/settings forms, exact-selected-plan explanations, and relevant calculated evidence rather than every option on every message. |
+| Clear interface | AI Assistant and decision-first Clinic Overview, an hourly energy chart beside the battery, and expandable details, reviewed activity/settings forms, exact-selected-plan explanations, and relevant calculated evidence rather than every option on every message. |
 | Durable local work | Private atomic snapshots preserve sessions, drafts, confirmed inputs, receipts and recent chat. Interrupted calculations cannot restore as current. Failed saves roll back and return an explicit error. One process only; no accounts or distributed storage. |
 | Safe rollout | An explicit offline migration preserves a legacy preview's actual state and transcript, marks imported messages, and does not invent past timestamps/current readings. Original exports remain intact. |
 
@@ -25,19 +24,20 @@ There is no implicit migration of activities between clinics or dates.
 
 ## Verification record
 
-- Final assembled backend: **503 tests passed**, including settings, restart
+- Final assembled backend: **524 tests passed**, including settings, restart
   recovery, source/unit validation, shared-device runtime, migration and all
   existing numerical/API checks.
-- Final assembled frontend: **46/46 browser journeys**, TypeScript and production
+- Final assembled frontend: **56/56 browser journeys**, TypeScript and production
   build pass against the real Python compiler, simulator and MILP, with injected
   test-only weather/model transport. Desktop, narrow preview and phone layouts
   are covered, including blank setup, explicit demo autofill and saved-clinic resume.
   This is separate from genuine model/weather evidence.
-- Actual local Llama passed the exact clinic-weather question using explicitly
-  synthetic demo weather, settings proposal/correction, and four activity/runtime
-  checks. The demo is running with preserved canonical inputs and the Vaccination
-  draft. [Final release and timings](docs/FINAL_RELEASE.md). These are targeted
-  checks; the earlier CI run is not evidence for latest code.
+- Actual Claude Haiku passed the greeting, clinic assessment, date clarification,
+  valid vaccination proposal, recovery comparison, selected explanation and
+  history journeys in targeted runs. The last seven-case batch was **6/7**;
+  recovery passed after a documented source-validation correction. A genuine
+  browser check passed Hello (2.272s) and assessment (6.685s), with no adopted
+  changes or page errors. [Measured evidence and limitations](docs/HAIKU_VALIDATION.md).
 - The teammates' [comprehensive evaluation](LLM_EVALUATION.md) records
   **87.5/100** on the previous tool set. New targeted checks do not inherit that
   score and do not establish arbitrary-language or clinical reliability.
@@ -73,7 +73,7 @@ nearly as good. [Computed proof](docs/evidence/demo-weather-scheduling-proof.jso
 
 ## Remaining external work
 
-1. Recheck actual weather and warm Ollama on the presentation machine/network;
+1. Check Anthropic API access and the selected weather mode on the presentation machine/network;
    rehearse the [current demo](DEMO.md) on the final build. Clearly identify any
    historical, recorded or synthetic fallback.
 2. Confirm official registration, eligibility, deadline/timezone, submission URL,
