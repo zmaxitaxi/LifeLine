@@ -23,7 +23,7 @@ export interface SessionAgentRequest extends RevisionRequest { question: string 
 export interface CreateEnergySettingsProposal extends RevisionRequest { settings?: EnergySettingsPatch; current_battery_reading?: BatteryReading|null }
 export type UpdateEnergySettingsProposal = CreateEnergySettingsProposal;
 export interface AgentPresentation { kind: 'conversation'|'activity_review'|'energy_review'|'calculation'|'explanation'; input_revision: number|null; generation: number|null; option_ids: string[]; show_schedule: boolean }
-export interface PlanningMessage { id: string; role: 'user'|'assistant'; content: string; created_at: string; presentation: AgentPresentation|null; mode: 'local_tool_agent'|'local_agent_unavailable'|null; imported: boolean }
+export interface PlanningMessage { id: string; role: 'user'|'assistant'; content: string; created_at: string; presentation: AgentPresentation|null; mode: 'local_tool_agent'|'local_agent_unavailable'|null; imported: boolean; failure?:AgentFailure|null }
 export interface PlanningConversation { session_id: string; messages: PlanningMessage[] }
 export interface AgentFailure { code: 'MODEL_TIMEOUT'|'MODEL_BUSY'|'MODEL_UNAVAILABLE'|'MODEL_INVALID_OUTPUT'|'MODEL_VALIDATION_FAILED'|'WEATHER_UNAVAILABLE'|'DATE_MISMATCH'; retryable: boolean; suggested_action:'retry'|'wait_model'|'review_date'|'review_inputs'; selected_date:string|null; requested_date:string|null }
 export interface AgentTimings { total_seconds:number;first_progress_seconds:number|null;stages_seconds:Record<string,number>;model_calls:number|null;model_metrics:Record<string,number>[] }

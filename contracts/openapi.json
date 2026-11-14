@@ -5033,6 +5033,16 @@
             "type": "boolean",
             "title": "Imported",
             "default": false
+          },
+          "failure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentFailure"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,

@@ -227,7 +227,8 @@ class PlanningStore:
             now = datetime.now(timezone.utc)
             user = PlanningMessage(id=str(uuid4()), role='user', content=question, created_at=now)
             assistant = PlanningMessage(id=str(uuid4()), role='assistant', content=response.message,
-                created_at=now, presentation=response.presentation, mode=response.mode)
+                created_at=now, presentation=response.presentation, mode=response.mode,
+                failure=response.failure)
             self.conversations[session_id] = (self.conversations.get(session_id, []) + [user, assistant])[-80:]
             self._persist()
             response.message_id = assistant.id

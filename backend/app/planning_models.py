@@ -219,6 +219,15 @@ class AgentPresentation(StrictModel):
     show_schedule: bool = False
 
 
+class AgentFailure(StrictModel):
+    code: Literal['MODEL_TIMEOUT', 'MODEL_BUSY', 'MODEL_UNAVAILABLE', 'MODEL_INVALID_OUTPUT',
+                  'MODEL_VALIDATION_FAILED', 'WEATHER_UNAVAILABLE', 'DATE_MISMATCH']
+    retryable: bool
+    suggested_action: Literal['retry', 'wait_model', 'review_date', 'review_inputs']
+    selected_date: str | None = None
+    requested_date: str | None = None
+
+
 class PlanningMessage(StrictModel):
     id: ID
     role: Literal['user', 'assistant']
@@ -227,20 +236,12 @@ class PlanningMessage(StrictModel):
     presentation: AgentPresentation | None = None
     mode: Literal['local_tool_agent', 'local_agent_unavailable'] | None = None
     imported: bool = False
+    failure: AgentFailure | None = None
 
 
 class PlanningConversation(StrictModel):
     session_id: ID
     messages: list[PlanningMessage] = []
-
-
-class AgentFailure(StrictModel):
-    code: Literal['MODEL_TIMEOUT', 'MODEL_BUSY', 'MODEL_UNAVAILABLE', 'MODEL_INVALID_OUTPUT',
-                  'MODEL_VALIDATION_FAILED', 'WEATHER_UNAVAILABLE', 'DATE_MISMATCH']
-    retryable: bool
-    suggested_action: Literal['retry', 'wait_model', 'review_date', 'review_inputs']
-    selected_date: str | None = None
-    requested_date: str | None = None
 
 
 class AgentTimings(StrictModel):

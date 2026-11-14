@@ -14,6 +14,25 @@ from test_planning_agent import ask
 from test_energy_settings import energy, accept
 
 
+def test_structured_failure_survives_restart_without_inventing_retry_semantics(tmp_path):
+    from app.planning_models import SessionAgentResponse, AgentFailure
+    path = tmp_path / 'planning.json'
+    service, _ = service_for()
+    with TestClient(create_app(forecast_service=service, planning_state_path=path)) as client:
+        state = create(client)
+        store = client.app.state.planning
+        failure = AgentFailure(code='DATE_MISMATCH', retryable=False,
+            suggested_action='review_date', selected_date=state['planning_date'], requested_date='2026-11-13')
+        reply = SessionAgentResponse(mode='local_tool_agent', message='Please review the selected clinic day.',
+            needs_clarification=True, state=store.read(state['id']), failure=failure)
+        asyncio.run(store.record_turn(state['id'], 'Plan today at 10 AM.', reply))
+    with TestClient(create_app(forecast_service=service, planning_state_path=path)) as client:
+        messages=client.get(f"{BASE}/{state['id']}/conversation").json()['messages']
+        assert messages[-1]['failure']==failure.model_dump()
+        assert messages[0]['failure'] is None
+        assert client.get(f"{BASE}/{state['id']}").json()==state
+
+
 def test_restart_preserves_settings_activity_plan_and_idempotency(tmp_path):
     path = tmp_path / 'state' / 'planning.json'
     service, _ = service_for()
