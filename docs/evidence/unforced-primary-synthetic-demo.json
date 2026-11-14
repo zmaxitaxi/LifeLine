@@ -1,0 +1,620 @@
+{
+  "started_at": "2026-11-14T02:23:22.302602+00:00",
+  "implementation_commit": "3493063991072b5ab63b6f2ace8d73c825d02204",
+  "backend_uncommitted_changes": false,
+  "scope": "SYNTHETIC DEMO WEATHER; actual local Llama native choices and real existing physics. Not live forecast validation.",
+  "turns": [
+    {
+      "question": "Can our clinic safely operate tomorrow given the weather forecast?",
+      "seconds": 44.318156542256474,
+      "weather_calls": 1,
+      "http_status": 200,
+      "native_turns": [
+        {
+          "turn": {
+            "type": "tool_call",
+            "call": {
+              "index": 0,
+              "name": "recompute_clinic_plan",
+              "arguments": {
+                "include_recovery": "false",
+                "sunshine_factor": "1.0"
+              }
+            },
+            "content": ""
+          },
+          "seconds": 13.327514959033579,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ],
+          "prior_rejections": []
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "The clinic cannot safely operate tomorrow given the weather forecast. The optimized schedule under the modeled forecast and assumptions indicates that essential demand is not met, and all required essential and flexible work is not met. This does not establish real-world availability or clinical safety."
+          },
+          "seconds": 12.210077333729714,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ],
+          "prior_rejections": []
+        },
+        {
+          "turn": {
+            "type": "tool_call",
+            "call": {
+              "index": 0,
+              "name": "explain_current_plan",
+              "arguments": {}
+            },
+            "content": ""
+          },
+          "seconds": 10.786350457929075,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ],
+          "prior_rejections": [
+            "That attempt was rejected: An electrical model cannot establish clinical safety. Do not assert safety. Distinguish electrical shortfalls from clinical safety decisions. Use the current modeled result if one exists; otherwise the configured inputs already suffice for the calculator. Do not ask for known settings or replace the requested electrical assessment with a disclaimer. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "The clinic's electrical plan indicates that there will be an essential energy shortfall of 1.200 kWh tomorrow. The lowest battery level is expected to be 6.000 kWh."
+          },
+          "seconds": 7.914730332791805,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ],
+          "prior_rejections": [
+            "That attempt was rejected: An electrical model cannot establish clinical safety. Do not assert safety. Distinguish electrical shortfalls from clinical safety decisions. Use the current modeled result if one exists; otherwise the configured inputs already suffice for the calculator. Do not ask for known settings or replace the requested electrical assessment with a disclaimer. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ]
+        }
+      ],
+      "passed": true,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "The clinic's electrical plan indicates that there will be an essential energy shortfall of 1.200 kWh tomorrow. The lowest battery level is expected to be 6.000 kWh.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan",
+          "explain_current_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "a4b12c52-da70-40ef-bd7d-baf07a5ebdc0",
+        "user_message_id": "b0e0742e-7799-48b5-899a-7a699610186d"
+      },
+      "state": {
+        "id": "3ecfb0be-e453-40e1-858b-4873d2863c53",
+        "revision": 2,
+        "input_revision": 0,
+        "selected_clinic_id": "illustrative-conversation",
+        "clinic_name": "Illustrative native verification",
+        "location": {
+          "latitude": -0.0917,
+          "longitude": 34.768
+        },
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "clinic": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "max_discharge_kw": 0.4,
+          "scenario": "normal",
+          "equipment": [
+            {
+              "id": "evening",
+              "name": "Illustrative essential evening equipment",
+              "category": "critical",
+              "power_kw": 1.0,
+              "required_hours": [
+                19,
+                20
+              ]
+            }
+          ],
+          "weather_dataset": "synthetic"
+        },
+        "equipment_inventory": [
+          {
+            "id": "evening",
+            "name": "Illustrative essential evening equipment",
+            "category": "critical",
+            "power_kw": 1.0,
+            "required_hours": [
+              19,
+              20
+            ]
+          }
+        ],
+        "energy_settings": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "charge_efficiency": 0.95,
+          "discharge_efficiency": 0.95,
+          "max_charge_kw": 4.0,
+          "max_discharge_kw": 0.4,
+          "additional_critical_kw": 0.0
+        },
+        "current_battery_reading": null,
+        "energy_proposals": [],
+        "active_energy_proposal_id": null,
+        "confirmed_activities": [],
+        "proposals": [],
+        "active_proposal_id": null,
+        "plan_status": "current",
+        "plan_error": null,
+        "selected_recovery_intervention_id": null,
+        "sunshine_factor": 1.0,
+        "forecast_reference": {
+          "source": "LifeLine synthetic demo weather",
+          "data_kind": "synthetic_demo_weather",
+          "weather_mode": "demo",
+          "requested_location": {
+            "latitude": -0.0917,
+            "longitude": 34.768
+          },
+          "model_grid_location": {
+            "latitude": -0.0917,
+            "longitude": 34.768
+          },
+          "timezone": "Africa/Nairobi",
+          "retrieved_at": "2026-11-14T02:23:35.956295Z",
+          "expires_at": "2026-11-14T03:23:35.956295Z",
+          "cache_status": "cached",
+          "source_url": "https://github.com/zmaxitaxi/LifeLine/blob/main/docs/DEMO_WEATHER.md",
+          "attribution_url": "https://github.com/zmaxitaxi/LifeLine/blob/main/docs/DEMO_WEATHER.md",
+          "licence_url": "",
+          "interval_convention": "Assumed hourly mean W/m\u00b2, zero outside 06:00\u201318:00 in the declared demo timezone; kWh/m\u00b2 = W/m\u00b2 \u00f7 1000 for each one-hour slot.",
+          "days": [
+            {
+              "date": "2026-11-14",
+              "hours": [
+                {
+                  "start": "2026-11-14T00:00:00+03:00",
+                  "end": "2026-11-14T01:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T01:00:00+03:00",
+                  "end": "2026-11-14T02:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T02:00:00+03:00",
+                  "end": "2026-11-14T03:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T03:00:00+03:00",
+                  "end": "2026-11-14T04:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T04:00:00+03:00",
+                  "end": "2026-11-14T05:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T05:00:00+03:00",
+                  "end": "2026-11-14T06:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T06:00:00+03:00",
+                  "end": "2026-11-14T07:00:00+03:00",
+                  "shortwave_radiation_w_m2": 104.42095377604126,
+                  "irradiance_kwh_m2": 0.10442095377604126
+                },
+                {
+                  "start": "2026-11-14T07:00:00+03:00",
+                  "end": "2026-11-14T08:00:00+03:00",
+                  "shortwave_radiation_w_m2": 306.1467458920718,
+                  "irradiance_kwh_m2": 0.3061467458920718
+                },
+                {
+                  "start": "2026-11-14T08:00:00+03:00",
+                  "end": "2026-11-14T09:00:00+03:00",
+                  "shortwave_radiation_w_m2": 487.00914320697655,
+                  "irradiance_kwh_m2": 0.4870091432069765
+                },
+                {
+                  "start": "2026-11-14T09:00:00+03:00",
+                  "end": "2026-11-14T10:00:00+03:00",
+                  "shortwave_radiation_w_m2": 634.6826722329881,
+                  "irradiance_kwh_m2": 0.6346826722329881
+                },
+                {
+                  "start": "2026-11-14T10:00:00+03:00",
+                  "end": "2026-11-14T11:00:00+03:00",
+                  "shortwave_radiation_w_m2": 739.1036260090294,
+                  "irradiance_kwh_m2": 0.7391036260090295
+                },
+                {
+                  "start": "2026-11-14T11:00:00+03:00",
+                  "end": "2026-11-14T12:00:00+03:00",
+                  "shortwave_radiation_w_m2": 793.1558890990483,
+                  "irradiance_kwh_m2": 0.7931558890990483
+                },
+                {
+                  "start": "2026-11-14T12:00:00+03:00",
+                  "end": "2026-11-14T13:00:00+03:00",
+                  "shortwave_radiation_w_m2": 793.1558890990483,
+                  "irradiance_kwh_m2": 0.7931558890990483
+                },
+                {
+                  "start": "2026-11-14T13:00:00+03:00",
+                  "end": "2026-11-14T14:00:00+03:00",
+                  "shortwave_radiation_w_m2": 739.1036260090294,
+                  "irradiance_kwh_m2": 0.7391036260090295
+                },
+                {
+                  "start": "2026-11-14T14:00:00+03:00",
+                  "end": "2026-11-14T15:00:00+03:00",
+                  "shortwave_radiation_w_m2": 634.6826722329881,
+                  "irradiance_kwh_m2": 0.6346826722329881
+                },
+                {
+                  "start": "2026-11-14T15:00:00+03:00",
+                  "end": "2026-11-14T16:00:00+03:00",
+                  "shortwave_radiation_w_m2": 487.0091432069767,
+                  "irradiance_kwh_m2": 0.4870091432069767
+                },
+                {
+                  "start": "2026-11-14T16:00:00+03:00",
+                  "end": "2026-11-14T17:00:00+03:00",
+                  "shortwave_radiation_w_m2": 306.1467458920719,
+                  "irradiance_kwh_m2": 0.3061467458920719
+                },
+                {
+                  "start": "2026-11-14T17:00:00+03:00",
+                  "end": "2026-11-14T18:00:00+03:00",
+                  "shortwave_radiation_w_m2": 104.42095377604159,
+                  "irradiance_kwh_m2": 0.10442095377604159
+                },
+                {
+                  "start": "2026-11-14T18:00:00+03:00",
+                  "end": "2026-11-14T19:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T19:00:00+03:00",
+                  "end": "2026-11-14T20:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T20:00:00+03:00",
+                  "end": "2026-11-14T21:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T21:00:00+03:00",
+                  "end": "2026-11-14T22:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T22:00:00+03:00",
+                  "end": "2026-11-14T23:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-14T23:00:00+03:00",
+                  "end": "2026-11-15T00:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                }
+              ],
+              "simulation_supported": true,
+              "warnings": [
+                "SYNTHETIC DEMO WEATHER: assumed clear-day irradiation and sample temperatures, not observations or a live forecast. The declared demo timezone is Africa/Nairobi; these conditions are not a geographic weather prediction."
+              ]
+            },
+            {
+              "date": "2026-11-15",
+              "hours": [
+                {
+                  "start": "2026-11-15T00:00:00+03:00",
+                  "end": "2026-11-15T01:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T01:00:00+03:00",
+                  "end": "2026-11-15T02:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T02:00:00+03:00",
+                  "end": "2026-11-15T03:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T03:00:00+03:00",
+                  "end": "2026-11-15T04:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T04:00:00+03:00",
+                  "end": "2026-11-15T05:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T05:00:00+03:00",
+                  "end": "2026-11-15T06:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T06:00:00+03:00",
+                  "end": "2026-11-15T07:00:00+03:00",
+                  "shortwave_radiation_w_m2": 104.42095377604126,
+                  "irradiance_kwh_m2": 0.10442095377604126
+                },
+                {
+                  "start": "2026-11-15T07:00:00+03:00",
+                  "end": "2026-11-15T08:00:00+03:00",
+                  "shortwave_radiation_w_m2": 306.1467458920718,
+                  "irradiance_kwh_m2": 0.3061467458920718
+                },
+                {
+                  "start": "2026-11-15T08:00:00+03:00",
+                  "end": "2026-11-15T09:00:00+03:00",
+                  "shortwave_radiation_w_m2": 487.00914320697655,
+                  "irradiance_kwh_m2": 0.4870091432069765
+                },
+                {
+                  "start": "2026-11-15T09:00:00+03:00",
+                  "end": "2026-11-15T10:00:00+03:00",
+                  "shortwave_radiation_w_m2": 634.6826722329881,
+                  "irradiance_kwh_m2": 0.6346826722329881
+                },
+                {
+                  "start": "2026-11-15T10:00:00+03:00",
+                  "end": "2026-11-15T11:00:00+03:00",
+                  "shortwave_radiation_w_m2": 739.1036260090294,
+                  "irradiance_kwh_m2": 0.7391036260090295
+                },
+                {
+                  "start": "2026-11-15T11:00:00+03:00",
+                  "end": "2026-11-15T12:00:00+03:00",
+                  "shortwave_radiation_w_m2": 793.1558890990483,
+                  "irradiance_kwh_m2": 0.7931558890990483
+                },
+                {
+                  "start": "2026-11-15T12:00:00+03:00",
+                  "end": "2026-11-15T13:00:00+03:00",
+                  "shortwave_radiation_w_m2": 793.1558890990483,
+                  "irradiance_kwh_m2": 0.7931558890990483
+                },
+                {
+                  "start": "2026-11-15T13:00:00+03:00",
+                  "end": "2026-11-15T14:00:00+03:00",
+                  "shortwave_radiation_w_m2": 739.1036260090294,
+                  "irradiance_kwh_m2": 0.7391036260090295
+                },
+                {
+                  "start": "2026-11-15T14:00:00+03:00",
+                  "end": "2026-11-15T15:00:00+03:00",
+                  "shortwave_radiation_w_m2": 634.6826722329881,
+                  "irradiance_kwh_m2": 0.6346826722329881
+                },
+                {
+                  "start": "2026-11-15T15:00:00+03:00",
+                  "end": "2026-11-15T16:00:00+03:00",
+                  "shortwave_radiation_w_m2": 487.0091432069767,
+                  "irradiance_kwh_m2": 0.4870091432069767
+                },
+                {
+                  "start": "2026-11-15T16:00:00+03:00",
+                  "end": "2026-11-15T17:00:00+03:00",
+                  "shortwave_radiation_w_m2": 306.1467458920719,
+                  "irradiance_kwh_m2": 0.3061467458920719
+                },
+                {
+                  "start": "2026-11-15T17:00:00+03:00",
+                  "end": "2026-11-15T18:00:00+03:00",
+                  "shortwave_radiation_w_m2": 104.42095377604159,
+                  "irradiance_kwh_m2": 0.10442095377604159
+                },
+                {
+                  "start": "2026-11-15T18:00:00+03:00",
+                  "end": "2026-11-15T19:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T19:00:00+03:00",
+                  "end": "2026-11-15T20:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T20:00:00+03:00",
+                  "end": "2026-11-15T21:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T21:00:00+03:00",
+                  "end": "2026-11-15T22:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T22:00:00+03:00",
+                  "end": "2026-11-15T23:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                },
+                {
+                  "start": "2026-11-15T23:00:00+03:00",
+                  "end": "2026-11-16T00:00:00+03:00",
+                  "shortwave_radiation_w_m2": 0.0,
+                  "irradiance_kwh_m2": 0.0
+                }
+              ],
+              "simulation_supported": true,
+              "warnings": [
+                "SYNTHETIC DEMO WEATHER: assumed clear-day irradiation and sample temperatures, not observations or a live forecast. The declared demo timezone is Africa/Nairobi; these conditions are not a geographic weather prediction."
+              ]
+            }
+          ],
+          "warnings": [
+            "SYNTHETIC DEMO WEATHER: assumed clear-day irradiation and sample temperatures, not observations or a live forecast. The declared demo timezone is Africa/Nairobi; these conditions are not a geographic weather prediction."
+          ]
+        },
+        "computed_plan": {
+          "input_revision": 0,
+          "generation": 1,
+          "sunshine_factor": 1.0,
+          "computed_at": "2026-11-14T02:23:35.979107Z",
+          "simulation": {
+            "effective_config": {
+              "battery_capacity_kwh": 8.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "equipment": [
+              {
+                "id": "evening",
+                "name": "Illustrative essential evening equipment",
+                "category": "critical",
+                "power_kw": 1.0,
+                "required_hours": [
+                  19,
+                  20
+                ]
+              }
+            ],
+            "comparison": {
+              "same_flexible_work_completed": true,
+              "battery_preserved_at_midnight_kwh": 1.7763568394002505e-15,
+              "minimum_battery_improvement_kwh": -1.7763568394002505e-15,
+              "evening_minimum_improvement_kwh": 8.881784197001252e-16,
+              "conversion_loss_reduction_kwh": -1.1102230246251565e-16,
+              "heuristic_matches_optimizer_metrics": true
+            },
+            "status": "CRITICAL_SHORTAGE",
+            "input_provenance": {
+              "equipment": "user_entered_unverified",
+              "weather": "LifeLine_synthetic_demo_weather",
+              "model": "Horizontal irradiance approximation; reduced-sunshine factor applied once; preset cloud curve replaced.",
+              "initial_battery": "Operator assumption at selected day\u2019s local midnight; not a carried-forward prediction."
+            },
+            "metrics": {
+              "baseline": {
+                "total_solar_kwh": 7.354845672518775,
+                "critical_requested_kwh": 2.0,
+                "critical_unserved_kwh": 1.2,
+                "critical_coverage_pct": 40.0,
+                "min_soc_kwh": 6.0,
+                "final_soc_kwh": 7.157894736842104,
+                "flexible_requested_kwh": 0.0,
+                "flexible_served_kwh": 0.0,
+                "flexible_deferred_kwh": 0.0,
+                "curtailed_kwh": 5.249582514624039,
+                "conversion_loss_kwh": 0.1473684210526316,
+                "critical_shortage_hours": [
+                  19,
+                  20
+                ],
+                "reserve_breach_boundaries": []
+              },
+              "heuristic": {
+                "total_solar_kwh": 7.354845672518775,
+                "critical_requested_kwh": 2.0,
+                "critical_unserved_kwh": 1.2,
+                "critical_coverage_pct": 40.0,
+                "min_soc_kwh": 6.0,
+                "final_soc_kwh": 7.157894736842104,
+                "flexible_requested_kwh": 0.0,
+                "flexible_served_kwh": 0.0,
+                "flexible_deferred_kwh": 0.0,
+                "curtailed_kwh": 5.249582514624039,
+                "conversion_loss_kwh": 0.1473684210526316,
+                "critical_shortage_hours": [
+                  19,
+                  20
+                ],
+                "reserve_breach_boundaries": []
+              },
+              "optimized": {
+                "total_solar_kwh": 7.354845672518775,
+                "critical_requested_kwh": 2.0,
+                "critical_unserved_kwh": 1.2,
+                "critical_coverage_pct": 40.0,
+                "min_soc_kwh": 5.999999999999998,
+                "final_soc_kwh": 7.157894736842106,
+                "flexible_requested_kwh": 0.0,
+                "flexible_served_kwh": 0.0,
+                "flexible_deferred_kwh": 0.0,
+                "curtailed_kwh": 5.249582514624038,
+                "conversion_loss_kwh": 0.1473684210526317,
+                "critical_shortage_hours": [
+                  19,
+                  20
+                ],
+                "reserve_breach_boundaries": []
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "passed": true
+}
