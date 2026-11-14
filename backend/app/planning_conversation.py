@@ -294,8 +294,6 @@ def validate_grounded_prose(message, facts, selected, *, enforce_topics=True, na
             continue
         kinds = option_kinds(sentence)
         candidates = [key for key in selected if key.startswith('option_') and any(kind in key for kind in kinds)]
-        if len(candidates) > 1 and len(kinds) > 1:
-            raise PlanningError('INVALID_ACTIVITY', 'Use a separate numerical sentence for each tested alternative.')
         if candidates:
             # Bind a mentioned hypothetical size to its own tested result, not
             # every candidate of that kind (which may have different deficits).
@@ -307,12 +305,24 @@ def validate_grounded_prose(message, facts, selected, *, enforce_topics=True, na
                     for value,unit,_,_ in numbers if unit!='date') for known,known_unit,_,_ in targets):
                     sized.append(key)
             if sized:
-                candidates=sized
+                candidates=[key for kind in kinds for key in
+                    ([item for item in sized if item.startswith('option_'+kind)] or
+                     [item for item in candidates if item.startswith('option_'+kind)])]
+            if len(kinds)>1:
+                # Shared-outcome comparisons are valid only when EVERY named
+                # tested option agrees. Different outcomes need separate claims.
+                for value,unit,start,end in numbers:
+                    role=quantity_role(sentence,start,end)
+                    if unit!='kwh' or role not in ('essential_unserved','battery_minimum','flexible_unfinished'):
+                        continue
+                    if not all(any(source_unit==unit and abs(value-original)<=1e-6 and
+                        quantity_role(facts[key],a,b)==role for original,source_unit,a,b in quantities(facts[key])[0]) for key in candidates):
+                        raise PlanningError('INVALID_ACTIVITY','Use a separate numerical sentence for alternatives with different modeled outcomes.')
             allowed = [entry for key in candidates for entry in quantities(facts[key])[0]]
             # Baseline battery/reserve explanations are not hardware-option claims.
             baseline = bool(re.search(r'lowest|minimum|reserve|current|existing|baseline',sentence,re.I))
-            if not baseline and not all(any(unit == source_unit and (value == original if unit=='date' else abs(value-original)<=1e-6)
-                    for original,source_unit,_,_ in allowed) for value,unit,_,_ in numbers):
+            if not baseline and not all(unit in ('date','local_hour') or any(unit == source_unit and abs(value-original)<=1e-6
+                    for original,source_unit,_,_ in allowed if source_unit!='date') for value,unit,_,_ in numbers):
                 raise PlanningError('INVALID_ACTIVITY', 'The stated option quantities do not match that computed alternative.')
         role_sources = candidates or [key for key in selected if not key.startswith('option_')]
         if natural and not candidates:

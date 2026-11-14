@@ -63,11 +63,14 @@ def test_output_and_storage_options_bind_their_own_tested_size_and_result():
         assert validate_reply_content(criteria,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==criteria
         negative='The tested battery capacity alternative at 10 kWh did not resolve the modeled essential shortfall of 1.200 kWh.'
         assert validate_reply_content(negative,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==negative
+        shared='A test battery of 10 kWh and a test solar array of 2 kW each leave 1.200 kWh of essential shortfall.'
+        assert validate_reply_content(shared,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==shared
         for message in ('Under the current baseline and optimized schedules, 1.200 kWh of essential evening demand (19:00 and 20:00) goes unserved.',
                         'I can compare a larger battery output limit or a larger battery capacity to see whether either closes the 1.200 kWh gap.'):
             assert validate_reply_content(message,parsed,'Explain the result.',('recompute_clinic_plan',))==message
         for bad in ('The tested battery output alternative at 0.9 kW meets the modeled essential demand.',
-                    'The tested battery output alternative at 1.4 kW leaves 0.200 kWh of essential shortfall.'):
+                    'The tested battery output alternative at 1.4 kW leaves 0.200 kWh of essential shortfall.',
+                    'A test output of 1.4 kW and a test solar array of 2 kW each leave 0.000 kWh of essential shortfall.'):
             with pytest.raises(PlanningError):
                 validate_reply_content(bad,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))
         option=next(o for o in parsed.computed_plan.recovery.options if o.kind=='output' and o.config.max_discharge_kw==1.4)
