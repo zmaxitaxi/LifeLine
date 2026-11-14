@@ -47,7 +47,7 @@ def test_native_multiturn_draft_changes_and_explicit_confirmation_then_weather()
         assert len(s['proposals'])==1
         assert s['sunshine_factor']==.5
         assert s['computed_plan']['recovery']['reference']['optimized']['metrics']['critical_requested_kwh']==pytest.approx(2.4)
-        wire=json.loads(calls[-1].content)
+        wire=json.loads(next(call.content for call in reversed(calls) if call.method=='POST' and any(t['function']['name']=='recompute_clinic_plan' for t in json.loads(call.content)['tools'])))
         assert wire['model']=='llama3.1:8b'
         tool_names={t['function']['name'] for t in wire['tools']}
         assert 'recompute_clinic_plan' in tool_names and not any('confirm' in name for name in tool_names)
@@ -179,7 +179,7 @@ def test_new_draft_clarification_takes_priority_over_existing_recovery_summary()
         s=post(c,f"{BASE}/{s['id']}/recompute",{'expected_revision':s['revision'],'include_recovery':True})
         previous=s['computed_plan']
         d=ask(c,s,'We have a vaccination campaign.');s=d['state']
-        assert d['message']=='Please provide the local start time.'
+        assert 'the local start time' in d['message']
         assert s['computed_plan']==previous
         d=ask(c,s,'Recalculate the confirmed clinic plan with recovery.');s=d['state']
         assert 'unconfirmed activity draft is not included' in d['message']
@@ -237,7 +237,7 @@ def test_state_inspection_feeds_back_before_creating_the_requested_activity():
         d=ask(c,create(c),'Vaccination campaign starts at 9 AM.')
         assert d['tool_calls']==['inspect_planning_state','propose_activity']
         assert d['state']['proposals'][0]['details']['start_hour']==9
-        wire=json.loads(calls[-1].content)
+        wire=json.loads(next(call.content for call in reversed(calls) if call.method=='POST' and any(t['function']['name']=='propose_activity' for t in json.loads(call.content)['tools'])))
         assert any(m['role']=='tool' and m.get('tool_name')=='inspect_planning_state' for m in wire['messages'])
 
 

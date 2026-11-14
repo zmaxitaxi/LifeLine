@@ -37,8 +37,19 @@ class ProposedEquipment(StrictModel):
     required_hours: list[Hour] | None = None
     max_power_kw: Annotated[float, Field(gt=0, le=100)] | None = None
     required_energy_kwh: Annotated[float, Field(gt=0)] | None = None
+    required_duration_hours: Annotated[int, Field(ge=1, le=24)] | None = None
     allowed_hours: list[Hour] | None = None
     divisible: Literal[True] | None = None
+
+    @model_validator(mode='after')
+    def consistent_rated_duration(self):
+        if self.category=='flexible' and self.max_power_kw is not None and self.required_duration_hours is not None and self.required_energy_kwh is not None:
+            if abs(self.required_energy_kwh-self.max_power_kw*self.required_duration_hours)>1e-6:
+                raise ValueError('Energy must agree with the explicitly supplied rated power and operating duration')
+        if self.category=='critical' and self.required_duration_hours is not None and self.required_hours is not None:
+            if len(self.required_hours)!=self.required_duration_hours:
+                raise ValueError('Fixed required hours must agree with the explicitly supplied duration')
+        return self
 
 
 class ActivityDraft(StrictModel):
