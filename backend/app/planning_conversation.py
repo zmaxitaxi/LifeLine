@@ -470,7 +470,7 @@ def _qualified_coverage(state,sentence,message,calls):
     plan=state.computed_plan
     if state.plan_status!='current' or plan is None or plan.input_revision!=state.input_revision:
         return False
-    if not re.search(r'\b(?:model(?:ed|led)?|simulation|simulated|calculated|forecast|assumptions?|tested)\b',message,re.I):
+    if not re.search(r'\b(?:model(?:ed|led)?|simulation|simulated|calculated|forecast|assumptions?|tested|optimized schedule|optimised schedule|current plan shows)\b',message,re.I):
         return False
     contexts=[]
     recovery=plan.recovery
@@ -499,7 +499,7 @@ def _qualified_coverage(state,sentence,message,calls):
         else:
             essential,unfinished=metrics.critical_unserved_kwh,metrics.flexible_deferred_kwh
         return essential<=1e-6 and (essential_only or unfinished<=1e-6)
-    negative=bool(re.search(r'\bnot\s+(?:fully\s+)?(?:met|covered|supplied|sufficient|enough)\b|\b(?:does not|cannot|can.t)\s+(?:meet|cover|supply)\b',sentence,re.I))
+    negative=bool(re.search(r'\bnot\s+(?:have\s+)?(?:fully\s+)?(?:met|covered|supplied|sufficient|enough)\b|\b(?:does not|cannot|can.t)\s+(?:meet|cover|supply)\b',sentence,re.I))
     return bool(contexts) and all(covered(metrics)!=negative for metrics in contexts)
 
 
@@ -515,7 +515,7 @@ def _non_operational_guards(message,state,calls):
         conditional=bool(re.search(r'\b(?:if|suppose|hypothetical|could|might|may|depends)\b',sentence,re.I))
         question=sentence.rstrip().endswith('?')
         if re.search(r'\bsafe(?:ly)?\b',sentence,re.I) and not uncertain and not question:
-            raise PlanningError('INVALID_ACTIVITY','An electrical model cannot establish clinical safety. Do not assert safety. The configured clinic inputs are already available: you can still use the calculator to assess requested energy coverage rather than ask for known settings or replace the requested comparison with a disclaimer.')
+            raise PlanningError('INVALID_ACTIVITY','An electrical model cannot establish clinical safety. Do not assert safety. Distinguish electrical shortfalls from clinical safety decisions. Use the current modeled result if one exists; otherwise the configured inputs already suffice for the calculator. Do not ask for known settings or replace the requested electrical assessment with a disclaimer.')
         availability=re.search(r'\b(?:we|you|(?:the|our|your|this)\s+clinic)\s+(?:have|has|will have)\s+(?:enough|sufficient|adequate)\b|\b(?:the|our|your|this)\s+battery\s+(?:will|can)\s+(?:last|power|supply|run)\b|\b(?:electricity|power|energy)\s+(?:is|will be)\s+(?:enough|sufficient|adequate)\b|\ball\s+(?:loads|needs|requirements)\s+(?:are|will be)\s+(?:met|covered|supplied)\b|\beverything is fine\b',sentence,re.I)
         modeled_claim=re.search(r'\b(?:covers?|meets?|supplies)\b.*\b(?:essential|critical|protected|all)\b.*\b(?:needs?|demand|loads?|requirements?)\b|\b(?:essential|critical|protected)\b.*\b(?:needs?|demand|loads?|requirements?)\b.*\b(?:met|covered|supplied)\b|\b(?:resolves?|solves?|eliminates?)\b.*\b(?:shortage|shortfall|deficit)\b',sentence,re.I)
         future_battery=re.search(r'\bbattery\s+(?:will|can)\s+(?:last|power|supply|run)\b',sentence,re.I)

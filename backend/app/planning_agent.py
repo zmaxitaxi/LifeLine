@@ -30,7 +30,7 @@ class CorrectTimeTool(StrictModel):
 
 class RecomputeTool(StrictModel):
     sunshine_factor: Annotated[float, Field(ge=0, le=1)] = 1.
-    include_recovery: bool = False
+    include_recovery: bool = Field(default=False, description='Set true to investigate tested recovery alternatives such as output, battery or solar changes when the user requests alternatives; false calculates the existing and optimized schedules only.')
 
 
 PROMPT = """You are LifeLine, a local assistant helping clinic staff plan activities and electricity.

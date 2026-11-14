@@ -98,8 +98,8 @@ def main():
             for question in ('Hello, how are things?','What can you help me do here?',
                 'Could more battery storage help? I am just discussing an unevaluated idea, not asking for a calculation yet.') if 'conversation' in sections else ():
                 state=ask(state,question,no_change)
-            state=ask(state,'Can our clinic safely operate tomorrow given the weather forecast? Please compare only relevant modeled alternatives.',
-                lambda current,before,data,calls:current['plan_status']=='current' and bool(current['computed_plan'].get('recovery')) and calls>=1 and len(data['presentation']['option_ids'])<len(current['computed_plan']['recovery']['options']))
+            state=ask(state,'Can our clinic safely operate tomorrow given the weather forecast?',
+                lambda current,before,data,calls:current['plan_status']=='current' and calls>=1 and 'recompute_clinic_plan' in data['tool_calls'] and 'kWh' in data['message'])
             if state.get('computed_plan') and state['computed_plan'].get('recovery') and ('conversation' in sections or 'selected' in sections):
                 option=max((o for o in state['computed_plan']['recovery']['options'] if o['kind']=='output'),key=lambda item:item['config']['max_discharge_kw'])
                 response=client.post(f"/api/planning/sessions/{state['id']}/recovery-selection",json={'expected_revision':state['revision'],

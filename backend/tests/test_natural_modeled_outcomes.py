@@ -112,3 +112,18 @@ def test_selected_explanation_resolves_explicit_baseline_before_implicit_selecte
             assert validate_reply_content(message,state,'Explain selected plan.',['explain_current_plan'])==message
         else:
             with pytest.raises(PlanningError):validate_reply_content(message,state,'Explain selected plan.',['explain_current_plan'])
+
+
+@pytest.mark.parametrize('shortage', [False, True])
+def test_current_plan_negative_have_enough_uses_verified_shortfall(shortage):
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as client:
+        body=initial()
+        if shortage:
+            body['midnight_battery_kwh']=0.;body['clinic']|={'pv_capacity_kw':0.,'initial_battery_kwh':0.}
+        state=checked_state(client,post(client,BASE,body))
+        message='The current plan shows that the clinic will not have enough energy to meet its essential needs tomorrow.'
+        if shortage:
+            assert validate_reply_content(message,state,'Explain the result.',['explain_current_plan'])==message
+        else:
+            with pytest.raises(PlanningError):validate_reply_content(message,state,'Explain the result.',['explain_current_plan'])
