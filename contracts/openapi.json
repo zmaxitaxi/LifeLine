@@ -4199,6 +4199,19 @@
             ],
             "title": "Required Energy Kwh"
           },
+          "required_duration_hours": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 24.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Required Duration Hours"
+          },
           "allowed_hours": {
             "anyOf": [
               {

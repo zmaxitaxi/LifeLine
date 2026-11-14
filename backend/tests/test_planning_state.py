@@ -55,6 +55,58 @@ def test_returned_clinic_configuration_matches_the_strict_public_contract():
         assert fresh['equipment_inventory']==state['equipment_inventory']
 
 
+def test_flexible_duration_converts_to_energy_in_python_after_review_without_double_demand():
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as c:
+        s=create(c)
+        s=propose(c,s,equipment_ids=['new-fan'],additional_equipment=[{'id':'new-fan','name':'Optional fan',
+            'category':'flexible','max_power_kw':.3,'required_duration_hours':2,'allowed_hours':[10,11,12],
+            'divisible':True}])
+        assert not s['proposals'][0]['missing_fields']
+        assert not any(e['id']=='new-fan' for e in s['equipment_inventory'])
+        s=confirm(c,s)
+        equipment=next(e for e in s['equipment_inventory'] if e['id']=='new-fan')
+        assert equipment['required_energy_kwh']==pytest.approx(.6)
+        assert s['computed_plan']['simulation']['optimized']['metrics']['flexible_requested_kwh']==pytest.approx(1.6)
+        assert len([e for e in s['equipment_inventory'] if e['id']=='new-fan'])==1
+
+
+def test_flexible_duration_never_guesses_a_rating_or_conflicting_energy_requirement():
+    service,weather=service_for()
+    with TestClient(create_app(forecast_service=service)) as c:
+        s=create(c)
+        extra={'id':'new-fan','name':'Optional fan','category':'flexible','required_duration_hours':2,
+            'allowed_hours':[10,11,12],'divisible':True}
+        s=propose(c,s,equipment_ids=['new-fan'],additional_equipment=[extra])
+        assert 'additional_equipment.0.max_power_kw' in s['proposals'][0]['missing_fields']
+        r=c.post(f"{BASE}/{s['id']}/proposals/{s['active_proposal_id']}/confirm",json={
+            'expected_revision':s['revision'],'idempotency_key':'missing-rating'})
+        assert r.status_code==422 and not weather
+        r=c.patch(f"{BASE}/{s['id']}/proposals/{s['active_proposal_id']}",json={
+            'expected_revision':s['revision'],'details':{'additional_equipment':[extra|{'max_power_kw':.3,'required_energy_kwh':9.}]}})
+        assert r.status_code==422
+
+
+def test_reviewed_flexible_work_duration_changes_one_requirement_not_device_count_or_essential_loads():
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as c:
+        s=create(c)
+        equipment={'id':'new-fan','name':'Optional fan','category':'flexible','max_power_kw':.3,
+            'required_duration_hours':2,'allowed_hours':[10,11,12],'divisible':True}
+        s=propose(c,s,equipment_ids=['new-fan'],additional_equipment=[equipment]);s=confirm(c,s)
+        activity=s['confirmed_activities'][0]
+        s=post(c,f"{BASE}/{s['id']}/proposals",{'expected_revision':s['revision'],
+            'target_activity_id':activity['id'],'details':{'additional_equipment':[equipment|{'required_duration_hours':3}]}})
+        before=next(e for e in s['equipment_inventory'] if e['id']=='new-fan')
+        assert before['required_energy_kwh']==pytest.approx(.6)
+        s=confirm(c,s,key='reviewed-three-hours')
+        assert len(s['confirmed_activities'])==1 and s['confirmed_activities'][0]['version']==2
+        assert len(s['equipment_inventory'])==3
+        assert next(e for e in s['equipment_inventory'] if e['id']=='new-fan')['required_energy_kwh']==pytest.approx(.9)
+        assert s['computed_plan']['simulation']['optimized']['metrics']['critical_requested_kwh']==pytest.approx(2.4)
+        assert s['computed_plan']['simulation']['optimized']['metrics']['flexible_requested_kwh']==pytest.approx(1.9)
+
+
 def propose(client,state,**changes):
     return post(client,f"{BASE}/{state['id']}/proposals",{'expected_revision':state['revision'],'details':details(**changes)})
 

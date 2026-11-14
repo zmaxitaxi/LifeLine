@@ -31,7 +31,12 @@ def merge_draft(previous, patch):
 
 def equipment_from_draft(item):
     values = item.model_dump(exclude_none=True)
+    duration=values.pop('required_duration_hours',None)
     if item.category == 'flexible':
+        if item.required_energy_kwh is None and item.max_power_kw is not None and duration is not None:
+            # Dimensional conversion only: kW × hours = kWh. The operator must
+            # explicitly designate interruptible work; no device cycle inferred.
+            values['required_energy_kwh']=item.max_power_kw*duration
         values['baseline_allocations'] = []
         return FlexibleEquipment.model_validate(values)
     return CriticalEquipment.model_validate(values)
@@ -43,8 +48,10 @@ def missing_fields(details):
     for n, item in enumerate(details.additional_equipment):
         required = ('category',) if item.category is None else (
             ('power_kw', 'required_hours') if item.category == 'critical' else
-            ('max_power_kw', 'required_energy_kwh', 'allowed_hours', 'divisible'))
+            ('max_power_kw', 'allowed_hours', 'divisible'))
         missing.extend(f'additional_equipment.{n}.{field}' for field in required if getattr(item, field) is None)
+        if item.category=='flexible' and item.required_energy_kwh is None and item.required_duration_hours is None:
+            missing.append(f'additional_equipment.{n}.required_duration_hours')
     return missing
 
 
@@ -61,7 +68,10 @@ def validate_activity(details, state, *, complete=True, target=None):
     for item in details.additional_equipment:
         if item.id in inventory:
             old = next((e for e in target.details.additional_equipment if e.id == item.id), None) if target else None
-            if old != item:
+            work_only_revision = bool(old and old.category==item.category=='flexible' and all(
+                getattr(old,field)==getattr(item,field) for field in type(item).model_fields
+                if field not in ('required_duration_hours','required_energy_kwh')))
+            if old != item and not work_only_revision:
                 raise PlanningError('INVALID_ACTIVITY', 'Use an existing equipment reference; confirmed equipment specifications cannot be replaced.')
         try:
             parsed = equipment_from_draft(item)
