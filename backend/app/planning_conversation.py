@@ -106,7 +106,8 @@ def fact_references(state, calls):
             raise PlanningError('STALE_RESULT','The selected comparison does not belong to the current result.',409)
         m = selected.metrics
         facts['selected_option'] = (f'The exact selected comparison is {selected.label}. Its remaining essential shortfall is {m.essential_unserved_kwh:.3f} kWh, '
-            f'original flexible work unfinished is {m.flexible_unfinished_kwh:.3f} kWh, and lowest stored battery energy is {m.minimum_battery_kwh:.3f} kWh.')
+            f'original flexible work unfinished is {m.flexible_unfinished_kwh:.3f} kWh, and lowest stored battery energy is {m.minimum_battery_kwh:.3f} kWh. '
+            f'Reserve target: {selected.config.reserve_kwh:.3f} kWh.')
         changes = ', '.join(f'{c.field.replace("_", " ")}: {c.before:g} {c.unit} to {c.after:g} {c.unit}' for c in selected.infrastructure_changes)
         if changes:
             facts['selected_option'] += ' Hypothetical selected changes: ' + changes + '.'
@@ -121,7 +122,8 @@ def fact_references(state, calls):
             m = option.metrics
             changes = ', '.join(f'{change.field.replace("_", " ")}: {change.before:g} {change.unit} to {change.after:g} {change.unit}' for change in option.infrastructure_changes)
             text = (f'Tested option: {option.label}. It leaves {m.essential_unserved_kwh:.3f} kWh of essential energy unserved '
-                f'and {m.flexible_unfinished_kwh:.3f} kWh of original flexible work unfinished; the lowest battery level is {m.minimum_battery_kwh:.3f} kWh.')
+                f'and {m.flexible_unfinished_kwh:.3f} kWh of original flexible work unfinished; the lowest battery level is {m.minimum_battery_kwh:.3f} kWh. '
+                f'Reserve target: {option.config.reserve_kwh:.3f} kWh.')
             if changes:
                 text += ' Hypothetical changes: ' + changes + '.'
             if m.explicitly_postponed_kwh:
@@ -182,9 +184,15 @@ def quantity_role(text, start, end):
     entries, _ = quantities(text)
     previous = max((b for _,unit,a,b in entries if b <= start and unit not in ('date','local_hour')), default=0)
     following = min((a for _,unit,a,b in entries if a >= end and unit not in ('date','local_hour')), default=len(text))
+    if re.fullmatch(r'\s*\(\s*(?:(?:up|down)\s+)?from\s*',text[previous:start],re.I):
+        earlier=next(((a,b) for _,_,a,b in entries if b==previous),None)
+        if earlier:
+            return quantity_role(text,*earlier)
     left = re.split(r'(?<=[.!?])\s+|;|,|\band\b|\bwhile\b', re.sub(r'\([^)]*\)','',text[previous:start]), flags=re.I)[-1][-70:]
     right = re.split(r'(?<=[.!?])\s+|;|,|\band\b|\bwhile\b', re.sub(r'\([^)]*\)','',text[end:following]), flags=re.I)[0][:70]
     clause = (left + ' ' + right).lower()
+    if re.search(r'lowest|minimum',left,re.I) and re.search(r'battery|stored',left,re.I) and not re.search(r'reserve',left,re.I):
+        return 'battery_minimum'
     if 'reserve' in clause:
         return 'reserve'
     if re.search(r'\b(?:unserved|unmet|shortfall|shortage|deficit|gap)\b',clause):
@@ -209,6 +217,9 @@ def quantity_role(text, start, end):
 def option_kinds(sentence):
     output=bool(re.search(r'\b(?:output|inverter|discharge)\b',sentence,re.I))
     battery=bool(re.search(r'\b(?:battery|storage)\b',sentence,re.I))
+    storage_option=bool(re.search(r'\b(?:battery\s+(?:capacity|size|storage|test|option|alternative)|storage\s+(?:capacity|size|test|option)|test\s+battery|kwh\s+battery)\b|\bbattery\s*:\s*\d',sentence,re.I))
+    if battery and not storage_option and re.search(r'\b(?:lowest|minimum|reserve|stored|level)\b',sentence,re.I):
+        battery=False  # A solar option's battery metric is not a storage upgrade.
     # "Battery output" describes output power, not an additional storage option.
     if output and not re.search(r'\b(?:battery capacity|storage capacity|storage size)\b',sentence,re.I):
         battery=False
@@ -392,6 +403,7 @@ def synthesis_data(state, facts):
                 'remaining_unserved_essential_energy':f'{m.essential_unserved_kwh:.3f} kWh',
                 'flexible_unfinished':f'{m.flexible_unfinished_kwh:.3f} kWh',
                 'lowest_stored_energy':f'{m.minimum_battery_kwh:.3f} kWh',
+                'reserve_target':f'{selected.config.reserve_kwh:.3f} kWh',
                 'essential_requirements_configured':m.essential_requested_kwh>1e-6,
                 'modeled_essential_demand_met':m.essential_requested_kwh>1e-6 and m.essential_unserved_kwh<=1e-6,
                 'hypothetical_changes':[{'field':c.field,'before':f'{c.before:g} {c.unit}','after':f'{c.after:g} {c.unit}'} for c in selected.infrastructure_changes]}
@@ -406,6 +418,7 @@ def synthesis_data(state, facts):
                 'remaining_unserved_essential_energy':f'{m.essential_unserved_kwh:.3f} kWh',
                 'flexible_unfinished':f'{m.flexible_unfinished_kwh:.3f} kWh',
                 'lowest_stored_energy':f'{m.minimum_battery_kwh:.3f} kWh',
+                'reserve_target':f'{option.config.reserve_kwh:.3f} kWh',
                 'essential_requirements_configured':m.essential_requested_kwh>1e-6,
                 'modeled_essential_demand_met':m.essential_requested_kwh>1e-6 and m.essential_unserved_kwh<=1e-6,
                 'hypothetical_changes':[{
@@ -505,7 +518,8 @@ def collect_reply_facts(state, calls=(), question=''):
                 m=option.metrics
                 changes=' '.join(f'{c.field}: {c.before:g} {c.unit} to {c.after:g} {c.unit}.' for c in option.infrastructure_changes)
                 facts[key]=(f'Tested {option.kind} option {option.label}: essential shortfall {m.essential_unserved_kwh:.3f} kWh; '
-                    f'flexible work unfinished {m.flexible_unfinished_kwh:.3f} kWh; lowest battery {m.minimum_battery_kwh:.3f} kWh. '+changes)
+                    f'flexible work unfinished {m.flexible_unfinished_kwh:.3f} kWh; lowest battery {m.minimum_battery_kwh:.3f} kWh. '
+                    f'Reserve target: {option.config.reserve_kwh:.3f} kWh. '+changes)
         comparison=state.computed_plan.simulation.comparison
         facts['scheduling_comparison']=(f'Existing to optimized final battery change: {comparison.battery_preserved_at_midnight_kwh:.3f} kWh. '
             f'Minimum battery improvement: {comparison.minimum_battery_improvement_kwh:.3f} kWh. Conversion loss reduction: {comparison.conversion_loss_reduction_kwh:.3f} kWh. '
@@ -532,7 +546,7 @@ def _qualified_coverage(state,sentence,message,calls):
     plan=state.computed_plan
     if state.plan_status!='current' or plan is None or plan.input_revision!=state.input_revision:
         return False
-    if not re.search(r'\b(?:model(?:ed|led)?|simulation|simulated|calculated|forecast|assumptions?|tested|optimized schedule|optimised schedule|current plan shows)\b',message,re.I):
+    if not re.search(r'\b(?:model(?:s|ed|led)?|simulation|simulated|calculated|forecast|assumptions?|tested|optimized schedule|optimised schedule|current plan shows)\b',message,re.I):
         return False
     contexts=[]
     recovery=plan.recovery
@@ -557,7 +571,12 @@ def _qualified_coverage(state,sentence,message,calls):
             contexts=[option.metrics for option in (sized or candidates)]
     else:
         contexts=[plan.simulation.baseline.metrics]
-    essential_only=bool(re.search(r'\b(?:essential|critical|protected)\b',sentence,re.I)) and not re.search(r'\b(?:all loads|all needs|all requirements|flexible)\b',sentence,re.I)
+    # A contrast can truthfully say essential demand is met BUT flexible work
+    # remains unfinished. Check those claims independently against the same
+    # exact option; mentioning flexible work must not relabel essential coverage.
+    clauses=re.split(r'\bbut\b',sentence,maxsplit=1,flags=re.I)
+    coverage_scope=clauses[0]
+    essential_only=bool(re.search(r'\b(?:essential|critical|protected)\b',coverage_scope,re.I)) and not re.search(r'\b(?:all loads|all needs|all requirements|flexible)\b',coverage_scope,re.I)
     def covered(metrics):
         if hasattr(metrics,'essential_unserved_kwh'):
             essential,unfinished=metrics.essential_unserved_kwh,metrics.flexible_unfinished_kwh
@@ -566,8 +585,16 @@ def _qualified_coverage(state,sentence,message,calls):
         return essential<=1e-6 and (essential_only or unfinished<=1e-6)
     if any(getattr(metrics,'essential_requested_kwh',getattr(metrics,'critical_requested_kwh',0.))<=1e-6 for metrics in contexts):
         return False  # Missing requirements do not establish coverage or shortage.
-    negative=bool(re.search(r'\bnot\s+(?:have\s+)?(?:fully\s+)?(?:met|covered|supplied|sufficient|enough|resolved|solved|eliminated)\b|\b(?:does not|did not|do not|cannot|can.t)\s+(?:meet|cover|supply|resolve|solve|eliminate)\b',sentence,re.I))
-    return bool(contexts) and all(covered(metrics)!=negative for metrics in contexts)
+    negative=bool(re.search(r'\bnot\s+(?:have\s+)?(?:fully\s+)?(?:met|covered|supplied|sufficient|enough|resolved|solved|eliminated)\b|\b(?:does not|did not|do not|cannot|can.t)\s+(?:meet|cover|supply|resolve|solve|eliminate)\b',coverage_scope,re.I))
+    if not contexts or not all(covered(metrics)!=negative for metrics in contexts):
+        return False
+    if len(clauses)>1 and re.search(r'\bflexible\b',clauses[1],re.I):
+        remaining=[getattr(m,'flexible_unfinished_kwh',getattr(m,'flexible_deferred_kwh',0.)) for m in contexts]
+        if re.search(r'\b(?:unfinished|deferred|unserved|unmet)\b|\bnot\b.*\b(?:all|complete|completed|met|covered|supplied)\b',clauses[1],re.I):
+            return all(value>1e-6 for value in remaining)
+        if re.search(r'\b(?:complete|completed|finished|met|covered|supplied)\b',clauses[1],re.I):
+            return all(value<=1e-6 for value in remaining)
+    return True
 
 
 def without_clinical_denials(text):

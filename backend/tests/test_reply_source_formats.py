@@ -10,6 +10,29 @@ from test_planning_state import create, post, BASE
 from test_weather_forecast import service_for
 
 
+def test_essential_coverage_is_distinct_from_unfinished_flexible_work_and_reserve():
+    from app.demo_weather import DemoWeatherService
+    with TestClient(create_app(forecast_service=DemoWeatherService())) as client:
+        forecast=client.get('/api/forecast?latitude=-0.0917&longitude=34.768').json()
+        state=post(client,BASE,{'selected_clinic_id':'source-regression','clinic_name':'Illustrative source regression',
+            'location':{'latitude':-.0917,'longitude':34.768},'timezone':forecast['timezone'],
+            'planning_date':forecast['days'][1]['date'],'midnight_battery_kwh':6.,'clinic':{'scenario':'scheduling'}})
+        state=post(client,f"{BASE}/{state['id']}/recompute",{'expected_revision':state['revision'],'sunshine_factor':.5,'include_recovery':True})
+        parsed=model_state(state)
+        messages=(
+            'A test battery capacity of 10 kWh meets modeled essential demand but leaves 2.100 kWh of flexible work unfinished.',
+            'A test battery storage capacity of 10 kWh (up from 8 kWh) models essential demand as met but leaves 2.100 kWh of flexible work unfinished, with lowest stored energy at 4.172 kWh.',
+            'A test solar capacity of 3.5 kW has a lowest stored battery level of 4.975 kWh above its 4.800 kWh reserve target.',
+        )
+        for message in messages:
+            assert validate_reply_content(message,parsed,'Compare recovery options.',('recompute_clinic_plan',))==message
+        for bad in ('A test battery capacity of 10 kWh meets modeled essential demand and all flexible requirements.',
+                    'A test battery capacity of 10 kWh meets modeled essential demand but all flexible work is completed.',
+                    'A test solar capacity of 3.5 kW has a lowest stored battery level of 4.800 kWh above its 4.800 kWh reserve target.'):
+            with pytest.raises(PlanningError):
+                validate_reply_content(bad,parsed,'Compare recovery options.',('recompute_clinic_plan',))
+
+
 def model_state(value):
     return PlanningState.model_validate_json(json.dumps(value))
 
