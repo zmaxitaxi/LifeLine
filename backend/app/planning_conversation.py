@@ -364,6 +364,10 @@ def synthesis_data(state, facts):
 def collect_reply_facts(state, calls=(), question=''):
     """Facts constrain claims; they do not prescribe which topics to discuss."""
     facts={}
+    if state.plan_status=='failed':
+        facts['calculation_status']=('The latest calculation failed. No current verified result is available. '
+            +('Live forecast retrieval is unavailable; its underlying cause is not established by this status. ' if state.plan_error=='FORECAST_UNAVAILABLE' else 'The calculation failure code is '+str(state.plan_error)+'. ')
+            +'Do not infer a settings or data conflict. Session calculations require real Open-Meteo weather; no synthetic fallback was used.')
     if state.active_proposal_id:
         facts.update(fact_references(state,['review_activity_proposal'])[0])
     config=state.energy_settings
@@ -453,7 +457,7 @@ def reply_context(state,calls=(),question=''):
     # synthesis_data's exact variants supplement the full source catalog.
     return {'state_revision':state.revision,'input_revision':state.input_revision,
         'generation':state.computed_plan.generation if state.computed_plan else None,
-        'plan_status':state.plan_status,'selected_option_id':state.selected_recovery_intervention_id,
+        'plan_status':state.plan_status,'plan_error':state.plan_error,'selected_option_id':state.selected_recovery_intervention_id,
         'facts':data,'active_draft':next((p.model_dump(mode='json') for p in state.proposals if p.id==state.active_proposal_id),None),
         'active_energy_proposal':next((p.model_dump(mode='json') for p in state.energy_proposals if p.id==state.active_energy_proposal_id),None)}
 
