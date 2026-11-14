@@ -4,20 +4,14 @@ import { tmpdir } from "node:os";
 import { open, seed, read, calculate, say, overview, assistant, weatherFailure } from "./support/planning";
 test.beforeEach(() => weatherFailure(false)); test.afterEach(() => weatherFailure(false));
 
-test("the overview fills the workspace with four equal desktop quadrants", async ({ page, request }) => {
-  const errors: string[] = [];page.on('pageerror', error => errors.push(error.message));
-  await page.setViewportSize({ width:1280,height:900 });
-  await open(page, await calculate(request, await seed(request))); await overview(page).click(); await expect(overview(page)).toHaveAttribute("aria-current","page");
-  const panels = page.locator(".overview-grid > .overview-square"); await expect(panels).toHaveCount(4);
-  const boxes = await panels.evaluateAll(elements => elements.map(e => { const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}; }));
-  for (const box of boxes) {expect(Math.abs(box.width-boxes[0].width)).toBeLessThan(2);expect(Math.abs(box.height-boxes[0].height)).toBeLessThan(2);}
-  const grid=await page.locator('.overview-grid').boundingBox();expect(grid!.width).toBeGreaterThan(1180);expect(boxes[3].y+boxes[3].height).toBeGreaterThan(860);expect(boxes[3].y+boxes[3].height).toBeLessThan(900);
-  await expect(page.getByRole('slider',{name:'Simulation time',exact:true})).toBeVisible();await expect(page.getByRole('radio',{name:'Current plan',exact:true})).toBeVisible();
-  expect(Math.abs(boxes[0].y-boxes[1].y)).toBeLessThan(2); expect(boxes[2].y).toBeGreaterThan(boxes[0].y); expect(Math.abs(boxes[2].y-boxes[3].y)).toBeLessThan(2);
-  for (const name of ["Activities & Equipment","Weather","Battery & Energy","Plans"]) await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
-  await expect(page.getByRole("button",{name:"Add equipment",exact:true})).toBeVisible();
-  await expect(page).toHaveTitle('LifeLine — Clinic energy planner');await expect(page.locator('vite-error-overlay')).toHaveCount(0);expect(errors).toEqual([]);
-  await page.screenshot({path:join(tmpdir(),"lifeline-four-square-overview.png")});
+test("the overview puts the decision and next action before energy evidence",async({page,request})=>{
+ await page.setViewportSize({width:1280,height:900});await open(page,await calculate(request,await seed(request)));await overview(page).click();
+ const outlook=page.getByRole('region',{name:'Will we have enough electricity?',exact:true});const plans=page.getByRole('region',{name:'Plans',exact:true});const energy=page.getByRole('region',{name:'Energy through the day',exact:true});
+ for(const element of [outlook,plans,energy])await expect(element).toBeVisible();
+ const boxes=await Promise.all([outlook,plans,energy].map(e=>e.boundingBox()));expect(boxes[0]!.y).toBeLessThan(boxes[1]!.y);expect(boxes[1]!.y).toBeLessThan(boxes[2]!.y);
+ const chart=await page.locator('.energy-chart-column').boundingBox(),battery=await page.locator('.energy-battery-side').boundingBox();expect(battery!.x).toBeGreaterThan(chart!.x);expect(Math.abs(chart!.y-battery!.y)).toBeLessThan(2);
+ await expect(page.getByRole('navigation',{name:'Primary navigation'}).getByRole('link')).toHaveCount(2);await expect(page.getByRole('button',{name:'Add activity',exact:true})).toBeVisible();await expect(page.locator('vite-error-overlay')).toHaveCount(0);
+ await page.screenshot({path:join(tmpdir(),'lifeline-decision-first-overview.png')});
 });
 
 test("page navigation preserves the conversation and unsent message", async ({ page, request }) => {
@@ -44,8 +38,7 @@ test("equipment can be entered and reviewed in Overview without requiring the LL
 
 test("mobile panels stack and equipment form supports keyboard and unknown ratings", async ({ page, request }) => {
   await page.setViewportSize({width:375,height:812}); await open(page,await seed(request)); await overview(page).focus(); await page.keyboard.press("Enter"); await expect(overview(page)).toHaveAttribute("aria-current","page");
-  const boxes=await page.locator(".overview-square").evaluateAll(elements=>elements.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
-  for (let index=0;index<boxes.length;index++){expect(boxes[index].height).toBe(520);if(index)expect(boxes[index].y).toBeGreaterThan(boxes[index-1].y);}
+  const panels=await page.locator('.overview-context-panels > section').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width};}));expect(panels[1].y).toBeGreaterThan(panels[0].y);expect(Math.abs(panels[0].x-panels[1].x)).toBeLessThan(2);
   await page.getByRole("button",{name:"Add equipment",exact:true}).focus(); await page.keyboard.press("Enter"); const dialog=page.getByRole("dialog",{name:"Add clinic equipment",exact:true});
   await expect(dialog.getByRole("textbox",{name:"Equipment name",exact:true})).toBeFocused(); await page.keyboard.press("Escape"); await expect(dialog).toBeHidden(); await expect(page.getByRole("button",{name:"Add equipment",exact:true})).toBeFocused();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -61,13 +54,12 @@ test("equipment is visible, scrollable and opens details without changing the pl
   expect((await read(request,state.id)).revision).toBe(state.revision);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
-test("the in-app preview width keeps all four panels in view",async({page,request})=>{
-  await page.setViewportSize({width:631,height:955});await open(page,await calculate(request,await seed(request)));await overview(page).click();await expect(overview(page)).toHaveAttribute('aria-current','page');
-  const boxes=await page.locator('.overview-square').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
-  expect(boxes[1].x).toBeGreaterThan(boxes[0].x);expect(boxes[2].y).toBeGreaterThan(boxes[0].y);expect(boxes[3].y+boxes[3].height).toBeLessThan(955);
-  const energy=page.getByRole('region',{name:'Battery & Energy',exact:true});const play=await energy.getByRole('button',{name:'Play battery playback',exact:true}).boundingBox();expect(play!.y+play!.height).toBeLessThan(boxes[2].y+boxes[2].height);
-  const ticks=await page.locator('.battery-time-labels span:visible').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right};}));for(let i=1;i<ticks.length;i++)expect(ticks[i].left).toBeGreaterThanOrEqual(ticks[i-1].right-1);
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:join(tmpdir(),'lifeline-preview-four-panels.png')});
+test("the in-app preview stacks chart and battery without horizontal overflow",async({page,request})=>{
+ await page.setViewportSize({width:631,height:955});await open(page,await calculate(request,await seed(request)));await overview(page).click();
+ await expect(page.locator('.energy-chart-column')).toBeVisible();
+ const chart=await page.locator('.energy-chart-column').boundingBox(),battery=await page.locator('.energy-battery-side').boundingBox();expect(battery!.y).toBeGreaterThan(chart!.y);
+ const slider=page.getByRole('slider',{name:'Simulation time',exact:true});await slider.focus();await slider.press('End');await expect(page.getByLabel('Selected simulation time',{exact:true})).toHaveText('24:00');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:join(tmpdir(),'lifeline-preview-energy.png')});
 });
 
 test("flexible equipment asks for device hours and the backend derives its energy after review",async({page,request})=>{

@@ -92,9 +92,7 @@ export async function open(page: Page, state: PlanningState) {
     state.id,
   );
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: "How can LifeLine help today?", exact: true }),
-  ).toBeVisible();
+  await expect(page.locator('.clinic-context-row strong')).toHaveText(state.clinic_name);
   await expect(
     page.getByRole("textbox", { name: "Message LifeLine", exact: true }),
   ).toBeEditable();
@@ -104,7 +102,7 @@ export async function say(page: Page, question: string) {
     .getByRole("textbox", { name: "Message LifeLine", exact: true })
     .fill(question);
   const response = page.waitForResponse(
-    (r) => /\/agent$/.test(r.url()) && r.request().method() === "POST",
+    (r) => /\/agent(?:\/stream)?$/.test(r.url()) && r.request().method() === "POST",
   );
   await page.getByRole("button", { name: "Send message", exact: true }).click();
   const received = await response;

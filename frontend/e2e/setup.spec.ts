@@ -3,10 +3,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { apiBase,seed,read,say } from './support/planning';
 
+test.beforeEach(async({page})=>{await page.clock.setFixedTime(new Date('2026-11-13T09:00:00Z'));});
+
 async function locationStep(page:Page){
  await page.getByRole('textbox',{name:'Clinic name',exact:true}).fill('Community clinic');
  await page.getByRole('combobox',{name:'Clinic location',exact:true}).selectOption('kisumu');
- await page.getByLabel('Which day are you planning?',{exact:true}).fill('2026-11-14');
  await page.getByRole('button',{name:'Continue to electrical setup',exact:true}).click();
 }
 async function save(page:Page){await page.getByRole('button',{name:'Review setup',exact:true}).click();await page.getByRole('checkbox',{name:'I have reviewed the inputs and model assumptions.',exact:true}).check();}
@@ -18,6 +19,7 @@ test('first launch asks for the clinic without creating an example or calling pl
  await expect(page.getByRole('textbox',{name:'Clinic name',exact:true})).toHaveValue('');
  await expect(page.getByRole('link',{name:'Skip to clinic setup',exact:true})).toHaveAttribute('href','#setup-name');
  await expect(page.getByRole('combobox',{name:'Clinic location',exact:true})).toHaveValue('');
+ await expect(page.locator('input[type=date]')).toHaveCount(0);
  await expect(page.getByText('Battery may run too low',{exact:true})).toHaveCount(0);
  await expect(page.getByTestId('current-plan-summary')).toHaveCount(0);expect(posts).toBe(0);
  await page.screenshot({path:join(tmpdir(),'lifeline-setup-first-launch.png')});

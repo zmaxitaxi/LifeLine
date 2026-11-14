@@ -23,7 +23,7 @@ test("planning stays focused and alternatives appear only when the model explici
 
 test("no tool result is shown before the final model response",async({page,request})=>{
   const initial=await seed(request); await open(page,initial); const computed=await calculate(request,initial);
-  await page.route("**/api/planning/sessions/*/agent",async route=>{await new Promise(resolve=>setTimeout(resolve,700));await route.fulfill({json:{mode:"local_tool_agent",model:"llama3.1:8b",message:"Here is the plan I reviewed for your clinic. Please review the equipment times and the calculated alternatives below.",needs_clarification:false,clarification_fields:[],tool_calls:["recompute_clinic_plan"],presentation:{kind:"calculation",input_revision:computed.input_revision,generation:computed.computed_plan!.generation,option_ids:[],show_schedule:true},message_id:null,user_message_id:null,state:computed}});});
+  await page.route("**/api/planning/sessions/*/agent/stream",async route=>{await new Promise(resolve=>setTimeout(resolve,700));await route.fulfill({json:{mode:"local_tool_agent",model:"llama3.1:8b",message:"Here is the plan I reviewed for your clinic. Please review the equipment times and the calculated alternatives below.",needs_clarification:false,clarification_fields:[],tool_calls:["recompute_clinic_plan"],presentation:{kind:"calculation",input_revision:computed.input_revision,generation:computed.computed_plan!.generation,option_ids:[],show_schedule:true},message_id:null,user_message_id:null,state:computed}});});
   await page.getByRole("textbox",{name:"Message LifeLine",exact:true}).fill("Plan our electricity"); await page.getByRole("button",{name:"Send message",exact:true}).click();
   await expect(page.locator(".live-activity")).toContainText("preparing your response"); await expect(page.getByTestId("current-plan-summary")).toHaveCount(0); await expect(page.getByRole("button",{name:"What LifeLine checked",exact:true})).toHaveCount(0);
   await expect(page.locator(".assistant-message")).toContainText("Here is the plan I reviewed"); await expect(page.getByTestId("current-plan-summary")).toBeVisible();
@@ -37,7 +37,7 @@ test("later calculations preserve earlier plans in labeled conversation history"
 
 test("model failure offers retry and never substitutes deterministic planning replies",async({page,request})=>{
   const state=await seed(request); await open(page,state); let direct=0;page.on("request",r=>{if(r.url().endsWith("/recompute"))direct++;});
-  await page.route("**/api/planning/sessions/*/agent",route=>route.fulfill({json:{mode:"local_agent_unavailable",model:null,message:"Internal provider detail",needs_clarification:true,clarification_fields:[],tool_calls:[],state}}));
+  await page.route("**/api/planning/sessions/*/agent/stream",route=>route.fulfill({json:{mode:"local_agent_unavailable",model:null,message:"Internal provider detail",needs_clarification:true,clarification_fields:[],tool_calls:[],state}}));
   await page.getByRole("button",{name:"Plan our electricity",exact:true}).click(); await expect(page.getByRole("button",{name:"Retry reply",exact:true})).toBeVisible(); await expect(page.getByTestId("current-plan-summary")).toHaveCount(0);expect(direct).toBe(0);
   await expect(page.getByText("Internal provider detail",{exact:true})).toHaveCount(0);
 });
@@ -54,16 +54,17 @@ test("draft rejection does not change confirmed electricity requirements",async(
 
 test("a selected alternative can be explained in chat without resetting its energy calculation",async({page,request})=>{
   const state=await calculate(request,await seed(request));await open(page,state);await page.getByRole('link',{name:'Clinic Overview',exact:true}).click();
+  await page.getByRole('button',{name:/All calculated plans/}).click();
   const chosen=state.computed_plan!.recovery!.options.filter(o=>o.kind==='output').at(-1)!;
   await page.locator(`input[name="clinic-plan"][value="${chosen.id}"]`).click();await expect(page.locator(`input[name="clinic-plan"][value="${chosen.id}"]`)).toBeChecked();
-  await page.getByRole('button',{name:'Ask about this plan',exact:true}).click();await expect(page.getByTestId('current-plan-summary')).toHaveAttribute('data-selection-id',chosen.id);await expect(page.locator('.inline-alternative')).toHaveCount(0);
+  await page.getByRole('button',{name:'Ask LifeLine about this plan',exact:true}).click();await expect(page.getByTestId('current-plan-summary')).toHaveAttribute('data-selection-id',chosen.id);await expect(page.locator('.inline-alternative')).toHaveCount(0);
   const after=await read(request,state.id);expect(after.selected_recovery_intervention_id).toBe(chosen.id);expect(after.computed_plan!.generation).toBe(state.computed_plan!.generation);
 });
 
 test("long model replies keep author text separate on a phone",async({page,request})=>{
   await page.setViewportSize({width:375,height:812});const state=await seed(request);await open(page,state);
   const message='Let’s review what you need for your clinic day. '.repeat(12);
-  await page.route('**/api/planning/sessions/*/agent',route=>route.fulfill({json:{mode:'local_tool_agent',model:'llama3.1:8b',message,needs_clarification:false,clarification_fields:[],tool_calls:['conversational_reply'],state}}));
+  await page.route('**/api/planning/sessions/*/agent/stream',route=>route.fulfill({json:{mode:'local_tool_agent',model:'llama3.1:8b',message,needs_clarification:false,clarification_fields:[],tool_calls:['conversational_reply'],state}}));
   await say(page,'Hello');const answer=page.locator('.assistant-message').last();await expect(answer.locator('.assistant-text')).toHaveText(message.trim());
   const author=await answer.locator('.message-author').boundingBox();const prose=await answer.locator('.assistant-text').boundingBox();expect(prose!.y).toBeGreaterThan(author!.y+author!.height);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

@@ -26,7 +26,7 @@ test("sample weather and calculated evidence carry explicit demo labels",async({
   // Presentation-only transport fixtures: all energy values still come from the real calculation.
   await page.route('**/api/weather/mode',route=>route.fulfill({json:{mode:'demo',label:'Demo weather',description:'Synthetic sample conditions'}}));
   await page.route('**/api/weather/outlook?**',async route=>{const response=await route.fetch();const data=await response.json();data.weather_mode='demo';data.data_kind='synthetic_demo_weather';data.source='LifeLine synthetic demo weather';await route.fulfill({json:data});});
-  await page.route(`**/api/planning/sessions/${state.id}/agent`,async route=>{const response=await route.fetch();const data=await response.json();if(data.state.computed_plan)data.state.computed_plan.weather_mode='demo';await route.fulfill({json:data});});
+  await page.route(`**/api/planning/sessions/${state.id}/agent/stream`,async route=>{const response=await route.fetch();const data=(await response.text()).split('\n').filter(s=>s.startsWith('data: ')).map(s=>JSON.parse(s.slice(6))).find(e=>e.type==='result').response;if(data.state.computed_plan)data.state.computed_plan.weather_mode='demo';await route.fulfill({json:data});});
   await open(page,state);await say(page,'Calculate recovery plans for the clinic.');
   await expect(page.getByTestId('current-plan-summary')).toContainText('demo-weather simulation · not a live forecast');
   await showOverview(page);
@@ -36,7 +36,7 @@ test("sample weather and calculated evidence carry explicit demo labels",async({
   await expect(weather.getByLabel('Seven sample weather days')).toBeVisible();
   await expect(weather.getByTestId('weather-energy')).toContainText('Demo-weather simulation');
   await expect(page.getByTestId('battery-playback')).toContainText('demo-weather simulation · not a live forecast');
-  await expect(page.getByRole('region',{name:'Plans',exact:true})).toContainText('Demo-weather simulation');
+  await expect(page.getByRole('region',{name:'Energy through the day',exact:true})).toContainText('Simulated with sample weather');
   await weather.getByRole('button',{name:'Weather details',exact:true}).click();
   await expect(weather).toContainText('not observations or a prediction for this clinic');
   await expect(weather.getByRole('link',{name:'LifeLine synthetic demo weather'})).toHaveCount(0);
@@ -54,7 +54,7 @@ test("weather outages are brief and retry restores the real weekly feed",async({
 });
 
 test("selecting a calculated plan updates both energy and changed assumptions without new simulation",async({page,request})=>{
-  const state=await calculate(request,await seed(request));await open(page,state);await showOverview(page);
+  const state=await calculate(request,await seed(request));await open(page,state);await showOverview(page);await page.getByRole('button',{name:/All calculated plans/}).click();
   await expect(page.locator('input[name="clinic-plan"][value="existing"]')).toBeChecked();await expect(page.getByTestId('optimized-battery')).toHaveCount(0);
   const solar=state.computed_plan!.recovery!.options.find(o=>o.kind==='solar')!;await page.locator(`input[name="clinic-plan"][value="${solar.id}"]`).click();await expect(page.getByTestId('optimized-battery')).toHaveAttribute('data-energy-kwh',String(solar.plan.hourly[0].soc_start_kwh));
   const next=await read(request,state.id);expect(next.selected_recovery_intervention_id).toBe(solar.id);expect(next.computed_plan!.generation).toBe(state.computed_plan!.generation);
@@ -62,7 +62,7 @@ test("selecting a calculated plan updates both energy and changed assumptions wi
 });
 
 test("the selected battery scenario uses its own capacity at all hourly boundaries",async({page,request})=>{
-  const state=await calculate(request,await seed(request));await open(page,state);await showOverview(page);const option=state.computed_plan!.recovery!.options.find(o=>o.kind==='battery')!;
+  const state=await calculate(request,await seed(request));await open(page,state);await showOverview(page);await page.getByRole('button',{name:/All calculated plans/}).click();const option=state.computed_plan!.recovery!.options.find(o=>o.kind==='battery')!;
   await page.locator(`input[name="clinic-plan"][value="${option.id}"]`).click();
   const slider=page.getByRole('slider',{name:'Simulation time',exact:true});await slider.focus();await slider.press('Home');
   for(let hour=0;hour<=24;hour++){
@@ -87,7 +87,7 @@ test("a failed new calculation clears old plan evidence and retry goes through t
 
 test("empty energy is distinct from reserve risk and reduced motion disables fill transitions",async({page,request})=>{
   const state=await calculate(request,await seed(request,{midnight_battery_kwh:0}));expect(state.computed_plan!.simulation.baseline.metrics.critical_unserved_kwh).toBeGreaterThan(0);await page.emulateMedia({reducedMotion:'reduce'});await open(page,state);await showOverview(page);
-  await expect(page.getByRole('region',{name:'Plans',exact:true})).toContainText('Essential equipment may lose power');await expect(page.getByTestId('existing-battery')).toContainText('Essential equipment is short');
+  await expect(page.getByRole('region',{name:'Will we have enough electricity?',exact:true})).toContainText('Essential equipment may lose power');await expect(page.getByTestId('existing-battery')).toContainText('Essential equipment is short');
   expect((await page.locator('.battery-fill').evaluateAll(els=>els.map(el=>getComputedStyle(el).transitionDuration))).every(value=>value==='0s')).toBe(true);
 });
 
@@ -105,6 +105,7 @@ test("weather date and hour selections show actual computed solar and do not inv
     await weather.getByRole('button',{name:`${String(hour).padStart(2,'0')}:00`,exact:true}).click();
     await expect(weather.getByTestId('weather-solar')).toHaveText(`${state.computed_plan!.simulation.baseline.hourly[hour].pv_kwh.toFixed(3)} kWh`);
   }
+  await page.getByRole('button',{name:/All calculated plans/}).click();
   const solar=state.computed_plan!.recovery!.options.find(o=>o.kind==='solar')!;
   await page.locator(`input[name="clinic-plan"][value="${solar.id}"]`).click();
   await weather.getByRole('button',{name:'12:00',exact:true}).click();await expect(weather.getByTestId('weather-solar')).toHaveText(`${state.computed_plan!.simulation.baseline.hourly[12].pv_kwh.toFixed(3)} kWh → ${solar.plan.hourly[12].pv_kwh.toFixed(3)} kWh selected`);

@@ -2,6 +2,7 @@
 The real session API, compiler, simulator, optimizer and validators remain active.
 """
 import json
+import asyncio
 import os
 import re
 from pathlib import Path
@@ -168,4 +169,9 @@ def handler(request):
         name = 'recompute_clinic_plan'
     return wire(name, details or ({'include_recovery':True} if name == 'recompute_clinic_plan' else {}))
 
-app = create_app(forecast_service=TestWeather(), outlook_service=TestOutlook(), agent_service=LocalAgent(transport=httpx.MockTransport(handler)))
+async def async_handler(request):
+    if request.url.path == '/api/chat' and b'Observe streamed progress' in request.content:
+        await asyncio.sleep(.4)  # Test-only provider latency, never a real inference benchmark.
+    return handler(request)
+
+app = create_app(forecast_service=TestWeather(), outlook_service=TestOutlook(), agent_service=LocalAgent(transport=httpx.MockTransport(async_handler)))

@@ -24,7 +24,8 @@ import { ActivityConfirmation } from "@/features/planning/ActivityConfirmation";
 import { ActivitiesSection } from "@/features/planning/ActivitiesSection";
 import { WeatherSection } from "@/features/planning/WeatherSection";
 import { SolutionsSection } from "@/features/planning/SolutionsSection";
-import { BatterySummary } from "@/features/planning/BatterySummary";
+import { EnergyDay } from "@/features/planning/EnergyDay";
+import { PlanOutlook } from "@/features/planning/PlanOutlook";
 import { AddEquipment } from "@/features/planning/AddEquipment";
 import { ActivityWorkspace, type ActivitySelection } from "@/features/planning/ActivityWorkspace";
 import { EnergySettingsWorkspace, type EnergySelection } from "@/features/planning/EnergySettingsWorkspace";
@@ -34,6 +35,8 @@ import { InlinePlan } from "@/features/planning/InlinePlan";
 import { restoreMessages, resultAttachment, type ChatMessage } from "@/features/planning/conversation-view";
 import { EnergySettingsReview } from "@/features/planning/EnergySettingsReview";
 import { ClinicSetup } from "@/features/planning/ClinicSetup";
+import { askStream } from "@/features/planning/agent-stream";
+import { failureLabel,progressLabel } from "@/features/planning/agent-feedback";
 const toolLabels: Record<string, string> = {
   conversational_reply: "Answered your message",
   explain_current_plan: "Reviewed the selected plan",
@@ -65,6 +68,10 @@ export default function App() {
   const [weatherMode, setWeatherMode] = useState<WeatherRuntimeMode | null>(null);
   const [narrationPending, setNarrationPending] = useState(false);
   const [replyReady, setReplyReady] = useState(true);
+  const [agentProgress,setAgentProgress]=useState('');
+  const clientTurn=useRef<{progress:boolean;finished:boolean;committed:boolean;ok:boolean}|null>(null);
+  useLayoutEffect(()=>{const t=clientTurn.current;if(agentProgress&&t&&!t.progress){t.progress=true;performance.mark('lifeline.progress.committed');performance.measure('lifeline.first_progress_commit','lifeline.request.started','lifeline.progress.committed');}},[agentProgress]);
+  useLayoutEffect(()=>{const t=clientTurn.current;if(t?.finished&&!t.committed){t.committed=true;performance.mark('lifeline.reply.committed');performance.measure(t.ok?'lifeline.answer_commit':'lifeline.error_commit','lifeline.request.started','lifeline.reply.committed');}},[messages]);
   const [locations, setLocations] = useState<
     { name: string; latitude: number; longitude: number }[]
   >([]);
@@ -127,23 +134,27 @@ export default function App() {
   async function say(question: string, showUser = true) {
     if (!question.trim() || busy || historyLoading || !session.stateRef.current) return;
     following.current = true;
+    for(const name of ['lifeline.request.started','lifeline.progress.committed','lifeline.reply.committed'])performance.clearMarks(name);
+    for(const name of ['lifeline.first_progress_commit','lifeline.answer_commit','lifeline.error_commit'])performance.clearMeasures(name);
+    performance.mark('lifeline.request.started');clientTurn.current={progress:false,finished:false,committed:false,ok:false};
     setText("");
     setReplyReady(false);
+    setAgentProgress('');
     const optimisticUserId = showUser ? addMessage({ role: "user", text: question }) : undefined;
     const response = await session.run(
       "LifeLine is preparing your response…",
-      (s) => planningApi.ask(s, question),
+      (s) => askStream(s, question,event=>setAgentProgress(progressLabel(event))),
       (r) => r.state,
     );
     if(response?.user_message_id && optimisticUserId)setMessages(items=>items.map(item=>item.id === optimisticUserId ? {...item,id:response.user_message_id!} : item));
-    if (response?.mode === "local_tool_agent") {
+    if (response && ["local_tool_agent","cloud_tool_agent"].includes(response.mode)) {
       addMessage({role:"assistant",text:response.message,tools:response.tool_calls,presentation:response.presentation,...resultAttachment(response.presentation,response.state)},response.message_id ?? undefined);
       setReplyReady(true);
     } else if (response) {
       addMessage({
         role: "notice",
-        text: "The local assistant couldn’t finish this reply. Please retry.",
-        retryQuestion: question,
+        text: failureLabel(response.failure),
+        retryQuestion: !response.failure || response.failure.retryable ? question : undefined,
         presentation: response.presentation,
       },response.message_id ?? undefined);
     } else {
@@ -153,6 +164,8 @@ export default function App() {
         retryQuestion: question,
       });
     }
+    setAgentProgress('');
+    if(clientTurn.current){clientTurn.current.finished=true;clientTurn.current.ok=Boolean(response&&['local_tool_agent','cloud_tool_agent'].includes(response.mode));}
     requestAnimationFrame(() => input.current?.focus());
   }
   function requestPlan(question = planQuestion) {
@@ -295,7 +308,7 @@ export default function App() {
           <div>
             <strong>
               {busy || narrationPending
-                ? busy || "LifeLine is preparing your response…"
+                ? agentProgress || busy || "LifeLine is preparing your response…"
                 : session.weatherLoading && !currentWeather
                   ? "Checking weather…"
                   : currentWeather
@@ -514,7 +527,7 @@ export default function App() {
           </Button>
         </form>
         <p className="chat-composer-note">
-          Local AI · Don’t enter patient information.
+          {agent?.provider ?? "AI assistant"} · Don’t enter patient information.
         </p>
       </div>
     </>
@@ -523,55 +536,15 @@ export default function App() {
     <>
       {errorUI}
       {planFailure}
-      <div className="overview-grid">
-        <ActivitiesSection
-          state={state}
-          busy={Boolean(busy)}
-          onChat={focusChat}
-          onActivity={setActivitySelection}
-        onAddEquipment={() => setEquipmentOpen(true)}
-        />
-        <WeatherSection location={state.location} date={state.planning_date} computed={computed} selected={selected} />
-        <section
-          data-overview-section="energy"
-          className="overview-section overview-square"
-          aria-labelledby="energy-title"
-          tabIndex={0}
-        >
-          <div className="panel-heading"><h2 id="energy-title">Battery &amp; Energy</h2><Button variant="outline" disabled={Boolean(busy)} onClick={openEnergy}>Power setup</Button></div>
-          <div className="overview-square-body">
-            {computed && busy ? <p className="panel-footnote" role="status">LifeLine is working. Showing the last verified calculation.</p> : null}
-            {computed ? (
-              <BatterySummary computed={computed} date={state.planning_date} selected={selected} />
-            ) : (
-              <p className="panel-lead">Set the power assumptions, then ask LifeLine to check the day’s electricity.</p>
-            )}
-            <Disclosure title="Battery assumptions" keepMounted={false}>
-              <p>{state.current_battery_reading ? `Recorded reading: ${num(state.current_battery_reading.energy_kwh)} kWh at ${new Intl.DateTimeFormat("en",{dateStyle:"medium",timeStyle:"short",timeZone:state.timezone ?? undefined}).format(new Date(state.current_battery_reading.measured_at))}.` : "No current battery reading is recorded."}</p>
-              <p>
-                Assumed stored energy at midnight:{" "}
-                {state.clinic.initial_battery_kwh != null
-                  ? `${num(state.clinic.initial_battery_kwh)} kWh`
-                  : "not provided"}
-                . This is a planning assumption, not a current measurement.
-              </p>
-            </Disclosure>
-            <Button
-              variant="outline"
-              disabled={Boolean(busy)}
-              onClick={() => requestPlan(computed ? "Explain the battery results for the exact selected plan compared with the existing baseline, in plain English. Do not recalculate." : "Calculate the clinic battery forecast and describe its limitations in plain English.")}
-            >
-              Ask about the battery
-            </Button>
-          </div>
-        </section>
-        <SolutionsSection
-          computed={computed}
-          busy={Boolean(busy)}
-          selected={selected}
-          onSelect={id => void session.run("Updating the selected comparison…", s => planningApi.selectRecovery(s, id), s => s)}
-          onChat={requestPlan}
-        />
+      <div className="overview-flow">
+        <PlanOutlook state={state} computed={computed}/>
+        <SolutionsSection computed={computed} busy={Boolean(busy)} selected={selected}
+          onSelect={id=>void session.run("Updating the selected comparison…",s=>planningApi.selectRecovery(s,id),s=>s)} onChat={requestPlan}/>
+        <EnergyDay key={`${computed?.input_revision}-${computed?.generation}-${computed?.computed_at}-${selected?.id??"current"}`} state={state} computed={computed} selected={selected} busy={Boolean(busy)} onSettings={openEnergy}/>
+        <div className="overview-context-panels">
+          <ActivitiesSection state={state} busy={Boolean(busy)} onChat={focusChat} onActivity={setActivitySelection} onAddEquipment={()=>setEquipmentOpen(true)}/>
+          <WeatherSection location={state.location} date={state.planning_date} computed={computed} selected={selected}/>
+        </div>
       </div>
     </>
   ) : (
@@ -596,17 +569,17 @@ export default function App() {
           />
           <span>
             {modelError
-              ? "Local AI connection unavailable"
+              ? "AI connection unavailable"
               : agent?.available
-                ? `Local model · ${agent.model}`
+                ? `${agent.provider} · ${agent.model}`
                 : agent
-                  ? "Local AI unavailable"
-                  : "Connecting to local AI…"}
+                  ? "AI assistant unavailable"
+                  : "Connecting to the assistant…"}
           </span>
           {modelError || (agent && !agent.available) ? (
             <Button
               variant="ghost"
-              aria-label="Reconnect local model"
+              aria-label="Reconnect AI provider"
               onClick={() => void checkModel()}
             >
               <RefreshCw data-icon="inline-start" />

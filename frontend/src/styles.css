@@ -2190,3 +2190,36 @@ a {
 .setup-resume > p, .setup-demo > p { margin-block: 10px; }
 .clinic-setup button { min-height: 44px; white-space: normal; height: auto; }
 @media (max-width: 599px) { .clinic-setup { padding: 20px 14px 30px; }.setup-columns { grid-template-columns: 1fr; } }
+
+/* Decision first; computed evidence and editable requirements follow. */
+.two-page-app .overview-page { display: block; overflow-y: auto; padding: 20px; }
+.overview-flow { display: flex; flex-direction: column; gap: 28px; min-width: 0; padding-bottom: 24px; }
+.overview-flow h2 { font-size: 22px; font-weight: 600; letter-spacing: -.4px; margin-bottom: 12px; }
+.plan-outlook { border-left: 4px solid var(--primary); padding: 4px 0 4px 20px; }
+.plan-outlook h2 { margin-top: 8px; }
+.outlook-answer { font-size: 21px; line-height: 1.4; max-width: 850px; }
+.outlook-facts { display: flex; flex-wrap: wrap; gap: 12px 36px; margin-top: 18px; }
+.outlook-facts dt { font-size: 13px; color: var(--muted); }.outlook-facts dd { font-size: 15px; font-weight: 500; }
+.overview-flow > .overview-section { border: 0; border-top: 1px solid var(--border); padding: 24px 0 0; min-width: 0; }
+.recommended-plan { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.recommended-plan h3 { font-size: 19px; font-weight: 600; }.plan-kicker { font-size: 13px; color: var(--primary); margin-bottom: 4px; font-weight: 600; }
+.recommended-actions { list-style: decimal; padding-left: 22px; margin-block: 16px; max-width: 900px; }.recommended-actions li { padding-left: 4px; margin-block: 8px; }
+.overview-plans .plan-outcomes { font-size: 15px; margin-block: 18px; }.plan-outcomes caption { text-align: left; color: var(--muted); padding-bottom: 8px; font-size: 13px; }
+.overview-plans > button { margin-top: 16px; }.overview-plans > .disclosure { margin-top: 12px; }
+.plan-work-changes { font-size: 14px; margin-block: 14px; }.plan-work-changes h4 { font-weight: 600; }.plan-work-changes ul { list-style: disc; padding-left: 20px; }
+.plan-cost { color: var(--muted); font-size: 13px; margin-block: 12px; }.plan-cost strong { font-weight: 500; }
+.plan-options-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.plan-option { min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: 8px; }.plan-option[data-selected="true"] { border: 2px solid var(--primary); padding: 15px; }
+.plan-option-choice { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-height: 44px; cursor: pointer; }.plan-option-choice input { width: 20px; height: 20px; accent-color: var(--primary); }.plan-option-choice small { color: var(--primary); }
+.plan-tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 13px; margin-block: 14px; }.plan-tradeoffs h4 { font-weight: 600; }.plan-tradeoffs ul { list-style: disc; padding-left: 16px; }.plan-tradeoffs li { margin-top: 6px; }
+.energy-day-layout { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 24px; margin-top: 16px; }.energy-chart-column { min-width: 0; }
+.energy-day-chart { margin: 0; overflow-x: auto; }.energy-day-chart figcaption { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 13px; margin-bottom: 10px; }.energy-day-chart figcaption span:first-child { color: var(--primary); }
+.energy-day-chart svg { width: 100%; min-width: 760px; height: auto; display: block; }.energy-hour-picker { display: flex; gap: 4px; overflow-x: auto; max-width: 100%; padding-block: 10px; }
+.energy-hour-picker button { flex-shrink: 0; min-width: 48px; min-height: 44px; border-radius: 5px; font-size: 13px; border: 1px solid var(--border); }.energy-hour-picker button[aria-pressed="true"] { color: white; background: var(--primary); border-color: var(--primary); }
+.energy-hour-readout { padding: 14px 0; font-size: 14px; }.energy-hour-readout dl { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 8px; }.energy-hour-readout dt { font-size: 12px; color: var(--muted); }.energy-hour-readout dd { font-weight: 600; }
+.energy-events { margin-block: 12px; }.energy-events h3 { font-size: 15px; font-weight: 600; }.energy-events button { display: inline-flex; gap: 16px; align-items: center; min-height: 44px; padding: 8px 12px; margin: 6px 8px 6px 0; border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 4px; text-align: left; font-size: 13px; }
+.energy-battery-side { border-left: 1px solid var(--border); padding-left: 20px; min-width: 0; }.energy-battery-side .battery-playback { padding-top: 0; margin: 0; border-top: 0; }
+.energy-battery-side .battery-playback-heading h3 { font-size: 17px; }.energy-battery-side .battery-playback-heading p { display: none; }.energy-battery-side .battery-graphic > svg { width: 70px; height: 98px; }.energy-battery-side .battery-graphic { flex-direction: column; gap: 8px; margin-block: 12px; }.energy-battery-side .battery-value strong { font-size: 30px; }.energy-battery-side .battery-value > span { font-size: 12px; }.energy-battery-side .battery-flow { font-size: 12px; }.energy-battery-side .battery-modes { gap: 4px; }.energy-battery-side .battery-modes button { font-size: 12px; padding: 8px; }.energy-battery-side .battery-controls > span { display: none; }.energy-battery-side .battery-pair { margin-block: 12px; }.energy-battery-side .battery-state h4 { font-size: 13px; }.energy-battery-side .battery-time-labels { font-size: 11px; }.energy-battery-side .battery-minimum,.energy-battery-side .battery-reserve-caption,.energy-battery-side .battery-warning { font-size: 12px; }
+.overview-context-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }.overview-context-panels > .overview-square { padding: 0; border: 0; border-top: 1px solid var(--border); border-radius: 0; overflow: visible; min-width: 0; }.overview-context-panels .overview-square-body { max-height: 540px; overflow-y: auto; }.overview-context-panels .overview-square > h2 { font-size: 22px; }
+@media(max-width: 899px) { .energy-day-layout { grid-template-columns: minmax(0,1fr); }.energy-battery-side { border-left: 0; border-top: 1px solid var(--border); padding: 20px 0 0; }.energy-battery-side .battery-pair { max-width: 420px; margin: 12px auto; }.plan-options-grid { grid-template-columns: minmax(0,1fr); } }
+@media(max-width: 599px) { .two-page-app .overview-page { padding: 16px 12px; }.overview-context-panels { grid-template-columns: minmax(0,1fr); }.outlook-answer { font-size: 19px; }.outlook-facts { gap: 12px 22px; }.overview-flow { gap: 22px; }.plan-tradeoffs { grid-template-columns: minmax(0,1fr); }.energy-events button { flex-wrap: wrap; gap: 4px 16px; }.overview-flow h2 { font-size: 20px; } }

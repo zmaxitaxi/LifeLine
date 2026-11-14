@@ -1,4 +1,5 @@
 import type { AgentPresentation, ComputedPlan, PlanningMessage, PlanningState } from "../../../../contracts/planning";
+import { failureLabel } from "./agent-feedback";
 export interface ChatMessage {
   id:string;createdAt:string;role:"user"|"assistant"|"notice";text:string;tools?:string[];
   presentation?:AgentPresentation|null;plan?:ComputedPlan;date?:string;sessionId?:string;
@@ -17,6 +18,6 @@ export function restoreMessages(messages:PlanningMessage[],state:PlanningState):
   return messages.map(message=>{
     if(message.role === "user")question=message.content;
     const failed=message.mode === "local_agent_unavailable";
-    return {id:message.id,createdAt:message.created_at,role:failed ? "notice" : message.role,text:failed ? "The local assistant couldn’t finish this reply. Please retry." : message.content,presentation:message.presentation,...(failed ? {retryQuestion:question} : resultAttachment(message.presentation,state))};
+    return {id:message.id,createdAt:message.created_at,role:failed ? "notice" : message.role,text:failed ? failureLabel(message.failure) : message.content,presentation:message.presentation,...(failed ? {retryQuestion:!message.failure || message.failure.retryable ? question : undefined} : resultAttachment(message.presentation,state))};
   });
 }

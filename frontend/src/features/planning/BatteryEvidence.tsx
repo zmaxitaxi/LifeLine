@@ -202,6 +202,8 @@ export function BatteryEvidence({
   showIndicators = true,
   resetKey,
   weatherLabel = "forecast-based simulation",
+  onHourChange,
+  seekRequest,
 }: {
   result: SimulationResponse;
   date: string;
@@ -209,6 +211,8 @@ export function BatteryEvidence({
   showIndicators?: boolean;
   resetKey:string;
   weatherLabel?: string;
+  onHourChange?: (hour:number)=>void;
+  seekRequest?: {hour:number};
 }) {
   const [hour, setHour] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -217,6 +221,8 @@ export function BatteryEvidence({
   );
   const [reducedMotion, setReducedMotion] = useState(false);
   const sliderId = useId();
+  useEffect(()=>{onHourChange?.(hour);},[hour,onHourChange]);
+  useEffect(()=>{if(seekRequest){setPlaying(false);setHour(Math.max(0,Math.min(24,Math.floor(seekRequest.hour))));}},[seekRequest]);
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReducedMotion(preference.matches);
