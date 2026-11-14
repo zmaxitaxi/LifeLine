@@ -18,7 +18,7 @@ export function WeatherEnergy({ day, planningDate, computed, selected }: {
   const next = proposed?.hourly[hour];
   return <div className="weather-energy" aria-live="polite" data-testid="weather-energy">
     <h3>{day} · Solar energy</h3>
-    <p className="panel-footnote">Forecast-based simulation · {computed.simulation.timezone}</p>
+    <p className="panel-footnote">{computed.weather_mode === "demo" ? "Demo-weather simulation · not a live forecast" : "Forecast-based simulation"} · {computed.simulation.timezone}</p>
     <div className="weather-hours" role="group" aria-label="Weather energy hour">
       {current.hourly.map(item => <button type="button" key={item.hour} aria-pressed={hour === item.hour} onClick={() => setHour(item.hour)}>{String(item.hour).padStart(2, "0")}:00</button>)}
     </div>

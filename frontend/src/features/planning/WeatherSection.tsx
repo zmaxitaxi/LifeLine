@@ -49,6 +49,7 @@ export function WeatherSection({ location, date, computed, selected }: { locatio
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
+  const demo = outlook?.weather_mode === "demo";
   useEffect(() => {
     const abort = new AbortController();
     setLoading(true);
@@ -96,7 +97,8 @@ export function WeatherSection({ location, date, computed, selected }: { locatio
           </p>
         ) : outlook ? (
           <>
-            <div className="current-weather" aria-label="Current weather">
+            {demo ? <p className="panel-attention" role="status">Demo weather · sample conditions, not a live forecast.</p> : null}
+            <div className="current-weather" aria-label={demo ? "Sample weather" : "Current weather"}>
               <CurrentIcon aria-hidden="true" />
               <div>
                 <strong>
@@ -111,7 +113,7 @@ export function WeatherSection({ location, date, computed, selected }: { locatio
                 Older forecast · update when connected
               </p>
             ) : null}
-            <div className="weekly-weather" aria-label="Seven-day forecast">
+            <div className="weekly-weather" aria-label={demo ? "Seven sample weather days" : "Seven-day forecast"}>
               {outlook.days.map((day) => {
                 const Icon = icons[day.condition];
                 const label = new Intl.DateTimeFormat("en", {
@@ -138,14 +140,14 @@ export function WeatherSection({ location, date, computed, selected }: { locatio
             <div ref={energyDetails}><WeatherEnergy key={`${selectedDate}-${computed?.generation}`} day={selectedDate} planningDate={date} computed={computed} selected={selected} /></div>
             <Disclosure title="Weather details" keepMounted={false}>
               <p>
-                <a
+                {demo ? outlook.source : <a
                   href={outlook.attribution_url}
                   target="_blank"
                   rel="noreferrer"
                 >
                   {outlook.source}
-                </a>{" "}
-                · {outlook.cache_status} · updated{" "}
+                </a>}{" "}
+                · {demo ? "generated" : `${outlook.cache_status} · updated`}{" "}
                 {new Intl.DateTimeFormat("en", {
                   dateStyle: "medium",
                   timeStyle: "short",
@@ -154,9 +156,7 @@ export function WeatherSection({ location, date, computed, selected }: { locatio
                 ({outlook.timezone}).
               </p>
               <p>
-                Current conditions and the week ahead are weather-model
-                estimates, not station measurements. The electricity plan uses
-                its own hourly solar forecast.
+                {demo ? "These sample temperatures and sunshine assumptions demonstrate the workflow. They are not observations or a prediction for this clinic. The simulator still calculates the electricity plan from the sample sunshine." : "Current conditions and the week ahead are weather-model estimates, not station measurements. The electricity plan uses its own hourly solar forecast."}
               </p>
               <ul>
                 {outlook.days.map((day) => (

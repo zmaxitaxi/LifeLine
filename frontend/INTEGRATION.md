@@ -29,6 +29,7 @@ For an older in-memory server, preserve its GET session state and actual browser
 - When the model is unavailable, chat offers an explicit retry. Manual drafting, editing, confirmation and numerical planning remain usable. Legacy deterministic backend assistant routes are preserved but never masquerade as Llama replies.
 - Battery playback uses actual integer hourly boundaries from each scenario's `.plan`. Percentages use each scenario's capacity, alongside stored kWh and reserve. Essential unmet demand is distinct from low charge. Playback resets on changed results/selection; reduced motion removes fill transitions. CSS never creates sub-hour numerical readouts.
 - Weather uses the independent current/seven-day outlook API. Clicking the modeled date/hour shows actual baseline and selected solar-energy rows. Other dates explicitly have no clinic energy calculation. Weather codes never become fictional energy generation. Missing readings stay unavailable, source/time details remain inspectable, and provider errors have a short retry path.
+- Start the server with `LIFELINE_WEATHER_MODE=demo` for an explicitly labeled offline weather demonstration. Llama and the physical simulator remain real. The runtime notice uses `GET /api/weather/mode`; each saved calculation uses its own backend `weather_mode`, so earlier live results are never relabeled. Sample conditions are not presented as observations or a geographic forecast. Live weather remains the default when the environment setting is omitted.
 
 ## Verification
 
@@ -46,3 +47,5 @@ Browser plugin was unavailable, so rendered verification uses the existing Playw
 The local store supports restart recovery and atomic rollback, not multi-user or multi-process synchronization. Forecast results retain their original modeled date and provenance after restart. No equipment control, physical infrastructure adoption, medical-cycle validation or clinical availability guarantee is implied.
 
 Verified frontend handoff on Main Chat’s natural-agent dependency `edde294`: **38/38 Playwright journeys**, TypeScript and the production build pass; the combined backend suite passes **460/460**. Main Chat owns additional genuine Ollama/live-weather evidence and final integration checks. Final release references and any subsequent check counts are recorded in the handoff after assembly.
+
+The additive demo-weather presentation on backend contract `9927b1c` passes TypeScript, the production build, and two focused browser regressions covering demo labeling and preservation of older live provenance. These are presentation tests with provider fixtures, not evidence of genuine Llama inference or a reachable live weather provider.

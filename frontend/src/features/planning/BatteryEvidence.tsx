@@ -201,12 +201,14 @@ export function BatteryEvidence({
   intervention,
   showIndicators = true,
   resetKey,
+  weatherLabel = "forecast-based simulation",
 }: {
   result: SimulationResponse;
   date: string;
   intervention?: EvidenceOption;
   showIndicators?: boolean;
   resetKey:string;
+  weatherLabel?: string;
 }) {
   const [hour, setHour] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -264,7 +266,7 @@ export function BatteryEvidence({
         <div>
           <h3 id={`${sliderId}-title`}>Battery evidence</h3>
           <p>
-            {date} · {result.timezone} · forecast-based simulation
+            {date} · {result.timezone} · {weatherLabel}
           </p>
         </div>
         <time className="battery-clock" aria-label="Selected simulation time">

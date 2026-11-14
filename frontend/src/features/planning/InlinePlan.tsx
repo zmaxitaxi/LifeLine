@@ -122,7 +122,7 @@ export function InlinePlan({
       data-selection-id={chosen?.id}
     >
       <p className="plan-date">
-        {date} · forecast-based simulation
+        {date} · {computed.weather_mode === "demo" ? "demo-weather simulation · not a live forecast" : "forecast-based simulation"}
         {computed.sunshine_factor < 1
           ? ` · ${Math.round((1 - computed.sunshine_factor) * 100)}% less sunshine`
           : ""}

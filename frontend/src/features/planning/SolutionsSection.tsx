@@ -33,6 +33,7 @@ export function SolutionsSection({
 
         {computed && existing && next ? (
           <>
+            {computed.weather_mode === "demo" ? <p className="panel-footnote">Demo-weather simulation · not a live forecast.</p> : null}
             <p className="panel-lead">{existing.critical_unserved_kwh > 1e-6 ? "Essential equipment may lose power" : existing.min_soc_kwh < computed.simulation.effective_config.reserve_kwh - 1e-6 ? "Battery may run too low" : existing.flexible_deferred_kwh > 1e-6 ? "Some work is unfinished" : existing.critical_requested_kwh <= 1e-6 ? "Essential needs need review" : "Current modeled needs are met"}</p>
             <table className="plan-outcomes"><caption className="sr-only">Current and selected plan outcomes</caption>
               <thead><tr><th scope="col">Daily outcome</th><th scope="col">Current</th><th scope="col">Selected</th></tr></thead>

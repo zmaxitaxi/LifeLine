@@ -11,6 +11,37 @@ test("weather shows actual current conditions and seven daily forecasts",async({
   await panel.getByRole('button',{name:'Weather details',exact:true}).click();await expect(panel).toContainText('Open-Meteo');await expect(panel).toContainText('2026-11-19');
 });
 
+test("demo runtime is labeled without relabeling an earlier live calculation",async({page,request})=>{
+  const state=await calculate(request,await seed(request));
+  await page.route('**/api/weather/mode',route=>route.fulfill({json:{mode:'demo',label:'Demo weather',description:'Synthetic sample conditions'}}));
+  await open(page,state);
+  await expect(page.locator('.chat-context')).toContainText('Demo weather · sample conditions, not a live forecast.');
+  await showOverview(page);
+  await expect(page.getByTestId('battery-playback')).toContainText('forecast-based simulation');
+  await expect(page.getByTestId('battery-playback')).not.toContainText('demo-weather simulation');
+});
+
+test("sample weather and calculated evidence carry explicit demo labels",async({page,request})=>{
+  const state=await seed(request);
+  // Presentation-only transport fixtures: all energy values still come from the real calculation.
+  await page.route('**/api/weather/mode',route=>route.fulfill({json:{mode:'demo',label:'Demo weather',description:'Synthetic sample conditions'}}));
+  await page.route('**/api/weather/outlook?**',async route=>{const response=await route.fetch();const data=await response.json();data.weather_mode='demo';data.data_kind='synthetic_demo_weather';data.source='LifeLine synthetic demo weather';await route.fulfill({json:data});});
+  await page.route(`**/api/planning/sessions/${state.id}/agent`,async route=>{const response=await route.fetch();const data=await response.json();if(data.state.computed_plan)data.state.computed_plan.weather_mode='demo';await route.fulfill({json:data});});
+  await open(page,state);await say(page,'Calculate recovery plans for the clinic.');
+  await expect(page.getByTestId('current-plan-summary')).toContainText('demo-weather simulation · not a live forecast');
+  await showOverview(page);
+  const weather=page.getByRole('region',{name:'Weather',exact:true});
+  await expect(weather).toContainText('Demo weather · sample conditions, not a live forecast.');
+  await expect(weather.getByLabel('Sample weather',{exact:true})).toBeVisible();
+  await expect(weather.getByLabel('Seven sample weather days')).toBeVisible();
+  await expect(weather.getByTestId('weather-energy')).toContainText('Demo-weather simulation');
+  await expect(page.getByTestId('battery-playback')).toContainText('demo-weather simulation · not a live forecast');
+  await expect(page.getByRole('region',{name:'Plans',exact:true})).toContainText('Demo-weather simulation');
+  await weather.getByRole('button',{name:'Weather details',exact:true}).click();
+  await expect(weather).toContainText('not observations or a prediction for this clinic');
+  await expect(weather.getByRole('link',{name:'LifeLine synthetic demo weather'})).toHaveCount(0);
+});
+
 test("missing temperatures remain unavailable rather than becoming zero",async({page,request})=>{
   await page.route('**/api/weather/outlook?**',async route=>{const response=await route.fetch();const data=await response.json();data.current.temperature_c=null;data.days[0].temperature_max_c=null;await route.fulfill({json:data});});
   await open(page,await seed(request));await showOverview(page);await expect(page.locator('.current-weather strong')).toContainText('—');await expect(page.locator('.weather-day').first()).toContainText('—');

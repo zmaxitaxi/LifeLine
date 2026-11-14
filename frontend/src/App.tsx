@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Disclosure } from "@/components/Disclosure";
 import { api, num } from "@/lib/clinic";
 import type { AgentStatus } from "../../contracts/agent";
+import type { WeatherRuntimeMode } from "../../contracts/weather";
 import type { ActivityDraft, ActivityProposal, ComputedPlan, EnergySettingsProposal } from "../../contracts/planning";
 import {
   Workspace,
@@ -60,6 +61,7 @@ export default function App() {
   const [equipmentOpen, setEquipmentOpen] = useState(false);
   const [agent, setAgent] = useState<AgentStatus | null>(null);
   const [modelError, setModelError] = useState(false);
+  const [weatherMode, setWeatherMode] = useState<WeatherRuntimeMode | null>(null);
   const [narrationPending, setNarrationPending] = useState(false);
   const [replyReady, setReplyReady] = useState(true);
   const [locations, setLocations] = useState<
@@ -105,6 +107,7 @@ export default function App() {
   }
   useEffect(() => {
     void checkModel();
+    void api<WeatherRuntimeMode>("weather/mode").then(setWeatherMode).catch(() => {});
     void api<{
       locations: { name: string; latitude: number; longitude: number }[];
     }>("forecast/locations")
@@ -214,6 +217,7 @@ export default function App() {
   }
   function openEnergy() {setEnergySelection(state?.active_energy_proposal_id ? {kind:"proposal",id:state.active_energy_proposal_id} : {kind:"new"});}
   const currentWeather = state?.forecast_reference ?? session.weather;
+  const demoWeather = weatherMode ? weatherMode.mode === "demo" : currentWeather?.weather_mode === "demo";
   const existing = computed?.simulation.baseline.metrics;
   const outlook = existing
     ? existing.critical_requested_kwh <= 1e-6
@@ -299,6 +303,7 @@ export default function App() {
           </div>
         </div>
       ) : null}
+      {demoWeather ? <p className="panel-footnote" role="status">Demo weather · sample conditions, not a live forecast.</p> : null}
     </div>
   ) : null;
   const assistant = (
