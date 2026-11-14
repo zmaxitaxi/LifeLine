@@ -1,0 +1,1948 @@
+{
+  "id": "2d1e2ed0-dffb-4760-a239-a33616f4bcfe",
+  "revision": 5,
+  "input_revision": 1,
+  "selected_clinic_id": "reviewed-clinic",
+  "clinic_name": "Operator clinic",
+  "location": {
+    "latitude": -0.0917,
+    "longitude": 34.768
+  },
+  "planning_date": "2026-11-14",
+  "timezone": "Africa/Nairobi",
+  "clinic": {
+    "battery_capacity_kwh": 4.0,
+    "initial_battery_kwh": 2.0,
+    "reserve_kwh": 0.5,
+    "pv_capacity_kw": 1.0,
+    "charge_efficiency": 0.9,
+    "discharge_efficiency": 0.9,
+    "max_charge_kw": 2.0,
+    "max_discharge_kw": 2.0,
+    "scenario": "normal",
+    "equipment": [
+      {
+        "id": "fridge",
+        "name": "Vaccine refrigerator",
+        "category": "critical",
+        "power_kw": 0.1,
+        "required_hours": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "id": "pump",
+        "name": "Water pump",
+        "category": "flexible",
+        "max_power_kw": 0.5,
+        "required_energy_kwh": 1.0,
+        "allowed_hours": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "baseline_allocations": [
+          {
+            "hour": 8,
+            "requested_kwh": 0.5
+          },
+          {
+            "hour": 9,
+            "requested_kwh": 0.5
+          }
+        ],
+        "divisible": true
+      }
+    ],
+    "weather_dataset": "synthetic"
+  },
+  "equipment_inventory": [
+    {
+      "id": "fridge",
+      "name": "Vaccine refrigerator",
+      "category": "critical",
+      "power_kw": 0.1,
+      "required_hours": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ]
+    },
+    {
+      "id": "pump",
+      "name": "Water pump",
+      "category": "flexible",
+      "max_power_kw": 0.5,
+      "required_energy_kwh": 1.0,
+      "allowed_hours": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "baseline_allocations": [
+        {
+          "hour": 8,
+          "requested_kwh": 0.5
+        },
+        {
+          "hour": 9,
+          "requested_kwh": 0.5
+        }
+      ],
+      "divisible": true
+    }
+  ],
+  "energy_settings": {
+    "battery_capacity_kwh": 4.0,
+    "initial_battery_kwh": 2.0,
+    "reserve_kwh": 0.5,
+    "pv_capacity_kw": 1.0,
+    "charge_efficiency": 0.9,
+    "discharge_efficiency": 0.9,
+    "max_charge_kw": 2.0,
+    "max_discharge_kw": 2.0,
+    "additional_critical_kw": 0.0
+  },
+  "current_battery_reading": null,
+  "energy_proposals": [
+    {
+      "id": "b607c41f-e686-4595-aff7-3b1d69471365",
+      "status": "draft",
+      "base_input_revision": 1,
+      "settings": {
+        "battery_capacity_kwh": 8.0
+      },
+      "proposed_energy_settings": {
+        "battery_capacity_kwh": 8.0,
+        "initial_battery_kwh": 2.0,
+        "reserve_kwh": 0.5,
+        "pv_capacity_kw": 1.0,
+        "charge_efficiency": 0.9,
+        "discharge_efficiency": 0.9,
+        "max_charge_kw": 2.0,
+        "max_discharge_kw": 2.0,
+        "additional_critical_kw": 0.0
+      },
+      "current_battery_reading": null,
+      "updates_current_battery_reading": false
+    }
+  ],
+  "active_energy_proposal_id": "b607c41f-e686-4595-aff7-3b1d69471365",
+  "confirmed_activities": [
+    {
+      "id": "79d6275e-44f6-439d-9c9b-2c12e8396a1c",
+      "version": 1,
+      "status": "confirmed",
+      "details": {
+        "name": "Vaccination campaign",
+        "planning_date": "2026-11-14",
+        "start_hour": 10,
+        "end_hour": 15,
+        "deadline_hour": null,
+        "duration_hours": null,
+        "equipment_ids": [
+          "fridge"
+        ],
+        "equipment_constraints": [],
+        "additional_equipment": []
+      }
+    }
+  ],
+  "proposals": [
+    {
+      "id": "2674bd72-3729-4a59-bc85-f7913ad38d46",
+      "status": "confirmed",
+      "target_activity_id": null,
+      "base_activity_version": null,
+      "details": {
+        "name": "Vaccination campaign",
+        "planning_date": "2026-11-14",
+        "start_hour": 10,
+        "end_hour": 15,
+        "deadline_hour": null,
+        "duration_hours": null,
+        "equipment_ids": [
+          "fridge"
+        ],
+        "equipment_constraints": [],
+        "additional_equipment": []
+      },
+      "missing_fields": [],
+      "confirmed_activity_id": "79d6275e-44f6-439d-9c9b-2c12e8396a1c"
+    }
+  ],
+  "active_proposal_id": null,
+  "forecast_reference": {
+    "source": "Open-Meteo Forecast API",
+    "data_kind": "weather_model_forecast",
+    "requested_location": {
+      "latitude": -0.0917,
+      "longitude": 34.768
+    },
+    "model_grid_location": {
+      "latitude": -0.1,
+      "longitude": 34.75
+    },
+    "timezone": "Africa/Nairobi",
+    "retrieved_at": "2026-11-13T09:00:00Z",
+    "expires_at": "2026-11-13T09:15:00Z",
+    "cache_status": "live",
+    "source_url": "https://api.open-meteo.com/v1/forecast?latitude=-0.0917&longitude=34.768&hourly=shortwave_radiation%2Cterrestrial_radiation&timezone=auto&timeformat=unixtime&forecast_days=3",
+    "attribution_url": "https://open-meteo.com/",
+    "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+    "interval_convention": "Open-Meteo preceding-hour mean, aligned to local interval starts by overlap integration.",
+    "days": [
+      {
+        "date": "2026-11-13",
+        "hours": [
+          {
+            "start": "2026-11-13T00:00:00+03:00",
+            "end": "2026-11-13T01:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T01:00:00+03:00",
+            "end": "2026-11-13T02:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T02:00:00+03:00",
+            "end": "2026-11-13T03:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T03:00:00+03:00",
+            "end": "2026-11-13T04:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T04:00:00+03:00",
+            "end": "2026-11-13T05:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T05:00:00+03:00",
+            "end": "2026-11-13T06:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T06:00:00+03:00",
+            "end": "2026-11-13T07:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T07:00:00+03:00",
+            "end": "2026-11-13T08:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T08:00:00+03:00",
+            "end": "2026-11-13T09:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T09:00:00+03:00",
+            "end": "2026-11-13T10:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T10:00:00+03:00",
+            "end": "2026-11-13T11:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T11:00:00+03:00",
+            "end": "2026-11-13T12:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T12:00:00+03:00",
+            "end": "2026-11-13T13:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T13:00:00+03:00",
+            "end": "2026-11-13T14:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T14:00:00+03:00",
+            "end": "2026-11-13T15:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T15:00:00+03:00",
+            "end": "2026-11-13T16:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T16:00:00+03:00",
+            "end": "2026-11-13T17:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T17:00:00+03:00",
+            "end": "2026-11-13T18:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-13T18:00:00+03:00",
+            "end": "2026-11-13T19:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T19:00:00+03:00",
+            "end": "2026-11-13T20:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T20:00:00+03:00",
+            "end": "2026-11-13T21:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T21:00:00+03:00",
+            "end": "2026-11-13T22:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T22:00:00+03:00",
+            "end": "2026-11-13T23:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-13T23:00:00+03:00",
+            "end": "2026-11-14T00:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          }
+        ],
+        "simulation_supported": true,
+        "warnings": []
+      },
+      {
+        "date": "2026-11-14",
+        "hours": [
+          {
+            "start": "2026-11-14T00:00:00+03:00",
+            "end": "2026-11-14T01:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T01:00:00+03:00",
+            "end": "2026-11-14T02:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T02:00:00+03:00",
+            "end": "2026-11-14T03:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T03:00:00+03:00",
+            "end": "2026-11-14T04:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T04:00:00+03:00",
+            "end": "2026-11-14T05:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T05:00:00+03:00",
+            "end": "2026-11-14T06:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T06:00:00+03:00",
+            "end": "2026-11-14T07:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T07:00:00+03:00",
+            "end": "2026-11-14T08:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T08:00:00+03:00",
+            "end": "2026-11-14T09:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T09:00:00+03:00",
+            "end": "2026-11-14T10:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T10:00:00+03:00",
+            "end": "2026-11-14T11:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T11:00:00+03:00",
+            "end": "2026-11-14T12:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T12:00:00+03:00",
+            "end": "2026-11-14T13:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T13:00:00+03:00",
+            "end": "2026-11-14T14:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T14:00:00+03:00",
+            "end": "2026-11-14T15:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T15:00:00+03:00",
+            "end": "2026-11-14T16:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T16:00:00+03:00",
+            "end": "2026-11-14T17:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T17:00:00+03:00",
+            "end": "2026-11-14T18:00:00+03:00",
+            "shortwave_radiation_w_m2": 500.0,
+            "irradiance_kwh_m2": 0.5
+          },
+          {
+            "start": "2026-11-14T18:00:00+03:00",
+            "end": "2026-11-14T19:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T19:00:00+03:00",
+            "end": "2026-11-14T20:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T20:00:00+03:00",
+            "end": "2026-11-14T21:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T21:00:00+03:00",
+            "end": "2026-11-14T22:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T22:00:00+03:00",
+            "end": "2026-11-14T23:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          },
+          {
+            "start": "2026-11-14T23:00:00+03:00",
+            "end": "2026-11-15T00:00:00+03:00",
+            "shortwave_radiation_w_m2": 0.0,
+            "irradiance_kwh_m2": 0.0
+          }
+        ],
+        "simulation_supported": true,
+        "warnings": []
+      }
+    ],
+    "warnings": [
+      "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+      "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation."
+    ]
+  },
+  "computed_plan": {
+    "input_revision": 1,
+    "generation": 1,
+    "computed_at": "2026-11-14T01:07:35.464329Z",
+    "sunshine_factor": 1.0,
+    "simulation": {
+      "api_version": "1.0",
+      "model_version": "energy-1.0",
+      "scenario": "normal",
+      "scenario_name": "Normal",
+      "data_source": "mixed",
+      "cloud_factors": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "input_provenance": {
+        "equipment": "user_entered_unverified",
+        "weather": "Open_Meteo_weather_model_forecast",
+        "model": "Horizontal irradiance approximation; reduced-sunshine factor applied once; preset cloud curve replaced.",
+        "initial_battery": "Operator assumption at selected day\u2019s local midnight; not a carried-forward prediction."
+      },
+      "weather_dataset": "open-meteo-forecast",
+      "diagnosis": {
+        "assessment": "SCHEDULING_OPPORTUNITY",
+        "explanation": "The computed operating plan improves the current schedule. Check completed work and remaining warnings before interpreting the difference.",
+        "constraints": [],
+        "discharge_limited_hours": [],
+        "optimistic_energy_deficit_kwh": 0.0,
+        "window_limited_tasks": []
+      },
+      "timezone": "Africa/Nairobi",
+      "horizon_hours": 24,
+      "dt_hours": 1,
+      "pv_performance_ratio": 0.8,
+      "effective_config": {
+        "battery_capacity_kwh": 4.0,
+        "initial_battery_kwh": 2.0,
+        "reserve_kwh": 0.5,
+        "pv_capacity_kw": 1.0,
+        "charge_efficiency": 0.9,
+        "discharge_efficiency": 0.9,
+        "max_charge_kw": 2.0,
+        "max_discharge_kw": 2.0,
+        "additional_critical_kw": 0.0
+      },
+      "equipment": [
+        {
+          "id": "fridge",
+          "name": "Vaccine refrigerator",
+          "category": "critical",
+          "power_kw": 0.1,
+          "required_hours": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ]
+        },
+        {
+          "id": "pump",
+          "name": "Water pump",
+          "category": "flexible",
+          "max_power_kw": 0.5,
+          "required_energy_kwh": 1.0,
+          "allowed_hours": [
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "baseline_allocations": [
+            {
+              "hour": 8,
+              "requested_kwh": 0.5
+            },
+            {
+              "hour": 9,
+              "requested_kwh": 0.5
+            }
+          ],
+          "divisible": true
+        }
+      ],
+      "assumptions": [
+        "24 hourly slots for 2026-11-14 in Africa/Nairobi.",
+        "Forecast retrieved at 2026-11-13T09:00:00+00:00; cache status: live.",
+        "Radiation profile multiplied by 1; identical profile supplied to all three schedules.",
+        "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
+        "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
+        "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",
+        "PV energy = rated kW \u00d7 hourly horizontal irradiation (kWh/m\u00b2) \u00f7 1 kW/m\u00b2 \u00d7 existing performance ratio. Tilt, shading, temperature and inverter clipping are omitted.",
+        "Reduced-sunshine cases are user-chosen sensitivity tests, not confidence intervals or calibrated forecast probabilities. Each case is independently reoptimized.",
+        "Essential equipment hours and requirements stay fixed. Flexible energy is divisible and interruptible; medical appliance cycles and staffing constraints require separate validation.",
+        "No grid, generator, sub-hour starting surge, degradation, or multi-day reliability model is included."
+      ],
+      "status": "OK",
+      "baseline": {
+        "status": "OK",
+        "hourly": [
+          {
+            "hour": 0,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.0,
+            "soc_end_kwh": 1.8888888888888888
+          },
+          {
+            "hour": 1,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.8888888888888888,
+            "soc_end_kwh": 1.7777777777777777
+          },
+          {
+            "hour": 2,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.7777777777777777,
+            "soc_end_kwh": 1.6666666666666665
+          },
+          {
+            "hour": 3,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.6666666666666665,
+            "soc_end_kwh": 1.5555555555555554
+          },
+          {
+            "hour": 4,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.5555555555555554,
+            "soc_end_kwh": 1.4444444444444442
+          },
+          {
+            "hour": 5,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.4444444444444442,
+            "soc_end_kwh": 1.333333333333333
+          },
+          {
+            "hour": 6,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.333333333333333,
+            "soc_end_kwh": 1.603333333333333
+          },
+          {
+            "hour": 7,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.603333333333333,
+            "soc_end_kwh": 1.873333333333333
+          },
+          {
+            "hour": 8,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.5,
+            "flexible_served_kwh": 0.5,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.19999999999999996,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.873333333333333,
+            "soc_end_kwh": 1.651111111111111
+          },
+          {
+            "hour": 9,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.5,
+            "flexible_served_kwh": 0.5,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.19999999999999996,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.651111111111111,
+            "soc_end_kwh": 1.4288888888888889
+          },
+          {
+            "hour": 10,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.4288888888888889,
+            "soc_end_kwh": 1.698888888888889
+          },
+          {
+            "hour": 11,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.698888888888889,
+            "soc_end_kwh": 1.968888888888889
+          },
+          {
+            "hour": 12,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.968888888888889,
+            "soc_end_kwh": 2.238888888888889
+          },
+          {
+            "hour": 13,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.238888888888889,
+            "soc_end_kwh": 2.508888888888889
+          },
+          {
+            "hour": 14,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.508888888888889,
+            "soc_end_kwh": 2.778888888888889
+          },
+          {
+            "hour": 15,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.778888888888889,
+            "soc_end_kwh": 3.048888888888889
+          },
+          {
+            "hour": 16,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.048888888888889,
+            "soc_end_kwh": 3.318888888888889
+          },
+          {
+            "hour": 17,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.318888888888889,
+            "soc_end_kwh": 3.588888888888889
+          },
+          {
+            "hour": 18,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.588888888888889,
+            "soc_end_kwh": 3.477777777777778
+          },
+          {
+            "hour": 19,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.477777777777778,
+            "soc_end_kwh": 3.3666666666666667
+          },
+          {
+            "hour": 20,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.3666666666666667,
+            "soc_end_kwh": 3.2555555555555555
+          },
+          {
+            "hour": 21,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.2555555555555555,
+            "soc_end_kwh": 3.1444444444444444
+          },
+          {
+            "hour": 22,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.1444444444444444,
+            "soc_end_kwh": 3.033333333333333
+          },
+          {
+            "hour": 23,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.033333333333333,
+            "soc_end_kwh": 2.922222222222222
+          }
+        ],
+        "metrics": {
+          "total_solar_kwh": 4.800000000000001,
+          "critical_requested_kwh": 2.4000000000000004,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 1.333333333333333,
+          "final_soc_kwh": 2.922222222222222,
+          "flexible_requested_kwh": 1.0,
+          "flexible_served_kwh": 1.0,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.47777777777777786,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        },
+        "flexible_tasks": [
+          {
+            "task_id": "pump",
+            "requested_kwh": 1.0,
+            "served_kwh": 1.0,
+            "deferred_kwh": 0.0,
+            "allocations": [
+              {
+                "hour": 8,
+                "served_kwh": 0.5
+              },
+              {
+                "hour": 9,
+                "served_kwh": 0.5
+              }
+            ]
+          }
+        ]
+      },
+      "heuristic": {
+        "status": "OK",
+        "hourly": [
+          {
+            "hour": 0,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.0,
+            "soc_end_kwh": 1.8888888888888888
+          },
+          {
+            "hour": 1,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.8888888888888888,
+            "soc_end_kwh": 1.7777777777777777
+          },
+          {
+            "hour": 2,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.7777777777777777,
+            "soc_end_kwh": 1.6666666666666665
+          },
+          {
+            "hour": 3,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.6666666666666665,
+            "soc_end_kwh": 1.5555555555555554
+          },
+          {
+            "hour": 4,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.5555555555555554,
+            "soc_end_kwh": 1.4444444444444442
+          },
+          {
+            "hour": 5,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.4444444444444442,
+            "soc_end_kwh": 1.333333333333333
+          },
+          {
+            "hour": 6,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.333333333333333,
+            "soc_end_kwh": 1.603333333333333
+          },
+          {
+            "hour": 7,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.603333333333333,
+            "soc_end_kwh": 1.873333333333333
+          },
+          {
+            "hour": 8,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.5,
+            "flexible_served_kwh": 0.5,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.19999999999999996,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.873333333333333,
+            "soc_end_kwh": 1.651111111111111
+          },
+          {
+            "hour": 9,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.5,
+            "flexible_served_kwh": 0.5,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.19999999999999996,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.651111111111111,
+            "soc_end_kwh": 1.4288888888888889
+          },
+          {
+            "hour": 10,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.4288888888888889,
+            "soc_end_kwh": 1.698888888888889
+          },
+          {
+            "hour": 11,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.698888888888889,
+            "soc_end_kwh": 1.968888888888889
+          },
+          {
+            "hour": 12,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.968888888888889,
+            "soc_end_kwh": 2.238888888888889
+          },
+          {
+            "hour": 13,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.238888888888889,
+            "soc_end_kwh": 2.508888888888889
+          },
+          {
+            "hour": 14,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.508888888888889,
+            "soc_end_kwh": 2.778888888888889
+          },
+          {
+            "hour": 15,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.778888888888889,
+            "soc_end_kwh": 3.048888888888889
+          },
+          {
+            "hour": 16,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.048888888888889,
+            "soc_end_kwh": 3.318888888888889
+          },
+          {
+            "hour": 17,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.318888888888889,
+            "soc_end_kwh": 3.588888888888889
+          },
+          {
+            "hour": 18,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.588888888888889,
+            "soc_end_kwh": 3.477777777777778
+          },
+          {
+            "hour": 19,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.477777777777778,
+            "soc_end_kwh": 3.3666666666666667
+          },
+          {
+            "hour": 20,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.3666666666666667,
+            "soc_end_kwh": 3.2555555555555555
+          },
+          {
+            "hour": 21,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.2555555555555555,
+            "soc_end_kwh": 3.1444444444444444
+          },
+          {
+            "hour": 22,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.1444444444444444,
+            "soc_end_kwh": 3.033333333333333
+          },
+          {
+            "hour": 23,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.033333333333333,
+            "soc_end_kwh": 2.922222222222222
+          }
+        ],
+        "metrics": {
+          "total_solar_kwh": 4.800000000000001,
+          "critical_requested_kwh": 2.4000000000000004,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 1.333333333333333,
+          "final_soc_kwh": 2.922222222222222,
+          "flexible_requested_kwh": 1.0,
+          "flexible_served_kwh": 1.0,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.47777777777777786,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        },
+        "flexible_tasks": [
+          {
+            "task_id": "pump",
+            "requested_kwh": 1.0,
+            "served_kwh": 1.0,
+            "deferred_kwh": 0.0,
+            "allocations": [
+              {
+                "hour": 8,
+                "served_kwh": 0.5
+              },
+              {
+                "hour": 9,
+                "served_kwh": 0.5
+              }
+            ]
+          }
+        ]
+      },
+      "optimized": {
+        "status": "OK",
+        "hourly": [
+          {
+            "hour": 0,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.0,
+            "soc_end_kwh": 1.8888888888888888
+          },
+          {
+            "hour": 1,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.8888888888888888,
+            "soc_end_kwh": 1.7777777777777777
+          },
+          {
+            "hour": 2,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.7777777777777777,
+            "soc_end_kwh": 1.6666666666666665
+          },
+          {
+            "hour": 3,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.6666666666666665,
+            "soc_end_kwh": 1.5555555555555554
+          },
+          {
+            "hour": 4,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.5555555555555554,
+            "soc_end_kwh": 1.4444444444444442
+          },
+          {
+            "hour": 5,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.4444444444444442,
+            "soc_end_kwh": 1.333333333333333
+          },
+          {
+            "hour": 6,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.333333333333333,
+            "soc_end_kwh": 1.603333333333333
+          },
+          {
+            "hour": 7,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.603333333333333,
+            "soc_end_kwh": 1.873333333333333
+          },
+          {
+            "hour": 8,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.30000000000000004,
+            "flexible_served_kwh": 0.30000000000000004,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.873333333333333,
+            "soc_end_kwh": 1.873333333333333
+          },
+          {
+            "hour": 9,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.30000000000000004,
+            "flexible_served_kwh": 0.30000000000000004,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.873333333333333,
+            "soc_end_kwh": 1.873333333333333
+          },
+          {
+            "hour": 10,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.30000000000000004,
+            "flexible_served_kwh": 0.30000000000000004,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.873333333333333,
+            "soc_end_kwh": 1.873333333333333
+          },
+          {
+            "hour": 11,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.09999999999999987,
+            "flexible_served_kwh": 0.09999999999999987,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.20000000000000018,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 1.873333333333333,
+            "soc_end_kwh": 2.0533333333333332
+          },
+          {
+            "hour": 12,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.0533333333333332,
+            "soc_end_kwh": 2.3233333333333333
+          },
+          {
+            "hour": 13,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.3233333333333333,
+            "soc_end_kwh": 2.5933333333333333
+          },
+          {
+            "hour": 14,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.5933333333333333,
+            "soc_end_kwh": 2.8633333333333333
+          },
+          {
+            "hour": 15,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.3000000000000005,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 2.8633333333333333,
+            "soc_end_kwh": 3.1333333333333337
+          },
+          {
+            "hour": 16,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.3,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.1333333333333337,
+            "soc_end_kwh": 3.4033333333333338
+          },
+          {
+            "hour": 17,
+            "pv_kwh": 0.4,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.30000000000000004,
+            "discharge_output_kwh": 0.0,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.4033333333333338,
+            "soc_end_kwh": 3.673333333333334
+          },
+          {
+            "hour": 18,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.673333333333334,
+            "soc_end_kwh": 3.5622222222222226
+          },
+          {
+            "hour": 19,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.5622222222222226,
+            "soc_end_kwh": 3.4511111111111115
+          },
+          {
+            "hour": 20,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.4511111111111115,
+            "soc_end_kwh": 3.3400000000000003
+          },
+          {
+            "hour": 21,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.3400000000000003,
+            "soc_end_kwh": 3.228888888888889
+          },
+          {
+            "hour": 22,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.228888888888889,
+            "soc_end_kwh": 3.117777777777778
+          },
+          {
+            "hour": 23,
+            "pv_kwh": 0.0,
+            "critical_requested_kwh": 0.1,
+            "critical_served_kwh": 0.1,
+            "critical_unserved_kwh": 0.0,
+            "flexible_planned_kwh": 0.0,
+            "flexible_served_kwh": 0.0,
+            "flexible_unserved_kwh": 0.0,
+            "charge_input_kwh": 0.0,
+            "discharge_output_kwh": 0.1,
+            "curtailed_kwh": 0.0,
+            "soc_start_kwh": 3.117777777777778,
+            "soc_end_kwh": 3.006666666666667
+          }
+        ],
+        "metrics": {
+          "total_solar_kwh": 4.800000000000001,
+          "critical_requested_kwh": 2.4000000000000004,
+          "critical_unserved_kwh": 0.0,
+          "critical_coverage_pct": 100.0,
+          "min_soc_kwh": 1.333333333333333,
+          "final_soc_kwh": 3.006666666666667,
+          "flexible_requested_kwh": 1.0,
+          "flexible_served_kwh": 1.0,
+          "flexible_deferred_kwh": 0.0,
+          "curtailed_kwh": 0.0,
+          "conversion_loss_kwh": 0.3933333333333334,
+          "critical_shortage_hours": [],
+          "reserve_breach_boundaries": []
+        },
+        "flexible_tasks": [
+          {
+            "task_id": "pump",
+            "requested_kwh": 1.0,
+            "served_kwh": 1.0,
+            "deferred_kwh": 0.0,
+            "allocations": [
+              {
+                "hour": 8,
+                "served_kwh": 0.30000000000000004
+              },
+              {
+                "hour": 9,
+                "served_kwh": 0.30000000000000004
+              },
+              {
+                "hour": 10,
+                "served_kwh": 0.30000000000000004
+              },
+              {
+                "hour": 11,
+                "served_kwh": 0.09999999999999987
+              }
+            ]
+          }
+        ]
+      },
+      "comparison": {
+        "same_flexible_work_completed": true,
+        "battery_preserved_at_midnight_kwh": 0.08444444444444477,
+        "minimum_battery_improvement_kwh": 0.0,
+        "evening_minimum_improvement_kwh": 0.08444444444444477,
+        "conversion_loss_reduction_kwh": 0.08444444444444443,
+        "heuristic_matches_optimizer_metrics": false
+      },
+      "warnings": [],
+      "recommendations": [
+        {
+          "severity": "info",
+          "title": "Same flexible work completed",
+          "explanation": "Both schedules complete 1.000000 kWh of optional work. Optimized minus baseline battery at midnight: +0.084444 kWh; daily minimum: +0.000000 kWh. Baseline minus optimized conversion losses: +0.084444 kWh. These are separate quantities and must not be added together.",
+          "task_id": null,
+          "hours": null
+        },
+        {
+          "severity": "info",
+          "title": "Schedule: Water pump",
+          "explanation": "Serve 1.000000 of 1.000000 kWh in slots starting 08:00, 09:00, 10:00, 11:00; defer 0.000000 kWh within this horizon. Allocations respect the allowed windows and the ordered critical/reserve constraints.",
+          "task_id": "pump",
+          "hours": [
+            8,
+            9,
+            10,
+            11
+          ]
+        },
+        {
+          "severity": "info",
+          "title": "Sunshine-first and MILP outcomes differ",
+          "explanation": "Compare all three plans, including their work completion and warnings. The sunshine-first rule has no battery look-ahead or reserve constraint; a higher battery alone does not establish a better outcome.",
+          "task_id": null,
+          "hours": null
+        }
+      ]
+    },
+    "recovery": null
+  },
+  "plan_status": "current",
+  "plan_error": null,
+  "selected_recovery_intervention_id": null,
+  "sunshine_factor": 1.0
+}

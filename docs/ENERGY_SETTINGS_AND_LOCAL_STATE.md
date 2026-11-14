@@ -63,6 +63,26 @@ messages with stable IDs and timestamps. Agent responses include `message_id`
 and `user_message_id` so the UI can reconcile optimistic and restored messages
 without duplication. Social messages do not alter input or planning revisions.
 
+For an explicit switch from an older in-memory preview, export its actual GET
+session response and user/assistant transcript before refreshing. Then, with the
+new server stopped, run:
+
+```bash
+.venv/bin/python scripts/migrate_planning_snapshot.py \
+  --state /absolute/path/legacy-session.json \
+  --conversation /absolute/path/legacy-transcript.json \
+  --output /absolute/path/NEW-private-planning-state.json
+```
+
+The command refuses to overwrite a file, validates the existing clinic with the
+original catalog, retains IDs/activities/results/selection, and leaves an unknown
+current reading null. UI notices are preserved in the source export rather than
+relabeled as Llama replies. Imported messages are marked `imported:true`; an
+unknown old send time is recorded at import, not fabricated as a historical
+timestamp. Old private receipt keys are not available through GET, but confirmed
+proposal status still prevents duplicate adoption. Keep the original exports.
+Start the new server with `LIFELINE_STATE_PATH` pointing to the new validated file.
+
 Agent responses also carry `presentation` identifying the relevant result's
 input revision, generation, selected tested option IDs, and whether a schedule
 is relevant. Ordinary conversation does not automatically display every plan.

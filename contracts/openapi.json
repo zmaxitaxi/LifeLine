@@ -4744,6 +4744,11 @@
               }
             ],
             "title": "Mode"
+          },
+          "imported": {
+            "type": "boolean",
+            "title": "Imported",
+            "default": false
           }
         },
         "additionalProperties": false,

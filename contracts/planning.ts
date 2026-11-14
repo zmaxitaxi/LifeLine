@@ -23,7 +23,7 @@ export interface SessionAgentRequest extends RevisionRequest { question: string 
 export interface CreateEnergySettingsProposal extends RevisionRequest { settings?: EnergySettingsPatch; current_battery_reading?: BatteryReading|null }
 export type UpdateEnergySettingsProposal = CreateEnergySettingsProposal;
 export interface AgentPresentation { kind: 'conversation'|'activity_review'|'energy_review'|'calculation'|'explanation'; input_revision: number|null; generation: number|null; option_ids: string[]; show_schedule: boolean }
-export interface PlanningMessage { id: string; role: 'user'|'assistant'; content: string; created_at: string; presentation: AgentPresentation|null; mode: 'local_tool_agent'|'local_agent_unavailable'|null }
+export interface PlanningMessage { id: string; role: 'user'|'assistant'; content: string; created_at: string; presentation: AgentPresentation|null; mode: 'local_tool_agent'|'local_agent_unavailable'|null; imported: boolean }
 export interface PlanningConversation { session_id: string; messages: PlanningMessage[] }
 export interface SessionAgentResponse { mode: 'local_tool_agent'|'local_agent_unavailable'; model: string|null; message: string; needs_clarification: boolean; clarification_fields: string[]; tool_calls: string[]; presentation: AgentPresentation; message_id: string|null; user_message_id: string|null; state: PlanningState }
 export interface PlanningError { error: { code: 'REVISION_CONFLICT'|'PROPOSAL_INCOMPLETE'|'INVALID_ACTIVITY'|'PROPOSAL_CLOSED'|'IDEMPOTENCY_CONFLICT'|'STALE_RESULT'|'NOT_FOUND'|'INVALID_REQUEST'|'UNSUPPORTED_FORECAST_DAY'|string; message: string; details: {loc:(string|number)[]; message:string; type:string}[] } }

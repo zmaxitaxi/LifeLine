@@ -1,0 +1,174 @@
+{
+  "id": "2d1e2ed0-dffb-4760-a239-a33616f4bcfe",
+  "revision": 0,
+  "input_revision": 0,
+  "selected_clinic_id": "reviewed-clinic",
+  "clinic_name": "Operator clinic",
+  "location": {
+    "latitude": -0.0917,
+    "longitude": 34.768
+  },
+  "planning_date": "2026-11-14",
+  "timezone": null,
+  "clinic": {
+    "battery_capacity_kwh": 4.0,
+    "initial_battery_kwh": 2.0,
+    "reserve_kwh": 0.5,
+    "pv_capacity_kw": 1.0,
+    "charge_efficiency": 0.9,
+    "discharge_efficiency": 0.9,
+    "max_charge_kw": 2.0,
+    "max_discharge_kw": 2.0,
+    "scenario": "normal",
+    "equipment": [
+      {
+        "id": "fridge",
+        "name": "Vaccine refrigerator",
+        "category": "critical",
+        "power_kw": 0.1,
+        "required_hours": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "id": "pump",
+        "name": "Water pump",
+        "category": "flexible",
+        "max_power_kw": 0.5,
+        "required_energy_kwh": 1.0,
+        "allowed_hours": [
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "baseline_allocations": [
+          {
+            "hour": 8,
+            "requested_kwh": 0.5
+          },
+          {
+            "hour": 9,
+            "requested_kwh": 0.5
+          }
+        ],
+        "divisible": true
+      }
+    ],
+    "weather_dataset": "synthetic"
+  },
+  "equipment_inventory": [
+    {
+      "id": "fridge",
+      "name": "Vaccine refrigerator",
+      "category": "critical",
+      "power_kw": 0.1,
+      "required_hours": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ]
+    },
+    {
+      "id": "pump",
+      "name": "Water pump",
+      "category": "flexible",
+      "max_power_kw": 0.5,
+      "required_energy_kwh": 1.0,
+      "allowed_hours": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "baseline_allocations": [
+        {
+          "hour": 8,
+          "requested_kwh": 0.5
+        },
+        {
+          "hour": 9,
+          "requested_kwh": 0.5
+        }
+      ],
+      "divisible": true
+    }
+  ],
+  "energy_settings": {
+    "battery_capacity_kwh": 4.0,
+    "initial_battery_kwh": 2.0,
+    "reserve_kwh": 0.5,
+    "pv_capacity_kw": 1.0,
+    "charge_efficiency": 0.9,
+    "discharge_efficiency": 0.9,
+    "max_charge_kw": 2.0,
+    "max_discharge_kw": 2.0,
+    "additional_critical_kw": 0.0
+  },
+  "current_battery_reading": null,
+  "energy_proposals": [],
+  "active_energy_proposal_id": null,
+  "confirmed_activities": [],
+  "proposals": [],
+  "active_proposal_id": null,
+  "forecast_reference": null,
+  "computed_plan": null,
+  "plan_status": "not_computed",
+  "plan_error": null,
+  "selected_recovery_intervention_id": null,
+  "sunshine_factor": 1.0
+}

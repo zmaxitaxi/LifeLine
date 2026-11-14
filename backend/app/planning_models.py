@@ -225,6 +225,7 @@ class PlanningMessage(StrictModel):
     created_at: datetime
     presentation: AgentPresentation | None = None
     mode: Literal['local_tool_agent', 'local_agent_unavailable'] | None = None
+    imported: bool = False
 
 
 class PlanningConversation(StrictModel):

@@ -1,5 +1,5 @@
 {
-  "id": "afb1906e-1cce-40f5-9f03-bc6d6b9aeef0",
+  "id": "2d1e2ed0-dffb-4760-a239-a33616f4bcfe",
   "revision": 1,
   "input_revision": 0,
   "selected_clinic_id": "reviewed-clinic",
@@ -148,10 +148,24 @@
       "divisible": true
     }
   ],
+  "energy_settings": {
+    "battery_capacity_kwh": 4.0,
+    "initial_battery_kwh": 2.0,
+    "reserve_kwh": 0.5,
+    "pv_capacity_kw": 1.0,
+    "charge_efficiency": 0.9,
+    "discharge_efficiency": 0.9,
+    "max_charge_kw": 2.0,
+    "max_discharge_kw": 2.0,
+    "additional_critical_kw": 0.0
+  },
+  "current_battery_reading": null,
+  "energy_proposals": [],
+  "active_energy_proposal_id": null,
   "confirmed_activities": [],
   "proposals": [
     {
-      "id": "8382875d-c7ae-4e65-bc59-499f6b921a40",
+      "id": "2674bd72-3729-4a59-bc85-f7913ad38d46",
       "status": "draft",
       "target_activity_id": null,
       "base_activity_version": null,
@@ -172,7 +186,7 @@
       "confirmed_activity_id": null
     }
   ],
-  "active_proposal_id": "8382875d-c7ae-4e65-bc59-499f6b921a40",
+  "active_proposal_id": "2674bd72-3729-4a59-bc85-f7913ad38d46",
   "forecast_reference": null,
   "computed_plan": null,
   "plan_status": "not_computed",
