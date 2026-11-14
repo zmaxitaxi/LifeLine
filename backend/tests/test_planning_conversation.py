@@ -272,3 +272,66 @@ def test_existing_device_runtime_constraint_needs_physical_reference_and_device_
     text='The Water pump must operate for 3 hours.'
     tool=DraftTool(details=ActivityDraft(equipment_constraints=[{'equipment_id':'pump','required_duration_hours':3}]),evidence={'equipment_constraints':text})
     validate_grounding(tool,text,state)
+
+
+@pytest.mark.parametrize('bad',[
+    'The clinic is safe tomorrow.', 'The battery will last through the night.',
+    'We have sufficient electricity.', 'The power settings are now active.',
+    'The activity has been confirmed.', 'Confirmed!',
+])
+def test_direct_prose_cannot_assert_availability_or_adopt_pending_changes(bad):
+    service,weather=service_for()
+    agent,_=agent_with([{'content':bad},{'content':'These changes are still pending operator review.'}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=propose(client,create(client))
+        state=post(client,f"{BASE}/{state['id']}/energy-proposals",{'expected_revision':state['revision'],'settings':{'battery_capacity_kwh':8.}})
+        reply=ask(client,state,'Can we talk about those drafts?')
+        assert reply['message']=='These changes are still pending operator review.'
+        assert reply['state']==state and not weather and not reply['state']['confirmed_activities']
+
+
+@pytest.mark.parametrize('message',[
+    'I cannot determine whether the clinic is safe tomorrow.',
+    'I cannot determine whether we have sufficient electricity without checking the plan.',
+    'A larger battery might help if storage is limiting; that idea has not been evaluated.',
+])
+def test_uncertain_and_hypothetical_prose_is_not_an_affirmative_assurance(message):
+    service,weather=service_for();agent,_=agent_with([{'content':message}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client);reply=ask(client,state,'What do you think, without calculating yet?')
+        assert reply['message']==message and reply['state']==state and not weather
+
+
+def test_existing_confirmed_activity_can_be_discussed_while_a_different_draft_is_pending():
+    from test_planning_state import confirm
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as client:
+        state=confirm(client,propose(client,create(client),name='Morning vaccination campaign'))
+        state=propose(client,state,name='New afternoon campaign')
+        message='The earlier Morning vaccination campaign has been confirmed. The new afternoon draft remains unconfirmed.'
+        agent,_=agent_with([{'content':message}]);client.app.state.agent=agent
+        reply=ask(client,state,'Which activity is already confirmed?')
+        assert reply['message']==message and reply['state']==state
+
+
+def test_effective_confirmed_runtime_replaces_baseline_in_read_only_fact_context():
+    from test_planning_state import confirm
+    from app.planning_conversation import collect_reply_facts
+    service,weather=service_for()
+    with TestClient(create_app(forecast_service=service)) as client:
+        state=create(client)
+        state=propose(client,state,start_hour=9,end_hour=15,equipment_ids=['pump'],
+            equipment_constraints=[{'equipment_id':'pump','required_duration_hours':3}])
+        state=confirm(client,state)
+        # Storage intentionally retains the baseline physical inventory separately.
+        assert next(item for item in state['equipment_inventory'] if item['id']=='pump')['required_energy_kwh']==1.
+        facts=collect_reply_facts(state_model(state))
+        assert 'Water pump' in facts['equipment_inventory'] and '1.5 kWh' in facts['equipment_inventory']
+        assert '3 hours' in facts['equipment_inventory']
+        message='The confirmed Water pump requirement is 3 hours of daily operation, corresponding to 1.5 kWh in this model.'
+        agent,calls=agent_with([{'content':message}]);client.app.state.agent=agent
+        count=len(weather);reply=ask(client,state,'How long must the pump run now?')
+        assert reply['mode']=='local_tool_agent' and reply['message']==message
+        assert reply['state']==state and len(weather)==count
+        wire=json.loads(next(call.content for call in calls if call.method=='POST'))
+        assert 'explicit confirmed minimum total daily device runtime 3 hours' in wire['messages'][1]['content']
