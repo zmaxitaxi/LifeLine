@@ -13,9 +13,10 @@ from test_weather_forecast import service_for, request_body
 from app.scenarios import load_catalog
 
 
-def agent_with(calls=None, *, failure=None, remote=False):
+def agent_with(calls=None, *, failure=None, remote=False, syntheses=None, synthesis_failure=None):
     requests=[]
     calls=list(calls or [])
+    syntheses=None if syntheses is None else list(syntheses)
     def handler(request):
         requests.append(request)
         if request.url.path=='/api/tags':
@@ -26,7 +27,34 @@ def agent_with(calls=None, *, failure=None, remote=False):
         assert body['model']=='llama3.1:8b'
         assert body['stream'] is False
         assert not any(t['function']['name'] in ('send_email','run_python','update_clinic') for t in body['tools'])
-        call=calls.pop(0) if calls else {'name':'clarify','arguments':{'field':'intent'}}
+        if {t['function']['name'] for t in body['tools']} == {'compose_planning_reply'}:
+            if synthesis_failure:
+                return httpx.Response(synthesis_failure,json={'error':'private synthesis failure'})
+            if syntheses is not None:
+                call=syntheses.pop(0) if syntheses else {'name':'compose_planning_reply','arguments':{'message':'invalid missing references'}}
+                return httpx.Response(200,json={'message':{'role':'assistant','content':'','tool_calls':[{'function':call}]}})
+            # Synthetic synthesis fixture: verified facts still come from the real numerical model.
+            facts=json.loads(body['messages'][1]['content'])
+            keys=list(facts['required_references'])
+            keys += facts['recovery_options'][:3]
+            sentences=['Please review this modeled result.']
+            for key in keys:
+                item=facts['verified_facts'][key]
+                if key=='scope' and isinstance(item,dict):
+                    sentences.append('This is a modeled comparison for review, not a clinical guarantee. Hypothetical changes remain unadopted.')
+                elif isinstance(item,str):
+                    sentences.append(item)
+                elif key=='essential_summary':
+                    sentences.append(f"The existing baseline leaves {item['remaining_unserved_essential_energy']} of essential energy unserved. Flexible work unfinished is {item['flexible_unfinished']}.")
+                elif key=='selected_option':
+                    sentences.append(f"The selected {item['kind']} comparison leaves {item['remaining_unserved_essential_energy']} of essential energy unserved.")
+                    for change in item['hypothetical_changes']:
+                        sentences.append(f"The selected hypothetical change is {change['field']}: {change['before']} to {change['after']}.")
+                elif key.startswith('option_'):
+                    sentences.append(f"Tested option: {item['kind']} leaves {item['remaining_unserved_essential_energy']} of essential energy unserved.")
+            call={'name':'compose_planning_reply','arguments':{'message':' '.join(sentences),'fact_references':keys}}
+        else:
+            call=calls.pop(0) if calls else {'name':'clarify','arguments':{'field':'intent'}}
         return httpx.Response(200,json={'message':{'role':'assistant','content':'INVENTED ANSWER 99999 kWh — must never be displayed',
             'tool_calls':[{'function':call}]}})
     return LocalAgent(transport=httpx.MockTransport(handler)),requests
