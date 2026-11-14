@@ -1,0 +1,308 @@
+{
+  "implementation_commit": "da0381bd744df303f6d9cae042e57ef42880f914",
+  "started_at": "2026-11-14T03:45:55.449709+00:00",
+  "model": "llama3.1:8b",
+  "basis": "SYNTHETIC DEMO WEATHER; actual local Llama; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.",
+  "first_visible_basis": "Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.",
+  "cases": [
+    {
+      "name": "history",
+      "question": "Actually, I mean tomorrow at 10 AM. What else do you need to plan that vaccination campaign?",
+      "total_seconds": 100.00406862515956,
+      "first_visible_seconds": 100.00406862515956,
+      "model_calls": [
+        {
+          "seconds": 17.840425833128393,
+          "request_bytes": 13918,
+          "message_chars": 7439,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_bzpuzpkt",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "duration_hours": null,
+                    "equipment_ids": null,
+                    "deadline_hour": null,
+                    "equipment_constraints": null,
+                    "additional_equipment": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 17820781000,
+            "load_duration": 3845292,
+            "prompt_eval_count": 2742,
+            "prompt_eval_duration": 13702470000,
+            "eval_count": 59,
+            "eval_duration": 3737929000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 14.83752266690135,
+          "request_bytes": 14712,
+          "message_chars": 8230,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_hgfc553i",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "equipment_constraints": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 14805517917,
+            "load_duration": 2938958,
+            "prompt_eval_count": 2892,
+            "prompt_eval_duration": 11007047000,
+            "eval_count": 59,
+            "eval_duration": 3775990000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 16.06980854086578,
+          "request_bytes": 15506,
+          "message_chars": 9021,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_qlx1n5ed",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "duration_hours": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 16033523958,
+            "load_duration": 2265916,
+            "prompt_eval_count": 3042,
+            "prompt_eval_duration": 11626561000,
+            "eval_count": 59,
+            "eval_duration": 4379532000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 16.33674158435315,
+          "request_bytes": 16300,
+          "message_chars": 9812,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_unc7j1ik",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 16294898167,
+            "load_duration": 7696125,
+            "prompt_eval_count": 3192,
+            "prompt_eval_duration": 12139248000,
+            "eval_count": 59,
+            "eval_duration": 4128846999,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 17.794320249930024,
+          "request_bytes": 17094,
+          "message_chars": 10603,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_cxsc683d",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "additional_equipment": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 17761222459,
+            "load_duration": 6747584,
+            "prompt_eval_count": 3342,
+            "prompt_eval_duration": 11979345000,
+            "eval_count": 59,
+            "eval_duration": 5746955000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 17.071984542068094,
+          "error": "CancelledError",
+          "request_bytes": 17888
+        }
+      ],
+      "phases_seconds": {
+        "model_status_http": 0.029795916751027107,
+        "response_serialization": 0.00015345774590969086,
+        "model_http": 99.95080341724679,
+        "conversation_persistence": 0.0001927502453327179,
+        "agent_total": 100.00270716566592
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.029795916751027107
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.840425833128393
+        },
+        {
+          "phase": "model_http",
+          "seconds": 14.83752266690135
+        },
+        {
+          "phase": "model_http",
+          "seconds": 16.06980854086578
+        },
+        {
+          "phase": "model_http",
+          "seconds": 16.33674158435315
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.794320249930024
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.071984542068094
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 100.00270716566592
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0001927502453327179
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00015345774590969086
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model exceeded its response time limit. Completed planning changes are preserved; retry the current request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "dbb7cf3e-b048-49a7-8f3f-6d8a1356ef38",
+        "user_message_id": "e09978c2-60fc-405f-b56b-910a9122b52d"
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    }
+  ],
+  "completed_at": "2026-11-14T03:47:35.731342+00:00"
+}

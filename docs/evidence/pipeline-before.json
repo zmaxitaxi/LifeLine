@@ -1,0 +1,1620 @@
+{
+  "implementation_commit": "da0381bd744df303f6d9cae042e57ef42880f914",
+  "started_at": "2026-11-14T03:38:34.075757+00:00",
+  "model": "llama3.1:8b",
+  "basis": "SYNTHETIC DEMO WEATHER; actual local Llama; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.",
+  "first_visible_basis": "Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.",
+  "cases": [
+    {
+      "name": "conversation",
+      "question": "Hello",
+      "total_seconds": 63.701764749828726,
+      "first_visible_seconds": 63.701764749828726,
+      "model_calls": [
+        {
+          "seconds": 19.64490104233846,
+          "request_bytes": 13089,
+          "message_chars": 6618,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_my7i3fz0",
+                "function": {
+                  "index": 0,
+                  "name": "inspect_planning_state",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 19628194875,
+            "load_duration": 4107270167,
+            "prompt_eval_count": 2592,
+            "prompt_eval_duration": 14684622000,
+            "eval_count": 15,
+            "eval_duration": 826121000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 9.148602374829352,
+          "request_bytes": 14232,
+          "message_chars": 7759,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "The clinic is currently in a not_computed state, meaning that no plan has been generated yet. The latest edited fields are empty, and there are no active proposals or drafts. The selected clinic is the Illustrative benchmark clinic, and the planning date is November 15, 2026."
+          },
+          "ollama": {
+            "total_duration": 9113581833,
+            "load_duration": 1871875,
+            "prompt_eval_count": 1597,
+            "prompt_eval_duration": 4984661000,
+            "eval_count": 60,
+            "eval_duration": 3955054000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 9.612163292244077,
+          "request_bytes": 14811,
+          "message_chars": 8336,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_f01394p3",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 9585478167,
+            "load_duration": 6997792,
+            "prompt_eval_count": 2946,
+            "prompt_eval_duration": 8741734000,
+            "eval_count": 14,
+            "eval_duration": 805240000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 11.543060417287052,
+          "request_bytes": 15445,
+          "message_chars": 8967,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_997o20sl",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": "false",
+                    "sunshine_factor": "1"
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 11517270417,
+            "load_duration": 2440542,
+            "prompt_eval_count": 3059,
+            "prompt_eval_duration": 9563424000,
+            "eval_count": 29,
+            "eval_duration": 1936068000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 13.602227499708533,
+          "request_bytes": 18493,
+          "message_chars": 12013,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "The clinic's current plan is to use the optimized schedule, which has a lowest battery level of 6.0 kWh. The essential demand is not met, and all required essential and flexible work is not met. This does not establish real-world availability or clinical safety. The optimized schedule has a remaining unserved essential energy of 1.2 kWh and a flexible unfinished of 0.0 kWh. The battery summary shows a lowest stored energy of 6.0 kWh and a reserve target of 1.0 kWh. The weather basis is a synthetic demo weather with assumed clear-day irradiation and sample temperatures, not observations or a live forecast."
+          },
+          "ollama": {
+            "total_duration": 13554028083,
+            "load_duration": 4772750,
+            "prompt_eval_count": 2441,
+            "prompt_eval_duration": 4923683000,
+            "eval_count": 132,
+            "eval_duration": 8593690000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "agent_total": 63.694573666900396,
+        "conversation_persistence": 0.0017814170569181442,
+        "forecast_case_including_milp": 0.03396575013175607,
+        "model_http": 63.550954626407474,
+        "weather": 0.000510042067617178,
+        "response_serialization": 0.0009011253714561462,
+        "model_status_http": 0.042502458207309246,
+        "milp": 0.03236912516877055
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.042502458207309246
+        },
+        {
+          "phase": "model_http",
+          "seconds": 19.64490104233846
+        },
+        {
+          "phase": "model_http",
+          "seconds": 9.148602374829352
+        },
+        {
+          "phase": "model_http",
+          "seconds": 9.612163292244077
+        },
+        {
+          "phase": "model_http",
+          "seconds": 11.543060417287052
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.000510042067617178
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.03236912516877055
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.03396575013175607
+        },
+        {
+          "phase": "model_http",
+          "seconds": 13.602227499708533
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 63.694573666900396
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0017814170569181442
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0009011253714561462
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "The clinic's current plan is to use the optimized schedule, which has a lowest battery level of 6.0 kWh. The essential demand is not met, and all required essential and flexible work is not met. This does not establish real-world availability or clinical safety. The optimized schedule has a remaining unserved essential energy of 1.2 kWh and a flexible unfinished of 0.0 kWh. The battery summary shows a lowest stored energy of 6.0 kWh and a reserve target of 1.0 kWh. The weather basis is a synthetic demo weather with assumed clear-day irradiation and sample temperatures, not observations or a live forecast.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "inspect_planning_state",
+          "recompute_clinic_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "f2449ec8-0fbc-4296-a9b7-ad58ad104088",
+        "user_message_id": "253ae875-2655-4794-a3ac-3909faa28333"
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "assessment",
+      "question": "Can our clinic safely operate tomorrow given the weather forecast?",
+      "total_seconds": 40.140881875064224,
+      "first_visible_seconds": 40.140881875064224,
+      "model_calls": [
+        {
+          "seconds": 6.976593167055398,
+          "request_bytes": 13211,
+          "message_chars": 6740,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_6el3k80f",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": "false",
+                    "sunshine_factor": "1.0"
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 6950055250,
+            "load_duration": 4555666,
+            "prompt_eval_count": 2613,
+            "prompt_eval_duration": 4597178000,
+            "eval_count": 31,
+            "eval_duration": 2039581000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 12.707546167075634,
+          "request_bytes": 16322,
+          "message_chars": 9849,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "The clinic cannot safely operate tomorrow given the weather forecast. The optimized schedule under the modeled forecast and assumptions indicates that essential demand is not met, and all required essential and flexible work is not met. This does not establish real-world availability or clinical safety."
+          },
+          "ollama": {
+            "total_duration": 12682495375,
+            "load_duration": 4850417,
+            "prompt_eval_count": 2007,
+            "prompt_eval_duration": 9166296000,
+            "eval_count": 51,
+            "eval_duration": 3259593000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 11.691897042095661,
+          "request_bytes": 17205,
+          "message_chars": 10730,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_fwwxekup",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 11627515542,
+            "load_duration": 5366625,
+            "prompt_eval_count": 3391,
+            "prompt_eval_duration": 10512832000,
+            "eval_count": 14,
+            "eval_duration": 1072185999,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 8.641149083152413,
+          "request_bytes": 20264,
+          "message_chars": 13787,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "The clinic's electrical plan indicates that there will be an essential energy shortfall of 1.200 kWh tomorrow. The lowest battery level is expected to be 6.000 kWh."
+          },
+          "ollama": {
+            "total_duration": 8597687916,
+            "load_duration": 5750833,
+            "prompt_eval_count": 2771,
+            "prompt_eval_duration": 5726838000,
+            "eval_count": 37,
+            "eval_duration": 2822368000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "agent_total": 40.1338132917881,
+        "conversation_persistence": 0.002267667092382908,
+        "forecast_case_including_milp": 0.016215791925787926,
+        "model_http": 40.01718545937911,
+        "weather": 0.0004166248254477978,
+        "response_serialization": 0.0007281252183020115,
+        "model_status_http": 0.022238583769649267,
+        "milp": 0.014507416170090437
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.022238583769649267
+        },
+        {
+          "phase": "model_http",
+          "seconds": 6.976593167055398
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.0004166248254477978
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.014507416170090437
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.016215791925787926
+        },
+        {
+          "phase": "model_http",
+          "seconds": 12.707546167075634
+        },
+        {
+          "phase": "model_http",
+          "seconds": 11.691897042095661
+        },
+        {
+          "phase": "model_http",
+          "seconds": 8.641149083152413
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 40.1338132917881
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.002267667092382908
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0007281252183020115
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": true,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "The clinic's electrical plan indicates that there will be an essential energy shortfall of 1.200 kWh tomorrow. The lowest battery level is expected to be 6.000 kWh.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan",
+          "explain_current_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "6b83d3dd-85f2-4c15-b6e7-c91b2fa59961",
+        "user_message_id": "c276be8a-b311-405b-9bf9-8c89be1456b7"
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "vaccination",
+      "question": "What if I wanted to plan a vaccination clinic today at 10 AM?",
+      "total_seconds": 100.02915045898408,
+      "first_visible_seconds": 100.02915045898408,
+      "model_calls": [
+        {
+          "seconds": 9.48064404213801,
+          "request_bytes": 13201,
+          "message_chars": 6730,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_fnlmt45n",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "start_hour": 10,
+                    "equipment_ids": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "end_hour": null,
+                    "equipment_constraints": null,
+                    "additional_equipment": null,
+                    "name": "vaccination clinic"
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 9427637875,
+            "load_duration": 4724167,
+            "prompt_eval_count": 2625,
+            "prompt_eval_duration": 4784522000,
+            "eval_count": 65,
+            "eval_duration": 4061954000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 20.00551608297974,
+          "request_bytes": 14009,
+          "message_chars": 7535,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_u4wlo6fm",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "end_hour": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "vaccination clinic",
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 19964820250,
+            "load_duration": 6213000,
+            "prompt_eval_count": 2780,
+            "prompt_eval_duration": 15262048000,
+            "eval_count": 65,
+            "eval_duration": 4570972000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 15.298404916189611,
+          "request_bytes": 14817,
+          "message_chars": 8340,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_3axui5yt",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "end_hour": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "vaccination clinic"
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 15253152500,
+            "load_duration": 3288083,
+            "prompt_eval_count": 2935,
+            "prompt_eval_duration": 11371447000,
+            "eval_count": 56,
+            "eval_duration": 3835148000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 15.852541957981884,
+          "request_bytes": 15625,
+          "message_chars": 9145,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_947zqypm",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "vaccination clinic",
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "end_hour": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 15770730667,
+            "load_duration": 3851375,
+            "prompt_eval_count": 3090,
+            "prompt_eval_duration": 11311170000,
+            "eval_count": 56,
+            "eval_duration": 4423829000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 16.73560083284974,
+          "request_bytes": 16433,
+          "message_chars": 9950,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_reaiho7y",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "end_hour": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "vaccination clinic"
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 16579286750,
+            "load_duration": 10572708,
+            "prompt_eval_count": 3245,
+            "prompt_eval_duration": 12274273000,
+            "eval_count": 56,
+            "eval_duration": 4056949000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 15.68844583304599,
+          "request_bytes": 17241,
+          "message_chars": 10755,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_2qbggiqd",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "end_hour": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "vaccination clinic",
+                    "start_hour": 10
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 15641537916,
+            "load_duration": 11921583,
+            "prompt_eval_count": 3400,
+            "prompt_eval_duration": 11915832000,
+            "eval_count": 56,
+            "eval_duration": 3694984000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 6.834406707901508,
+          "error": "CancelledError",
+          "request_bytes": 18049
+        }
+      ],
+      "phases_seconds": {
+        "agent_total": 100.0218803328462,
+        "conversation_persistence": 0.0009171660058200359,
+        "model_http": 99.89556037308648,
+        "response_serialization": 0.0026687076315283775,
+        "model_status_http": 0.0332651250064373
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.0332651250064373
+        },
+        {
+          "phase": "model_http",
+          "seconds": 9.48064404213801
+        },
+        {
+          "phase": "model_http",
+          "seconds": 20.00551608297974
+        },
+        {
+          "phase": "model_http",
+          "seconds": 15.298404916189611
+        },
+        {
+          "phase": "model_http",
+          "seconds": 15.852541957981884
+        },
+        {
+          "phase": "model_http",
+          "seconds": 16.73560083284974
+        },
+        {
+          "phase": "model_http",
+          "seconds": 15.68844583304599
+        },
+        {
+          "phase": "model_http",
+          "seconds": 6.834406707901508
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 100.0218803328462
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0009171660058200359
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0026687076315283775
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model exceeded its response time limit. Completed planning changes are preserved; retry the current request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "c61e3ab8-4c4c-436e-aa8b-01046e3d63d6",
+        "user_message_id": "3977ab64-ac1f-4980-9b5a-1147e02234f9"
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "recovery",
+      "question": "What changes could resolve our modeled essential electricity shortfall? Please compare tested recovery alternatives.",
+      "total_seconds": 100.1410422087647,
+      "first_visible_seconds": 100.1410422087647,
+      "model_calls": [
+        {
+          "seconds": 17.269211874809116,
+          "request_bytes": 13311,
+          "message_chars": 6840,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "{\"name\": \"respond_to_user\", \"parameters\": {\"message\": \"To resolve the modeled essential electricity shortfall, we need to consider alternative energy sources or optimize our current setup. Let me propose some tested recovery alternatives.\", \"fact_references\": [\"energy_settings\", \"equipment_inventory\", \"clinic_context\"], \"presentation\": {\"kind\": \"conversation\"}}"
+          },
+          "ollama": {
+            "total_duration": 17226031666,
+            "load_duration": 8632000,
+            "prompt_eval_count": 2624,
+            "prompt_eval_duration": 5381405000,
+            "eval_count": 70,
+            "eval_duration": 5910528000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 17.276760958135128,
+          "request_bytes": 14165,
+          "message_chars": 7692,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_24dviqlx",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 17243890958,
+            "load_duration": 2973542,
+            "prompt_eval_count": 2784,
+            "prompt_eval_duration": 16280782000,
+            "eval_count": 14,
+            "eval_duration": 846591000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 13.220857540611178,
+          "request_bytes": 14799,
+          "message_chars": 8323,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_705dgcsl",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": true,
+                    "sunshine_factor": 1
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 13195299500,
+            "load_duration": 2635958,
+            "prompt_eval_count": 2897,
+            "prompt_eval_duration": 11280835000,
+            "eval_count": 30,
+            "eval_duration": 1898745000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 37.97589987469837,
+          "request_bytes": 22187,
+          "message_chars": 15709,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "Based on the recompute_clinic_plan tool, the current plan status is \"current\" and the plan error is null. The optimized schedule has an essential requested energy of 2.000 kWh, an essential shortfall of 1.200 kWh, and a flexible work unfinished of 0.000 kWh. The lowest battery level in the optimized schedule is 6.000 kWh.\n\nThe existing recovery comparison ranks \"Test output: 1.4 kW\" first under its stated criteria. This option has a remaining unserved essential energy of 0.000 kWh and a flexible unfinished of 0.000 kWh.\n\nThe tool also provides a comparison between the existing and optimized schedules, showing that the optimized schedule has a lower minimum battery improvement and a lower conversion loss reduction.\n\nTo resolve the modeled essential electricity shortfall, we can consider the following options:\n\n1. Increase the maximum discharge power to 1.4 kW.\n2. Reschedule the work within the allowed hours.\n3. Increase the battery capacity to 10 kWh.\n4. Increase the solar capacity to 2 kW.\n\nThese options can be evaluated further to determine their feasibility and effectiveness in resolving the shortfall."
+          },
+          "ollama": {
+            "total_duration": 37945995541,
+            "load_duration": 4896458,
+            "prompt_eval_count": 3353,
+            "prompt_eval_duration": 14065347000,
+            "eval_count": 235,
+            "eval_duration": 23849113000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 13.950997250154614,
+          "error": "CancelledError",
+          "request_bytes": 23639
+        }
+      ],
+      "phases_seconds": {
+        "agent_total": 100.12785645900294,
+        "conversation_persistence": 0.005282416008412838,
+        "forecast_case_including_milp": 0.022027625236660242,
+        "recovery_forecast_case_including_milp": 0.06477679219096899,
+        "model_http": 99.6937274984084,
+        "weather": 0.0005752500146627426,
+        "response_serialization": 0.00189633434638381,
+        "model_status_http": 0.1331206657923758,
+        "milp": 0.08031424973160028
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.1331206657923758
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.269211874809116
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.276760958135128
+        },
+        {
+          "phase": "model_http",
+          "seconds": 13.220857540611178
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.0005752500146627426
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.02007995778694749
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.022027625236660242
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0071998341009020805
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.007684667129069567
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.007063957862555981
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.007633917033672333
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.00552733289077878
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.00598112540319562
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.009246500208973885
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.009809291921555996
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005099041853100061
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.005525541957467794
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005623999983072281
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006084583234041929
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005548832938075066
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006012582685798407
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004356542136520147
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.004737749695777893
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.006049166899174452
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006414708215743303
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.004519083071500063
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.004892624914646149
+        },
+        {
+          "phase": "model_http",
+          "seconds": 37.97589987469837
+        },
+        {
+          "phase": "model_http",
+          "seconds": 13.950997250154614
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 100.12785645900294
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.005282416008412838
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00189633434638381
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model exceeded its response time limit. Completed planning changes are preserved; retry the current request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "ea65736a-9d2e-4d3b-86d3-579ec0be0a9b",
+        "user_message_id": "993c2fb3-6b34-40ae-8ca7-477847779204"
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "followup",
+      "question": "Please explain my exact selected plan against the existing baseline without recalculating or refreshing weather.",
+      "total_seconds": 100.04025741573423,
+      "first_visible_seconds": 100.04025741573423,
+      "model_calls": [
+        {
+          "seconds": 20.590113583020866,
+          "request_bytes": 19411,
+          "message_chars": 12940,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_s39c20hz",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 20567318125,
+            "load_duration": 2541750,
+            "prompt_eval_count": 4056,
+            "prompt_eval_duration": 19064094000,
+            "eval_count": 14,
+            "eval_duration": 1108501000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 39.6946769580245,
+          "request_bytes": 22841,
+          "message_chars": 16368,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "The exact selected plan against the existing baseline is as follows:\n\n* The selected plan is \"Test output: 2.4 kW\" with a remaining unserved essential energy of 0.000 kWh and flexible unfinished work of 0.000 kWh.\n* The hypothetical changes adopted in the selected plan are an increase in the maximum discharge power from 0.4 kW to 2.4 kW.\n* The existing and optimized schedules have the same flexible work completed, and the sunshine-first heuristic matches the optimizer metrics.\n* The minimum battery improvement is -0.000 kWh, and the conversion loss reduction is -0.000 kWh.\n* The selected plan does not establish real-world availability or clinical safety, as the essential demand is not met in both the baseline and optimized schedules."
+          },
+          "ollama": {
+            "total_duration": 39665386000,
+            "load_duration": 3661416,
+            "prompt_eval_count": 3527,
+            "prompt_eval_duration": 24428122000,
+            "eval_count": 158,
+            "eval_duration": 14475848000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 13.195598875172436,
+          "request_bytes": 23906,
+          "message_chars": 17431,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_lfr51xg5",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 13176220417,
+            "load_duration": 2464792,
+            "prompt_eval_count": 4973,
+            "prompt_eval_duration": 12159276000,
+            "eval_count": 14,
+            "eval_duration": 994371000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 19.93228454189375,
+          "request_bytes": 27336,
+          "message_chars": 20859,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "The exact selected plan against the existing baseline is as follows:\n\n* The selected plan is \"Test output: 2.4 kW\" with a remaining unserved essential energy of 0.000 kWh and flexible unfinished work of 0.000 kWh.\n* The hypothetical changes adopted in the selected plan are an increase in the maximum discharge power from 0.4 kW to 2.4 kW.\n* The existing and optimized schedules have the same flexible work completed, and the sunshine-first heuristic matches the optimizer metrics.\n* The minimum battery improvement is -0.000 kWh, and the conversion loss reduction is -0.000 kWh.\n\nNote: The selected plan does not provide any information about the availability or clinical safety of the clinic."
+          },
+          "ollama": {
+            "total_duration": 19906219917,
+            "load_duration": 1911625,
+            "prompt_eval_count": 4444,
+            "prompt_eval_duration": 6946752000,
+            "eval_count": 149,
+            "eval_duration": 12946955000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 6.4495961661450565,
+          "error": "CancelledError",
+          "request_bytes": 28342
+        }
+      ],
+      "phases_seconds": {
+        "agent_total": 100.02267212513834,
+        "conversation_persistence": 0.009928375016897917,
+        "model_http": 99.86227012425661,
+        "response_serialization": 0.0015568332746624947,
+        "model_status_http": 0.015014458913356066
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.015014458913356066
+        },
+        {
+          "phase": "model_http",
+          "seconds": 20.590113583020866
+        },
+        {
+          "phase": "model_http",
+          "seconds": 39.6946769580245
+        },
+        {
+          "phase": "model_http",
+          "seconds": 13.195598875172436
+        },
+        {
+          "phase": "model_http",
+          "seconds": 19.93228454189375
+        },
+        {
+          "phase": "model_http",
+          "seconds": 6.4495961661450565
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 100.02267212513834
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.009928375016897917
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0015568332746624947
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model exceeded its response time limit. Completed planning changes are preserved; retry the current request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "4ecdd941-9b04-4b73-9c43-abbdc49a980a",
+        "user_message_id": "2ebbc95a-7118-4c39-93cd-3068ca66100a"
+      },
+      "state_summary": {
+        "revision_before": 3,
+        "revision_after": 3,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    },
+    {
+      "name": "history",
+      "question": "Actually, I mean tomorrow at 10 AM. What else do you need to plan that vaccination campaign?",
+      "total_seconds": 100.00406862515956,
+      "first_visible_seconds": 100.00406862515956,
+      "model_calls": [
+        {
+          "seconds": 17.840425833128393,
+          "request_bytes": 13918,
+          "message_chars": 7439,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_bzpuzpkt",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "duration_hours": null,
+                    "equipment_ids": null,
+                    "deadline_hour": null,
+                    "equipment_constraints": null,
+                    "additional_equipment": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 17820781000,
+            "load_duration": 3845292,
+            "prompt_eval_count": 2742,
+            "prompt_eval_duration": 13702470000,
+            "eval_count": 59,
+            "eval_duration": 3737929000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 14.83752266690135,
+          "request_bytes": 14712,
+          "message_chars": 8230,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_hgfc553i",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "equipment_constraints": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 14805517917,
+            "load_duration": 2938958,
+            "prompt_eval_count": 2892,
+            "prompt_eval_duration": 11007047000,
+            "eval_count": 59,
+            "eval_duration": 3775990000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 16.06980854086578,
+          "request_bytes": 15506,
+          "message_chars": 9021,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_qlx1n5ed",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "duration_hours": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "additional_equipment": null,
+                    "deadline_hour": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 16033523958,
+            "load_duration": 2265916,
+            "prompt_eval_count": 3042,
+            "prompt_eval_duration": 11626561000,
+            "eval_count": 59,
+            "eval_duration": 4379532000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 16.33674158435315,
+          "request_bytes": 16300,
+          "message_chars": 9812,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_unc7j1ik",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "additional_equipment": null,
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 16294898167,
+            "load_duration": 7696125,
+            "prompt_eval_count": 3192,
+            "prompt_eval_duration": 12139248000,
+            "eval_count": 59,
+            "eval_duration": 4128846999,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 17.794320249930024,
+          "request_bytes": 17094,
+          "message_chars": 10603,
+          "tool_schema_chars": 6314,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 800
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_cxsc683d",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "deadline_hour": null,
+                    "duration_hours": null,
+                    "equipment_constraints": null,
+                    "equipment_ids": null,
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "additional_equipment": null
+                  }
+                }
+              }
+            ]
+          },
+          "ollama": {
+            "total_duration": 17761222459,
+            "load_duration": 6747584,
+            "prompt_eval_count": 3342,
+            "prompt_eval_duration": 11979345000,
+            "eval_count": 59,
+            "eval_duration": 5746955000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 17.071984542068094,
+          "error": "CancelledError",
+          "request_bytes": 17888
+        }
+      ],
+      "phases_seconds": {
+        "model_status_http": 0.029795916751027107,
+        "response_serialization": 0.00015345774590969086,
+        "model_http": 99.95080341724679,
+        "conversation_persistence": 0.0001927502453327179,
+        "agent_total": 100.00270716566592
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.029795916751027107
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.840425833128393
+        },
+        {
+          "phase": "model_http",
+          "seconds": 14.83752266690135
+        },
+        {
+          "phase": "model_http",
+          "seconds": 16.06980854086578
+        },
+        {
+          "phase": "model_http",
+          "seconds": 16.33674158435315
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.794320249930024
+        },
+        {
+          "phase": "model_http",
+          "seconds": 17.071984542068094
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 100.00270716566592
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0001927502453327179
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.00015345774590969086
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model exceeded its response time limit. Completed planning changes are preserved; retry the current request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "dbb7cf3e-b048-49a7-8f3f-6d8a1356ef38",
+        "user_message_id": "e09978c2-60fc-405f-b56b-910a9122b52d"
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      }
+    }
+  ],
+  "completed_at": "2026-11-14T03:47:35.731342+00:00",
+  "instrumentation_note": "History case measured separately after correcting a missing required field in the benchmark history fixture; application behavior remained unmodified at baseline387b1ce."
+}

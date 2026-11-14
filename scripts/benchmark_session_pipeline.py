@@ -116,7 +116,7 @@ def main():
                         ('Does an event automatically use electricity?','An activity alone does not add electrical demand.'),
                         ('Our existing equipment is already configured.','The configured equipment remains the current source of device facts.'),
                         ('I am considering a vaccination campaign.','What day and local operating window are you considering?')]:
-                        asyncio.run(client.app.state.planning.record_turn(state['id'],q,SessionAgentResponse(message=a,state=client.app.state.planning.read(state['id']),mode='local_tool_agent',model=agent.model)))
+                        asyncio.run(client.app.state.planning.record_turn(state['id'],q,SessionAgentResponse(needs_clarification=False,message=a,state=client.app.state.planning.read(state['id']),mode='local_tool_agent',model=agent.model)))
                 question={'conversation':'Hello',
                     'assessment':'Can our clinic safely operate tomorrow given the weather forecast?',
                     'vaccination':'What if I wanted to plan a vaccination clinic today at 10 AM?',
