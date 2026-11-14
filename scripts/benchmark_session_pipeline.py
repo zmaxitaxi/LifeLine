@@ -168,7 +168,10 @@ def main():
                 elif name=='vaccination':correct=success and current==before and (('today' in text.lower() and 'tomorrow' in text.lower()) or (datetime.now(ZoneInfo('Africa/Nairobi')).date().isoformat() in text and before['planning_date'] in text)) and 'power rating' not in text.lower()
                 elif name=='recovery':correct=success and current.get('computed_plan') is not None and current['computed_plan'].get('recovery') is not None
                 elif name=='followup':correct=success and current==before and 'recompute_clinic_plan' not in data.get('tool_calls',[])
-                else:correct=success and any(word in text.lower() for word in ('end','finish','duration','how long','window')) and any(word in text.lower() for word in ('equipment','device','appliance')) and 'power rating' not in text.lower() and 'midnight' not in text.lower()
+                else:
+                    # New unspecified devices legitimately need ratings. Protect
+                    # confirmed inputs and require the actual missing event facts.
+                    correct=success and current['input_revision']==before['input_revision'] and current['confirmed_activities']==before['confirmed_activities'] and not any(e['phase']=='weather' for e in metrics.events) and any(word in text.lower() for word in ('end','finish','duration','how long','window')) and any(word in text.lower() for word in ('equipment','device','appliance'))
                 phases={phase:sum(e['seconds'] for e in metrics.events if e['phase']==phase) for phase in {e['phase'] for e in metrics.events}}
                 item={'name':name,'question':question,'total_seconds':total,'first_visible_seconds':total,
                     'model_calls':deepcopy(transport.calls),'phases_seconds':phases,'events':deepcopy(metrics.events),

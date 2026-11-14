@@ -533,7 +533,7 @@ def _qualified_coverage(state,sentence,message,calls):
         contexts=[option.metrics for option in recovery.options+[recovery.existing] if option.id==selected]
     elif re.search(r'\b(?:optimized|optimised|rescheduled|after)\b',sentence,re.I):
         contexts=[plan.simulation.optimized.metrics]
-    elif recovery and re.search(r'\b(?:option|alternative|candidate|upgrade)\b',sentence,re.I):
+    elif recovery and re.search(r'\b(?:option|alternative|candidate|upgrade|test|tested|comparison|change)\b',sentence,re.I):
         exact=[option.metrics for option in recovery.options if option.label.casefold() in sentence.casefold()]
         if exact:
             contexts=exact
@@ -560,6 +560,16 @@ def _qualified_coverage(state,sentence,message,calls):
     return bool(contexts) and all(covered(metrics)!=negative for metrics in contexts)
 
 
+def without_clinical_denials(text):
+    """Remove explicit denials only; subsequent affirmative clauses stay checked."""
+    negative=r"(?:does not|doesn't|cannot|can't|do not|don't)"
+    outcome=r'(?:clinical safety|real-world availability|availability|safety)'
+    text=re.sub(r'\b'+negative+r'\s+(?:establish|confirm|determine|assess|guarantee|ensure)\s+'
+        +outcome+r'(?:\s+(?:or|nor|and)\s+(?:(?:guarantee|ensure|establish)\s+)?'+outcome+r')*','',text,flags=re.I)
+    text=re.sub(r'\b'+negative+r'\s+(?:decide|tell|determine|assess|confirm)(?:\s+you)?\s+(?:whether|if)\s+[^.!?;]*?\bsafe(?:ly)?\b','',text,flags=re.I)
+    return re.sub(r'\b'+negative+r'\s+(?:give|provide|offer|make)\s+(?:a\s+)?(?:clinical(?:\s+or\s+availability)?\s+)?guarantee\b','',text,flags=re.I)
+
+
 def _non_operational_guards(message,state,calls):
     if not isinstance(message,str) or not message.strip() or len(message)>6000:
         raise PlanningError('INVALID_ACTIVITY','Return a short authored reply or choose an available tool.')
@@ -571,7 +581,7 @@ def _non_operational_guards(message,state,calls):
         uncertain=bool(re.search(r"\b(?:cannot|can't|do not|don't|unable to)\s+(?:yet\s+)?(?:determine|know|tell|judge|assess|confirm)|\b(?:not evaluated|not assessed|not checked|haven't checked|haven't evaluated|uncertain whether)\b",sentence,re.I))
         conditional=bool(re.search(r'\b(?:if|suppose|hypothetical|could|might|may|depends)\b',sentence,re.I))
         question=sentence.rstrip().endswith('?')
-        if re.search(r'\bsafe(?:ly)?\b',sentence,re.I) and not uncertain and not question:
+        if re.search(r'\bsafe(?:ly)?\b',without_clinical_denials(sentence),re.I) and not uncertain and not question:
             raise PlanningError('INVALID_ACTIVITY','An electrical model cannot establish clinical safety. Do not assert safety. Distinguish electrical shortfalls from clinical safety decisions. Use the current modeled result if one exists; otherwise the configured inputs already suffice for the calculator. Do not ask for known settings or replace the requested electrical assessment with a disclaimer.')
         availability=re.search(r'\b(?:we|you|(?:the|our|your|this)\s+clinic)\s+(?:have|has|will have)\s+(?:enough|sufficient|adequate)\b|\b(?:the|our|your|this)\s+battery\s+(?:will|can)\s+(?:last|power|supply|run)\b|\b(?:electricity|power|energy)\s+(?:is|will be)\s+(?:enough|sufficient|adequate)\b|\ball\s+(?:loads|needs|requirements)\s+(?:are|will be)\s+(?:met|covered|supplied)\b|\beverything is fine\b',sentence,re.I)
         modeled_claim=re.search(r'\b(?:covers?|meets?|supplies)\b.*\b(?:essential|critical|protected|all)\b.*\b(?:needs?|demand|loads?|requirements?)\b|\b(?:essential|critical|protected)\b.*\b(?:needs?|demand|loads?|requirements?)\b.*\b(?:met|covered|supplied)\b|\b(?:resolves?|solves?|eliminates?)\b.*\b(?:shortage|shortfall|deficit)\b',sentence,re.I)
@@ -586,7 +596,8 @@ def _non_operational_guards(message,state,calls):
     truthful_draft_update=draft_updated and not adopted_claim
     if pending_energy and passive_settings and not truthful_draft_update and not (re.search(r'\b(?:existing|original|previous|confirmed)\b',message,re.I) and re.search(r'\b(?:draft|proposal|new settings)\b.*\b(?:not|pending|unconfirmed)\b',message,re.I)):
         raise PlanningError('INVALID_ACTIVITY','The pending energy settings are not active; only explicit operator confirmation can adopt them.')
-    passive_activity=re.search(r'\b(?:activity|campaign|draft|proposal|changes?)\s+(?:is|are|has been|have been)\s+(?:(?:now|already|just)\s+)?(?:confirmed|adopted|applied|active)\b',message,re.I)
+    adoption_text=re.sub(r'\b(?:none of (?:these|those|the)|no)\s+(?:activities|activity|campaigns?|drafts?|proposals?|changes?)\s+(?:is|are|has been|have been)\s+(?:confirmed|adopted|applied|active)\b','',message,flags=re.I)
+    passive_activity=re.search(r'\b(?:activity|campaign|draft|proposal|changes?)\s+(?:is|are|has been|have been)\s+(?:(?:now|already|just)\s+)?(?:confirmed|adopted|applied|active)\b',adoption_text,re.I)
     if passive_activity:
         named=[activity for activity in state.confirmed_activities if activity.details.name.casefold() in message.casefold()]
         conflicting=pending_activity and (not named or any(activity.id==pending_activity.target_activity_id or activity.details.name==pending_activity.details.name for activity in named))
@@ -596,7 +607,7 @@ def _non_operational_guards(message,state,calls):
         raise PlanningError('INVALID_ACTIVITY','Only explicit operator confirmation can apply reviewed changes.')
     if re.search(r'\b(?:i have|i.ve|i)\s+(?:created|added|updated|changed|staged|scheduled)\b',message,re.I) and not any(name in calls for name in ('propose_activity','update_activity_draft','correct_last_activity_time','propose_activity_revision','propose_energy_settings','update_energy_settings_draft')):
         raise PlanningError('INVALID_ACTIVITY','No planning change has been made in this turn. Use a proposal tool before claiming one.')
-    disclaimer=re.sub(r'\b(?:not(?:\s+to)?|no|never|without|cannot|does not|do not)\s+(?:a\s+)?(?:clinical(?:ly)?\s+)?(?:safety(?:\s+or\s+availability)?\s+)?guarantee(?:s|d)?(?:\s+(?:clinical\s+)?(?:safety|availability))?|\bnot\s+safe','',message,flags=re.I)
+    disclaimer=re.sub(r'\b(?:not(?:\s+to)?|no|never|without|cannot|does not|do not)\s+(?:a\s+)?(?:clinical(?:ly)?\s+)?(?:safety(?:\s+or\s+availability)?\s+)?guarantee(?:s|d)?(?:\s+(?:clinical\s+)?(?:safety|availability))?|\bnot\s+safe','',without_clinical_denials(message),flags=re.I)
     if re.search(r'\b(?:guarantee\w*|clinically safe|safe to (?:operate|run)|unlimited|definitely enough|certainly enough)\b',disclaimer,re.I):
         raise PlanningError('INVALID_ACTIVITY','Do not give clinical or availability guarantees.')
     if re.search(r'\b(?:turn (?:off|on)|switch (?:off|on)|disconnect|unplug|shut down|vaccinate|administer|diagnose)\b',message,re.I):

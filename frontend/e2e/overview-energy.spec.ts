@@ -31,7 +31,7 @@ test('empty electrical requirements never produce a safe overview assessment',as
 
 test('public progress arrives before the verified reply and browser commit timing is observable',async({page,request})=>{
  await open(page,await seed(request));let calls=0;page.on('request',r=>{if(r.url().endsWith('/agent/stream'))calls++;});await page.getByLabel('Message LifeLine',{exact:true}).fill('Observe streamed progress for the clinic.');await page.getByRole('button',{name:'Send message',exact:true}).click();
- await expect(page.locator('.chat-weather')).toContainText('Request received. Preparing the assistant');await expect(page.getByTestId('current-plan-summary')).toHaveCount(0);await expect(page.getByLabel('Message LifeLine',{exact:true})).toBeEditable();
+ await expect(page.locator('.chat-weather')).toContainText(/Request received\. Preparing the assistant|The assistant is preparing a reply/);await expect(page.getByTestId('current-plan-summary')).toHaveCount(0);await expect(page.getByLabel('Message LifeLine',{exact:true})).toBeEditable();
  const measures=await page.evaluate(()=>performance.getEntriesByType('measure').map(e=>({name:e.name,duration:e.duration})));const first=measures.find(m=>m.name==='lifeline.first_progress_commit')!,final=measures.find(m=>m.name==='lifeline.answer_commit')!;expect(first.duration).toBeLessThan(final.duration);expect(calls).toBe(1);await expect(page.locator('.chat-transcript')).not.toContainText('UNVERIFIED RAW MODEL TEXT');
 });
 

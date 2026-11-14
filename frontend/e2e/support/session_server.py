@@ -90,7 +90,8 @@ def natural_session(payload):
         for field,pattern in [('battery_capacity_kwh',r'battery capacity[^\d]*(\d+(?:\.\d+)?)\s*kWh'),('initial_battery_pct',r'starting charge[^\d]*(\d+(?:\.\d+)?)%'),('current_battery_pct',r'current reading[^\d]*(\d+(?:\.\d+)?)%')]:
             match=re.search(pattern,question,re.I)
             if match:values[field]=float(match[1])
-        return wire('update_energy_settings_draft' if context.get('active_energy_proposal_id') else 'propose_energy_settings',values)
+        pending=context.get('active_energy_proposal_id') or context.get('reply_context',{}).get('active_energy_proposal')
+        return wire('update_energy_settings_draft' if pending else 'propose_energy_settings',values)
     if 'explain' in lower and 'plan' in lower:return wire('explain_current_plan',{})
     if 'vaccination campaign' in lower and 'change' not in lower:return wire('propose_activity',{'name':'vaccination campaign','start_hour':9,'end_hour':15})
     if '10 AM' in question:return wire('update_activity_draft',{'start_hour':10})

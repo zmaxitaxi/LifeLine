@@ -30,6 +30,21 @@ def test_verified_natural_calendar_dates_and_parenthesized_units_are_allowed():
             validate_reply_content(bad,state,'Tell me the settings.')
 
 
+def test_denials_do_not_become_assurances_or_false_confirmation_claims():
+    with TestClient(create_app()) as client:
+        state=model_state(create(client))
+    for good in ('This is an electrical planning estimate only and does not establish clinical safety or guarantee availability.',
+                 "I can't offer a clinical or availability guarantee.",
+                 'It does not decide whether the clinic can provide clinical services safely.',
+                 'None of these changes has been adopted.'):
+        assert validate_reply_content(good,state,'What are the limits?')==good
+    for bad in ('This model does not establish clinical safety, but the clinic is safe to operate.',
+                'It does not decide whether the clinic can operate safely, but the clinic is clinically safe.',
+                'These changes have been adopted.', 'The model guarantees availability.'):
+        with pytest.raises(PlanningError):
+            validate_reply_content(bad,state,'What are the limits?')
+
+
 def test_output_and_storage_options_bind_their_own_tested_size_and_result():
     service,_=service_for()
     with TestClient(create_app(forecast_service=service)) as client:
