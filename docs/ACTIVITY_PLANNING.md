@@ -2,7 +2,7 @@
 
 Complete JSON request/response examples are in `contracts/examples/planning.*.json`; their computed confirmation response uses clearly synthetic test-transport weather and the real numerical model. Live-weather/native evidence is separate below.
 
-Authoritative contracts: `contracts/planning.ts`, `/openapi.json` (snapshot `contracts/openapi.json`). All new routes use `/api/planning/sessions`. Existing simulation, forecast, recovery and stateless agent APIs remain compatible. New sessions are local process-memory state; retain their returned ID in the UI. Restart discards sessions. No account or database. Clinic/location/date/energy/inventory configuration is immutable within a session; deliberately create a new session when editing that context, keeping any unconfirmed proposals visibly separate. No implicit migration of activities between clinics or dates.
+Authoritative contracts: `contracts/planning.ts`, `/openapi.json` (snapshot `contracts/openapi.json`). All new routes use `/api/planning/sessions`. Existing simulation, forecast, recovery and stateless agent APIs remain compatible. Retain the returned session ID in the UI. Production sessions, receipts and recent conversation now survive restart in a private atomic local snapshot; test applications remain isolated in memory. Energy settings can be staged, reviewed and confirmed inside the session, retaining activities. See [reviewed energy settings and local state](ENERGY_SETTINGS_AND_LOCAL_STATE.md) for endpoints and persistence limits. Clinic/location/date and base inventory still require deliberately creating a new session; there is no implicit migration of activities between clinics or dates and no account system.
 
 ## Routes
 
@@ -34,6 +34,21 @@ Confirmation requires an operator-supplied `idempotency_key`. Repeating that key
 For flexible equipment, the operator may provide `required_duration_hours` (whole hours) instead of kWh. Python converts explicit rated `max_power_kw × required_duration_hours` into the required-energy budget; Llama does not calculate it. Both rating and equipment runtime must be supplied. If kWh is also supplied it must agree, or validation rejects the proposal. This is an equivalent full-rated-power budget for explicitly divisible/interruptible work, not a validated appliance cycle. It is distinct from `ActivityDraft.duration_hours`, which describes an event and never automatically creates electrical demand. A reviewed revision may change a confirmed flexible device's work budget while preserving its physical rating, classification, allowed window and divisibility; it updates one requirement, not the device count. Essential equipment remains protected.
 
 ## Example sequence
+
+For existing divisible flexible devices, an explicit
+`equipment_constraints[].required_duration_hours` sets a minimum **total daily
+physical-device runtime**, not extra work per activity. Python multiplies the
+known rated power by that runtime. Shared activities use the maximum of the
+baseline work requirement and every confirmed daily-runtime requirement, with
+intersected allowed windows. Thus two references to one pump never create two
+pumps or overwrite another activity's larger requirement. Reducing one reviewed
+runtime leaves the baseline and other confirmed requirements protected. Distinct
+additive jobs on the same device are not separately modeled by this field;
+review the combined daily runtime explicitly. Event `duration_hours` never
+changes electrical demand. This runtime budget cannot shorten essential hours
+or represent a continuous medical-device cycle. The existing fixed baseline
+allocations remain explicit: new work without baseline allocations is reported
+unfinished in that schedule rather than silently scheduled for the operator.
 
 Create session with configured clinic, coordinates, selected ISO date and explicit midnight stored energy. POST proposals with `{expected_revision:0,details:{name:"Vaccination campaign",planning_date:"2026-11-14"}}`. It returns a draft and missing start/end/equipment fields. PATCH the returned proposal ID with `{expected_revision:1,details:{start_hour:9}}`, then `{expected_revision:2,details:{start_hour:10,end_hour:15,equipment_ids:["fridge"]}}`. Omitted keys preserve the draft; null clears a field. Inspect the returned proposal before POST confirm `{expected_revision:3,idempotency_key:"operator-click-001"}`. The returned confirmed activity references the existing fridge once. POST recompute `{expected_revision:<latest>,sunshine_factor:0.5,include_recovery:true}` retains every confirmed activity, fetches actual Open-Meteo weather, then tests 50% of forecast irradiation using the original simulator/MILP and Recovery Planner. Selecting a recovery option records a reviewed comparison selection; it does not install hypothetical hardware.
 

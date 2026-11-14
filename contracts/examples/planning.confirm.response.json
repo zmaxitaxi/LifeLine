@@ -1,5 +1,5 @@
 {
-  "id": "afb1906e-1cce-40f5-9f03-bc6d6b9aeef0",
+  "id": "2d1e2ed0-dffb-4760-a239-a33616f4bcfe",
   "revision": 4,
   "input_revision": 1,
   "selected_clinic_id": "reviewed-clinic",
@@ -148,9 +148,23 @@
       "divisible": true
     }
   ],
+  "energy_settings": {
+    "battery_capacity_kwh": 4.0,
+    "initial_battery_kwh": 2.0,
+    "reserve_kwh": 0.5,
+    "pv_capacity_kw": 1.0,
+    "charge_efficiency": 0.9,
+    "discharge_efficiency": 0.9,
+    "max_charge_kw": 2.0,
+    "max_discharge_kw": 2.0,
+    "additional_critical_kw": 0.0
+  },
+  "current_battery_reading": null,
+  "energy_proposals": [],
+  "active_energy_proposal_id": null,
   "confirmed_activities": [
     {
-      "id": "f0c4f5aa-263c-4c36-b921-ae4f8ae8e300",
+      "id": "79d6275e-44f6-439d-9c9b-2c12e8396a1c",
       "version": 1,
       "status": "confirmed",
       "details": {
@@ -170,7 +184,7 @@
   ],
   "proposals": [
     {
-      "id": "8382875d-c7ae-4e65-bc59-499f6b921a40",
+      "id": "2674bd72-3729-4a59-bc85-f7913ad38d46",
       "status": "confirmed",
       "target_activity_id": null,
       "base_activity_version": null,
@@ -188,7 +202,7 @@
         "additional_equipment": []
       },
       "missing_fields": [],
-      "confirmed_activity_id": "f0c4f5aa-263c-4c36-b921-ae4f8ae8e300"
+      "confirmed_activity_id": "79d6275e-44f6-439d-9c9b-2c12e8396a1c"
     }
   ],
   "active_proposal_id": null,
@@ -523,7 +537,7 @@
   "computed_plan": {
     "input_revision": 1,
     "generation": 1,
-    "computed_at": "2026-11-13T23:17:59.545267Z",
+    "computed_at": "2026-11-14T01:07:35.464329Z",
     "sunshine_factor": 1.0,
     "simulation": {
       "api_version": "1.0",

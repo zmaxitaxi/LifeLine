@@ -787,6 +787,572 @@
         }
       }
     },
+    "/api/planning/sessions/{session_id}/conversation": {
+      "get": {
+        "tags": [
+          "Shared planning"
+        ],
+        "summary": "Conversation",
+        "operationId": "conversation_api_planning_sessions__session_id__conversation_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningConversation"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/planning/sessions/{session_id}/energy-proposals": {
+      "post": {
+        "tags": [
+          "Shared planning"
+        ],
+        "summary": "Propose Energy",
+        "operationId": "propose_energy_api_planning_sessions__session_id__energy_proposals_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnergySettingsProposal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningState"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/planning/sessions/{session_id}/energy-proposals/{proposal_id}": {
+      "get": {
+        "tags": [
+          "Shared planning"
+        ],
+        "summary": "Inspect Energy",
+        "operationId": "inspect_energy_api_planning_sessions__session_id__energy_proposals__proposal_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnergySettingsProposal"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Shared planning"
+        ],
+        "summary": "Update Energy",
+        "operationId": "update_energy_api_planning_sessions__session_id__energy_proposals__proposal_id__patch",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnergySettingsProposal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningState"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/planning/sessions/{session_id}/energy-proposals/{proposal_id}/confirm": {
+      "post": {
+        "tags": [
+          "Shared planning"
+        ],
+        "summary": "Confirm Energy",
+        "operationId": "confirm_energy_api_planning_sessions__session_id__energy_proposals__proposal_id__confirm_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmActivityProposal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningState"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
+    "/api/planning/sessions/{session_id}/energy-proposals/{proposal_id}/reject": {
+      "post": {
+        "tags": [
+          "Shared planning"
+        ],
+        "summary": "Reject Energy",
+        "operationId": "reject_energy_api_planning_sessions__session_id__energy_proposals__proposal_id__reject_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectActivityProposal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningState"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
     "/api/planning/sessions/{session_id}/proposals": {
       "post": {
         "tags": [
@@ -1835,6 +2401,64 @@
         ],
         "title": "ActivityProposal"
       },
+      "AgentPresentation": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "conversation",
+              "activity_review",
+              "energy_review",
+              "calculation",
+              "explanation"
+            ],
+            "title": "Kind",
+            "default": "conversation"
+          },
+          "input_revision": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Revision"
+          },
+          "generation": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generation"
+          },
+          "option_ids": {
+            "items": {
+              "type": "string",
+              "maxLength": 120,
+              "minLength": 1
+            },
+            "type": "array",
+            "title": "Option Ids",
+            "default": []
+          },
+          "show_schedule": {
+            "type": "boolean",
+            "title": "Show Schedule",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AgentPresentation"
+      },
       "AgentRequest": {
         "properties": {
           "latitude": {
@@ -2240,6 +2864,27 @@
         ],
         "title": "BackupDeficit"
       },
+      "BatteryReading": {
+        "properties": {
+          "energy_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Energy Kwh"
+          },
+          "measured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Measured At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "energy_kwh",
+          "measured_at"
+        ],
+        "title": "BatteryReading"
+      },
       "CapacityResult": {
         "properties": {
           "target": {
@@ -2501,6 +3146,34 @@
         ],
         "title": "CreateActivityProposal"
       },
+      "CreateEnergySettingsProposal": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Expected Revision"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/EnergySettingsPatch"
+          },
+          "current_battery_reading": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BatteryReading"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision"
+        ],
+        "title": "CreateEnergySettingsProposal"
+      },
       "CreatePlanningSession": {
         "properties": {
           "selected_clinic_id": {
@@ -2530,6 +3203,16 @@
             "type": "number",
             "minimum": 0.0,
             "title": "Midnight Battery Kwh"
+          },
+          "current_battery_reading": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BatteryReading"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "timezone": {
             "anyOf": [
@@ -2890,6 +3573,114 @@
         ],
         "title": "EffectiveConfig"
       },
+      "EnergySettingsPatch": {
+        "properties": {
+          "battery_capacity_kwh": {
+            "type": "number",
+            "maximum": 200.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Battery Capacity Kwh"
+          },
+          "initial_battery_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Initial Battery Kwh"
+          },
+          "reserve_kwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Reserve Kwh"
+          },
+          "pv_capacity_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pv Capacity Kw"
+          },
+          "charge_efficiency": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Charge Efficiency"
+          },
+          "discharge_efficiency": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Discharge Efficiency"
+          },
+          "max_charge_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Max Charge Kw"
+          },
+          "max_discharge_kw": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Max Discharge Kw"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "EnergySettingsPatch"
+      },
+      "EnergySettingsProposal": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "confirmed",
+              "rejected"
+            ],
+            "title": "Status",
+            "default": "draft"
+          },
+          "base_input_revision": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Base Input Revision"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/EnergySettingsPatch"
+          },
+          "proposed_energy_settings": {
+            "$ref": "#/components/schemas/EffectiveConfig"
+          },
+          "current_battery_reading": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BatteryReading"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updates_current_battery_reading": {
+            "type": "boolean",
+            "title": "Updates Current Battery Reading",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "base_input_revision",
+          "settings",
+          "proposed_energy_settings"
+        ],
+        "title": "EnergySettingsProposal"
+      },
       "EquipmentConstraint": {
         "properties": {
           "equipment_id": {
@@ -2929,6 +3720,19 @@
               }
             ],
             "title": "Allowed Hours"
+          },
+          "required_duration_hours": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 24.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Required Duration Hours"
           }
         },
         "additionalProperties": false,
@@ -2956,6 +3760,8 @@
               "REVISION_CONFLICT",
               "PROPOSAL_INCOMPLETE",
               "INVALID_ACTIVITY",
+              "INVALID_ENERGY_SETTINGS",
+              "STATE_UNAVAILABLE",
               "PROPOSAL_CLOSED",
               "IDEMPOTENCY_CONFLICT",
               "STALE_RESULT",
@@ -3863,6 +4669,98 @@
         ],
         "title": "PlannerToolRequest"
       },
+      "PlanningConversation": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Session Id"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/PlanningMessage"
+            },
+            "type": "array",
+            "title": "Messages",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id"
+        ],
+        "title": "PlanningConversation"
+      },
+      "PlanningMessage": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Id"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 12000,
+            "minLength": 1,
+            "title": "Content"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "presentation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentPresentation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "local_tool_agent",
+                  "local_agent_unavailable"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "imported": {
+            "type": "boolean",
+            "title": "Imported",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "content",
+          "created_at"
+        ],
+        "title": "PlanningMessage"
+      },
       "PlanningQuestion": {
         "properties": {
           "kind": {
@@ -4011,6 +4909,40 @@
             "type": "array",
             "title": "Equipment Inventory"
           },
+          "energy_settings": {
+            "$ref": "#/components/schemas/EffectiveConfig"
+          },
+          "current_battery_reading": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BatteryReading"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "energy_proposals": {
+            "items": {
+              "$ref": "#/components/schemas/EnergySettingsProposal"
+            },
+            "type": "array",
+            "title": "Energy Proposals",
+            "default": []
+          },
+          "active_energy_proposal_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Energy Proposal Id"
+          },
           "confirmed_activities": {
             "items": {
               "$ref": "#/components/schemas/Activity"
@@ -4112,7 +5044,8 @@
           "location",
           "planning_date",
           "clinic",
-          "equipment_inventory"
+          "equipment_inventory",
+          "energy_settings"
         ],
         "title": "PlanningState"
       },
@@ -5043,6 +5976,35 @@
             "title": "Tool Calls",
             "default": []
           },
+          "presentation": {
+            "$ref": "#/components/schemas/AgentPresentation"
+          },
+          "message_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message Id"
+          },
+          "user_message_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Message Id"
+          },
           "state": {
             "$ref": "#/components/schemas/PlanningState"
           }
@@ -5532,6 +6494,34 @@
           "details"
         ],
         "title": "UpdateActivityProposal"
+      },
+      "UpdateEnergySettingsProposal": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Expected Revision"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/EnergySettingsPatch"
+          },
+          "current_battery_reading": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BatteryReading"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision"
+        ],
+        "title": "UpdateEnergySettingsProposal"
       },
       "ValidationError": {
         "properties": {

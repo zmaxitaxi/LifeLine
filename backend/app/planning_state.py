@@ -8,7 +8,9 @@ from uuid import uuid4
 from pydantic import ValidationError
 from starlette.concurrency import run_in_threadpool
 from .planning_models import (PlanningState, ActivityProposal, Activity, ActivityDraft,
-                              ComputedPlan)
+                              ComputedPlan, PlanningMessage, PlanningConversation)
+from .energy_settings_models import EnergySettingsPatch, EnergySettingsProposal
+from .planning_persistence import LocalPlanningPersistence
 from .models import SimulationRequest, CriticalEquipment, FlexibleEquipment, RequestedTaskAllocation
 from .forecast_planner import forecast_case
 from .forecast_models import ForecastLocation
@@ -99,6 +101,8 @@ def validate_activity(details, state, *, complete=True, target=None):
             raise PlanningError('INVALID_ACTIVITY', 'Fixed operating constraints require critical equipment; continuous cycles are unsupported for divisible flexible tasks.')
         if constraint.allowed_hours is not None and equipment.category != 'flexible':
             raise PlanningError('INVALID_ACTIVITY', 'Essential equipment cannot be shortened, moved or made flexible.')
+        if constraint.required_duration_hours is not None and equipment.category != 'flexible':
+            raise PlanningError('INVALID_ACTIVITY', 'Daily runtime budgets apply only to explicitly divisible flexible equipment. Essential required hours remain protected.')
         hours = constraint.required_hours if constraint.required_hours is not None else constraint.allowed_hours
         if hours is not None:
             validate_hours(hours, details)
@@ -141,6 +145,11 @@ def compile_clinic(state, activities=None, inventory=None):
                         allocations.append(RequestedTaskAllocation(hour=hour, requested_kwh=energy))
                     remaining -= energy
                 item.baseline_allocations = allocations
+            if constraint.required_duration_hours is not None:
+                item.required_energy_kwh = max(item.required_energy_kwh,
+                    item.max_power_kw * constraint.required_duration_hours)
+                if item.required_energy_kwh > len(item.allowed_hours) * item.max_power_kw + 1e-7:
+                    raise PlanningError('INVALID_ACTIVITY', 'The shared device daily work requirement cannot fit its combined allowed hours.')
     try:
         return SimulationRequest.model_validate(state.clinic.model_dump(exclude_unset=True) |
             {'equipment': [e.model_dump() for e in equipment.values()]})
@@ -149,7 +158,7 @@ def compile_clinic(state, activities=None, inventory=None):
 
 
 class PlanningStore:
-    def __init__(self):
+    def __init__(self, persistence_path=None):
         self.states = {}
         self.lock = asyncio.Lock()
         self.receipts = {}
@@ -157,6 +166,73 @@ class PlanningStore:
         self.history = {}
         self.last_edited_fields = {}
         self.agent_diagnostics = {}
+        self.conversations = {}
+        self.persistence = LocalPlanningPersistence(persistence_path)
+        self._restore()
+
+    def _restore(self):
+        saved = self.persistence.load()
+        if saved is None:
+            return
+        try:
+            import json
+            self.states = {key: PlanningState.model_validate_json(json.dumps(value))
+                           for key, value in saved['states'].items()}
+            if any(key != value.id for key, value in self.states.items()):
+                raise ValueError('Session identity mismatch')
+            self.receipts = {(s, k): proposal for s, k, proposal in saved.get('receipts', [])}
+            self.generations = {key: int(value) for key, value in saved.get('generations', {}).items()}
+            self.history = {key: list(value)[-8:] for key, value in saved.get('history', {}).items()}
+            self.last_edited_fields = saved.get('last_edited_fields', {})
+            self.conversations = {key: [PlanningMessage.model_validate_json(json.dumps(item)) for item in values][-80:]
+                                  for key, values in saved.get('conversations', {}).items()}
+            for state in self.states.values():
+                if state.plan_status == 'pending':
+                    self.invalidate(state)
+                    state.plan_status = 'failed'
+                    state.plan_error = 'CALCULATION_INTERRUPTED'
+                    state.revision += 1
+        except (KeyError, TypeError, ValueError, ValidationError) as exc:
+            raise RuntimeError('Local planning snapshot is invalid. Preserve it and restore a valid snapshot; confirmed inputs were not discarded.') from exc
+
+    def _persist(self):
+        if self.persistence.path is None:
+            return
+        payload = {'schema_version': 1,
+            'states': {key: value.model_dump(mode='json') for key, value in self.states.items()},
+            'receipts': [[s, k, proposal] for (s, k), proposal in self.receipts.items()],
+            'generations': self.generations, 'history': self.history,
+            'last_edited_fields': self.last_edited_fields,
+            'conversations': {key: [message.model_dump(mode='json') for message in values]
+                              for key, values in self.conversations.items()}}
+        try:
+            self.persistence.save(payload)
+        except OSError:
+            # A failed write cannot leave an acknowledged in-memory-only
+            # confirmation or receipt. Reload the preceding durable snapshot.
+            self.states, self.receipts, self.generations = {}, {}, {}
+            self.history, self.last_edited_fields, self.conversations = {}, {}, {}
+            self._restore()
+            raise PlanningError('STATE_UNAVAILABLE',
+                'Local planning state could not be saved. Reload the last saved state and retry when storage is available.', 503) from None
+
+    def conversation(self, session_id):
+        self.read(session_id)
+        return PlanningConversation(session_id=session_id,
+            messages=[message.model_copy(deep=True) for message in self.conversations.get(session_id, [])])
+
+    async def record_turn(self, session_id, question, response):
+        async with self.lock:
+            self.read(session_id)
+            now = datetime.now(timezone.utc)
+            user = PlanningMessage(id=str(uuid4()), role='user', content=question, created_at=now)
+            assistant = PlanningMessage(id=str(uuid4()), role='assistant', content=response.message,
+                created_at=now, presentation=response.presentation, mode=response.mode)
+            self.conversations[session_id] = (self.conversations.get(session_id, []) + [user, assistant])[-80:]
+            self._persist()
+            response.message_id = assistant.id
+            response.user_message_id = user.id
+        return response
 
     def read(self, session_id):
         if session_id not in self.states:
@@ -180,14 +256,20 @@ class PlanningStore:
             {'initial_battery_kwh': body.midnight_battery_kwh})
         config = catalog.resolve(clinic)
         inventory = catalog.equipment_for(clinic, config)
-        clinic = SimulationRequest.model_validate(clinic.model_dump(exclude_unset=True) |
-            {'equipment': [e.model_dump() for e in inventory]})
+        values = clinic.model_dump(exclude_unset=True)
+        values.pop('additional_critical_kw', None)  # materialized exactly once as a protected device
+        clinic = SimulationRequest.model_validate(values | {'equipment': [e.model_dump() for e in inventory]})
+        config = catalog.resolve(clinic)
         state = PlanningState(id=str(uuid4()), revision=0, input_revision=0,
             selected_clinic_id=body.selected_clinic_id, clinic_name=body.clinic_name,
             location=body.location, planning_date=body.planning_date,
-            clinic=clinic, equipment_inventory=inventory, timezone=body.timezone)
+            clinic=clinic, equipment_inventory=inventory, timezone=body.timezone,
+            energy_settings=config, current_battery_reading=body.current_battery_reading)
+        if body.current_battery_reading and body.current_battery_reading.energy_kwh > config.battery_capacity_kwh:
+            raise PlanningError('INVALID_ENERGY_SETTINGS', 'The timestamped reading exceeds the configured battery capacity.')
         async with self.lock:
             self.states[state.id] = state
+            self._persist()
         return state.model_copy(deep=True)
 
     async def propose(self, session_id, body):
@@ -207,7 +289,121 @@ class PlanningStore:
             state.active_proposal_id = proposal.id
             state.revision += 1
             self.states[state.id] = state
+            self._persist()
             return state.model_copy(deep=True)
+
+    def energy_proposal(self, state, proposal_id):
+        proposal = next((item for item in state.energy_proposals if item.id == proposal_id), None)
+        if proposal is None:
+            raise PlanningError('NOT_FOUND', 'Energy settings proposal was not found.', 404)
+        return proposal
+
+    def validate_energy(self, state, settings, reading):
+        from .models import EffectiveConfig
+        try:
+            config = EffectiveConfig.model_validate(state.energy_settings.model_dump() |
+                settings.model_dump(exclude_unset=True))
+            SimulationRequest.model_validate(state.clinic.model_dump(exclude_none=True) |
+                settings.model_dump(exclude_unset=True))
+        except ValidationError:
+            raise PlanningError('INVALID_ENERGY_SETTINGS',
+                'Review energy settings: starting energy and reserve must fit battery capacity, and efficiencies and output limits must be valid.') from None
+        if reading is not None and reading.energy_kwh > config.battery_capacity_kwh:
+            raise PlanningError('INVALID_ENERGY_SETTINGS',
+                'The recorded current reading exceeds the proposed capacity. Explicitly update or clear the reading; it will not be rescaled.')
+        return config
+
+    async def propose_energy(self, session_id, body):
+        async with self.lock:
+            state = self.check(session_id, body.expected_revision)
+            updates_reading = 'current_battery_reading' in body.model_fields_set
+            if not body.settings.model_fields_set and not updates_reading:
+                raise PlanningError('INVALID_ENERGY_SETTINGS', 'Supply a settings change or a timestamped battery reading for review.')
+            reading = body.current_battery_reading if updates_reading else state.current_battery_reading
+            config = self.validate_energy(state, body.settings, reading)
+            proposal = EnergySettingsProposal(id=str(uuid4()), base_input_revision=state.input_revision,
+                settings=body.settings.model_copy(deep=True), proposed_energy_settings=config,
+                current_battery_reading=reading, updates_current_battery_reading=updates_reading)
+            state.energy_proposals.append(proposal)
+            state.active_energy_proposal_id = proposal.id
+            state.revision += 1
+            self.states[session_id] = state
+            self._persist()
+            return state.model_copy(deep=True)
+
+    async def update_energy(self, session_id, proposal_id, body):
+        async with self.lock:
+            state = self.check(session_id, body.expected_revision)
+            proposal = self.energy_proposal(state, proposal_id)
+            if proposal.status != 'draft':
+                raise PlanningError('PROPOSAL_CLOSED', 'Create a new reviewed energy settings proposal.', 409)
+            if proposal.base_input_revision != state.input_revision:
+                raise PlanningError('REVISION_CONFLICT', 'Clinic requirements changed. Review a new energy settings proposal.', 409)
+            settings = EnergySettingsPatch.model_validate(proposal.settings.model_dump(exclude_unset=True) |
+                body.settings.model_dump(exclude_unset=True))
+            updates_reading = 'current_battery_reading' in body.model_fields_set
+            reading = body.current_battery_reading if updates_reading else proposal.current_battery_reading
+            config = self.validate_energy(state, settings, reading)
+            proposal.settings = settings
+            proposal.proposed_energy_settings = config
+            proposal.current_battery_reading = reading
+            proposal.updates_current_battery_reading |= updates_reading
+            state.active_energy_proposal_id = proposal.id
+            state.revision += 1
+            self.states[session_id] = state
+            self._persist()
+            return state.model_copy(deep=True)
+
+    async def reject_energy(self, session_id, proposal_id, body):
+        async with self.lock:
+            state = self.check(session_id, body.expected_revision)
+            proposal = self.energy_proposal(state, proposal_id)
+            if proposal.status == 'confirmed':
+                raise PlanningError('PROPOSAL_CLOSED', 'Confirmed settings require a new reviewed proposal.', 409)
+            if proposal.status != 'rejected':
+                proposal.status = 'rejected'
+                if state.active_energy_proposal_id == proposal.id:
+                    state.active_energy_proposal_id = None
+                state.revision += 1
+                self.states[session_id] = state
+                self._persist()
+            return state.model_copy(deep=True)
+
+    async def confirm_energy(self, session_id, proposal_id, body):
+        async with self.lock:
+            state = self.read(session_id)
+            receipt = self.receipts.get((session_id, body.idempotency_key))
+            if receipt:
+                if receipt != proposal_id:
+                    raise PlanningError('IDEMPOTENCY_CONFLICT', 'Confirmation key was already used for another proposal.', 409)
+                return state, False
+            proposal = self.energy_proposal(state, proposal_id)
+            if proposal.status == 'confirmed':
+                self.receipts[(session_id, body.idempotency_key)] = proposal_id
+                self._persist()
+                return state, False
+            state = self.check(session_id, body.expected_revision)
+            proposal = self.energy_proposal(state, proposal_id)
+            if proposal.status != 'draft':
+                raise PlanningError('PROPOSAL_CLOSED', 'Rejected energy settings cannot be confirmed.', 409)
+            if proposal.base_input_revision != state.input_revision:
+                raise PlanningError('REVISION_CONFLICT', 'Clinic inputs changed after these settings were staged. Review a new proposal.', 409)
+            reading = proposal.current_battery_reading if proposal.updates_current_battery_reading else state.current_battery_reading
+            config = self.validate_energy(state, proposal.settings, reading)
+            state.clinic = SimulationRequest.model_validate(state.clinic.model_dump(exclude_none=True) |
+                proposal.settings.model_dump(exclude_unset=True))
+            state.energy_settings = config
+            state.current_battery_reading = reading
+            proposal.status = 'confirmed'
+            if state.active_energy_proposal_id == proposal.id:
+                state.active_energy_proposal_id = None
+            state.input_revision += 1
+            state.revision += 1
+            self.invalidate(state)
+            self.states[session_id] = state
+            self.receipts[(session_id, body.idempotency_key)] = proposal_id
+            self._persist()
+            return state.model_copy(deep=True), True
 
     async def update(self, session_id, proposal_id, body):
         async with self.lock:
@@ -223,6 +419,7 @@ class PlanningStore:
             state.active_proposal_id = proposal.id
             state.revision += 1
             self.states[state.id] = state
+            self._persist()
             return state.model_copy(deep=True)
 
     async def reject(self, session_id, proposal_id, body):
@@ -237,6 +434,7 @@ class PlanningStore:
                 if state.active_proposal_id == proposal.id:
                     state.active_proposal_id = None
                 self.states[state.id] = state
+                self._persist()
             return state.model_copy(deep=True)
 
     async def confirm(self, session_id, proposal_id, body):
@@ -250,6 +448,7 @@ class PlanningStore:
             proposal = self.proposal(state, proposal_id)
             if proposal.status == 'confirmed':
                 self.receipts[(session_id, body.idempotency_key)] = proposal_id
+                self._persist()
                 return state, False
             state = self.check(session_id, body.expected_revision)
             proposal = self.proposal(state, proposal_id)
@@ -275,6 +474,7 @@ class PlanningStore:
             self.invalidate(state)
             self.states[state.id] = state
             self.receipts[(session_id, body.idempotency_key)] = proposal_id
+            self._persist()
             return state.model_copy(deep=True), True
 
     def invalidate(self, state):
@@ -301,6 +501,7 @@ class PlanningStore:
             generation = self.generations.get(session_id, 0) + 1
             self.generations[session_id] = generation
             self.states[session_id] = state
+            self._persist()
             snapshot = state.model_copy(deep=True)
         try:
             clinic = compile_clinic(snapshot)
@@ -330,6 +531,7 @@ class PlanningStore:
                     current.plan_error = getattr(exc, 'code', 'CALCULATION_UNAVAILABLE')
                     current.revision += 1
                     self.states[session_id] = current
+                    self._persist()
                 return self.read(session_id)
         async with self.lock:
             current = self.read(session_id)
@@ -340,6 +542,7 @@ class PlanningStore:
             current.plan_status = 'current'
             current.revision += 1
             self.states[session_id] = current
+            self._persist()
             return current.model_copy(deep=True)
 
     async def select_recovery(self, session_id, body):
@@ -353,4 +556,5 @@ class PlanningStore:
             state.selected_recovery_intervention_id = body.option_id
             state.revision += 1
             self.states[session_id] = state
+            self._persist()
             return state.model_copy(deep=True)
