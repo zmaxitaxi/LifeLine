@@ -25,8 +25,9 @@ class ForecastDay(StrictModel):
 
 
 class SolarForecast(StrictModel):
-    source: Literal['Open-Meteo Forecast API'] = 'Open-Meteo Forecast API'
-    data_kind: Literal['weather_model_forecast'] = 'weather_model_forecast'
+    source: Literal['Open-Meteo Forecast API', 'LifeLine synthetic demo weather'] = 'Open-Meteo Forecast API'
+    data_kind: Literal['weather_model_forecast', 'synthetic_demo_weather'] = 'weather_model_forecast'
+    weather_mode: Literal['live', 'demo'] = 'live'
     requested_location: ForecastLocation
     model_grid_location: ForecastLocation
     timezone: str

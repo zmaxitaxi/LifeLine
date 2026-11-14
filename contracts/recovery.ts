@@ -36,7 +36,7 @@ export interface RecoveryOption {
   remaining_constraints: string[];
 }
 export interface RecoveryResponse {
-  weather_mode: "live_forecast" | "existing_scenario";
+  weather_mode: "live_forecast" | "existing_scenario" | "demo_weather";
   forecast: SolarForecast | null;
   planning_date: string | null;
   timezone: string;

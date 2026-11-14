@@ -369,3 +369,49 @@ def test_actual_draft_update_still_cannot_be_described_as_adopted(message):
         reply=ask(client,state,'Use a 40% starting battery charge in that draft.')
         assert reply['message']=='The settings draft remains unconfirmed and available for review.'
         assert reply['state']['energy_settings']==state['energy_settings'] and not weather
+
+
+def test_serialized_python_tool_text_is_not_executed_and_gets_native_protocol_feedback():
+    bad='{"name":"recompute_clinic_plan","parameters":{"include_recovery":True}}'
+    agent,calls=agent_with([{'content':bad},{'name':'recompute_clinic_plan','arguments':{'include_recovery':True}}])
+    service,weather=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        reply=ask(client,create(client),'Can our clinic safely operate tomorrow given the weather forecast?')
+        assert reply['mode']=='local_tool_agent' and reply['tool_calls']==['recompute_clinic_plan']
+        assert len(weather)==1 and reply['state']['plan_status']=='current'
+        second=json.loads([call for call in calls if call.method=='POST'][1].content)
+        assert {'role':'assistant','content':bad} in second['messages']
+        assert 'lowercase true/false/null' in second['messages'][-1]['content']
+
+
+def test_long_question_echo_is_rejected_then_the_model_answers_it():
+    question='Could adding batteries help if we are just discussing an unevaluated idea?'
+    answer='Storage might help if storage capacity is limiting. That idea has not been evaluated for this clinic.'
+    agent,_=agent_with([{'content':question},{'content':answer}]);service,weather=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client);reply=ask(client,state,question)
+        assert reply['message']==answer and reply['state']==state and not weather
+
+
+def test_failed_live_calculation_supplies_error_and_unavailable_read_can_recover():
+    from app.weather_forecast import ForecastError
+    class UnavailableWeather:
+        async def get(self, location):
+            raise ForecastError('FORECAST_UNAVAILABLE','private upstream diagnosis')
+    authored='The live forecast is unavailable, so I cannot assess the clinic plan. Please retry when it is available.'
+    agent,calls=agent_with([{'name':'recompute_clinic_plan','arguments':{}}],syntheses=[
+        {'name':'explain_current_plan','arguments':{}},{'content':authored}])
+    with TestClient(create_app(forecast_service=UnavailableWeather(),agent_service=agent)) as client:
+        reply=ask(client,create(client),'Can our clinic safely operate tomorrow given the weather forecast?')
+        assert reply['mode']=='local_tool_agent' and reply['message']==authored
+        assert reply['tool_calls']==['recompute_clinic_plan']
+        assert reply['state']['plan_status']=='failed' and reply['state']['plan_error']=='FORECAST_UNAVAILABLE'
+        assert reply['state']['computed_plan'] is None
+        wire=json.loads(calls[-1].content)
+        result=next(json.loads(m['content']) for m in wire['messages'] if m['role']=='tool' and 'facts' in json.loads(m['content']))
+        assert result['plan_error']=='FORECAST_UNAVAILABLE'
+        assert 'underlying cause is not established' in result['facts']['calculation_status']
+        assert 'private upstream diagnosis' not in json.dumps(wire)
+        initial=json.loads(wire['messages'][1]['content'].split('Canonical clinic data: ')[1])
+        assert 'weather_dataset' not in initial['clinic']
+        assert any('No current calculated plan' in m['content'] for m in wire['messages'] if m['role']=='tool')

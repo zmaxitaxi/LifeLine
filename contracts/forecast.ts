@@ -17,8 +17,9 @@ export interface ForecastDay {
   warnings: string[];
 }
 export interface SolarForecast {
-  source: "Open-Meteo Forecast API";
-  data_kind: "weather_model_forecast";
+  source: "Open-Meteo Forecast API" | "LifeLine synthetic demo weather";
+  data_kind: "weather_model_forecast" | "synthetic_demo_weather";
+  weather_mode: "live" | "demo";
   requested_location: ForecastLocation;
   model_grid_location: ForecastLocation;
   timezone: string;

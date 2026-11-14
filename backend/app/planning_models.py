@@ -106,6 +106,7 @@ class ActivityProposal(StrictModel):
 
 
 class ComputedPlan(StrictModel):
+    weather_mode: Literal['live', 'demo'] = 'live'
     input_revision: Revision
     generation: Annotated[int, Field(ge=1)]
     computed_at: datetime

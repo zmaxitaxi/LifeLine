@@ -33,6 +33,7 @@ def reply_definition():
             if '$ref' in value: return expand(definitions[value['$ref'].split('/')[-1]])
             return {key:expand(item) for key,item in value.items() if key not in ('title','default')}
         return value
+    schema['properties']['message']['description']='Your own answer to the person, not a quote or echo of their request. Answer their question or ask a genuinely needed clarification.'
     return dict(name='respond_to_user',description='Optionally send your natural reply with only the relevant review/result cards or schedule. Direct ordinary text is equally valid. Include only tested option IDs you actually want shown; omit cards for conversation, clarification or unevaluated ideas.',parameters=expand(schema))
 
 
@@ -334,7 +335,10 @@ def synthesis_data(state, facts):
                 'reserve_target':f'{plan.simulation.effective_config.reserve_kwh:.3f} kWh'}
         if 'weather_basis' in data:
             data['weather_basis'] = {'planning_date':state.planning_date.isoformat(),
-                'forecast_irradiation_used':f'{plan.sunshine_factor*100:g}%'}
+                'forecast_irradiation_used':f'{plan.sunshine_factor*100:g}%',
+                'source':state.forecast_reference.source if state.forecast_reference else 'unavailable',
+                'data_kind':state.forecast_reference.data_kind if state.forecast_reference else 'unavailable',
+                'warnings':state.forecast_reference.warnings if state.forecast_reference else []}
     if plan.recovery:
         if 'selected_option' in facts:
             selected = next(o for o in plan.recovery.options + [plan.recovery.existing] if o.id == state.selected_recovery_intervention_id)
@@ -363,6 +367,10 @@ def synthesis_data(state, facts):
 def collect_reply_facts(state, calls=(), question=''):
     """Facts constrain claims; they do not prescribe which topics to discuss."""
     facts={}
+    if state.plan_status=='failed':
+        facts['calculation_status']=('The latest calculation failed. No current verified result is available. '
+            +('Live forecast retrieval is unavailable; its underlying cause is not established by this status. ' if state.plan_error=='FORECAST_UNAVAILABLE' else 'The calculation failure code is '+str(state.plan_error)+'. ')
+            +'Do not infer a settings or data conflict. No weather fallback or new verified outcome may be inferred from this error.')
     if state.active_proposal_id:
         facts.update(fact_references(state,['review_activity_proposal'])[0])
     config=state.energy_settings
@@ -424,7 +432,7 @@ def collect_reply_facts(state, calls=(), question=''):
             essential=metrics.critical_unserved_kwh<=1e-6
             all_work=essential and metrics.flexible_deferred_kwh<=1e-6
             facts['model_outcome_'+label]=(f'For the {label} schedule under the modeled forecast and assumptions: '
-                f'essential demand met: {essential}; all required essential and flexible work met: {all_work}. '
+                f'essential demand is {"met" if essential else "not met"}; all required essential and flexible work is {"met" if all_work else "not met"}. '
                 'This does not establish real-world availability or clinical safety.')
         computed,_,_=fact_references(state,['explain_current_plan'] if calls and calls[-1]=='explain_current_plan' else ['recompute_clinic_plan'])
         facts.update(computed)
@@ -452,7 +460,7 @@ def reply_context(state,calls=(),question=''):
     # synthesis_data's exact variants supplement the full source catalog.
     return {'state_revision':state.revision,'input_revision':state.input_revision,
         'generation':state.computed_plan.generation if state.computed_plan else None,
-        'plan_status':state.plan_status,'selected_option_id':state.selected_recovery_intervention_id,
+        'plan_status':state.plan_status,'plan_error':state.plan_error,'selected_option_id':state.selected_recovery_intervention_id,
         'facts':data,'active_draft':next((p.model_dump(mode='json') for p in state.proposals if p.id==state.active_proposal_id),None),
         'active_energy_proposal':next((p.model_dump(mode='json') for p in state.energy_proposals if p.id==state.active_energy_proposal_id),None)}
 
@@ -540,6 +548,8 @@ def _non_operational_guards(message,state,calls):
 def validate_reply_content(message,state,question,calls=(),references=None):
     """Validate claims without deciding the user's intent or requiring a tool."""
     _non_operational_guards(message,state,calls)
+    if len(question.strip())>20 and message.strip().casefold()==question.strip().casefold():
+        raise PlanningError('INVALID_ACTIVITY','Answer the person or ask a useful clarification instead of echoing the entire request.')
     facts=collect_reply_facts(state,calls,question)
     if references:
         if len(references)!=len(set(references)) or not set(references)<=set(facts):
