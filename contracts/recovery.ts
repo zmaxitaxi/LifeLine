@@ -16,6 +16,7 @@ export interface RecoveryMetrics {
   conversion_losses_kwh: number;
 }
 export interface RecoveryOption {
+  parts_cost: {status:'not_estimated';estimated_amount:number|null;currency:string|null;source:string|null;explanation:string};
   id: string;
   label: string;
   kind: "existing" | "scheduling" | "solar" | "battery" | "output" | "optional";

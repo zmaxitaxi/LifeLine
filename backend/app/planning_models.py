@@ -234,6 +234,15 @@ class PlanningConversation(StrictModel):
     messages: list[PlanningMessage] = []
 
 
+class AgentFailure(StrictModel):
+    code: Literal['MODEL_TIMEOUT', 'MODEL_BUSY', 'MODEL_UNAVAILABLE', 'MODEL_INVALID_OUTPUT',
+                  'MODEL_VALIDATION_FAILED', 'WEATHER_UNAVAILABLE', 'DATE_MISMATCH']
+    retryable: bool
+    suggested_action: Literal['retry', 'wait_model', 'review_date', 'review_inputs']
+    selected_date: str | None = None
+    requested_date: str | None = None
+
+
 class SessionAgentResponse(StrictModel):
     mode: Literal['local_tool_agent', 'local_agent_unavailable']
     model: str | None = None
@@ -245,3 +254,4 @@ class SessionAgentResponse(StrictModel):
     message_id: ID | None = None
     user_message_id: ID | None = None
     state: PlanningState
+    failure: AgentFailure | None = None

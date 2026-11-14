@@ -2417,6 +2417,67 @@
         ],
         "title": "ActivityProposal"
       },
+      "AgentFailure": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "MODEL_TIMEOUT",
+              "MODEL_BUSY",
+              "MODEL_UNAVAILABLE",
+              "MODEL_INVALID_OUTPUT",
+              "MODEL_VALIDATION_FAILED",
+              "WEATHER_UNAVAILABLE",
+              "DATE_MISMATCH"
+            ],
+            "title": "Code"
+          },
+          "retryable": {
+            "type": "boolean",
+            "title": "Retryable"
+          },
+          "suggested_action": {
+            "type": "string",
+            "enum": [
+              "retry",
+              "wait_model",
+              "review_date",
+              "review_inputs"
+            ],
+            "title": "Suggested Action"
+          },
+          "selected_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Date"
+          },
+          "requested_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested Date"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "retryable",
+          "suggested_action"
+        ],
+        "title": "AgentFailure"
+      },
       "AgentPresentation": {
         "properties": {
           "kind": {
@@ -4494,6 +4555,57 @@
         ],
         "title": "InfrastructureChange"
       },
+      "PartsCost": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "not_estimated",
+            "title": "Status",
+            "default": "not_estimated"
+          },
+          "estimated_amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Amount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "explanation": {
+            "type": "string",
+            "title": "Explanation",
+            "default": "Cost not estimated: no verified local parts prices, currency or installation quote is configured."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PartsCost"
+      },
       "PlanMetrics": {
         "properties": {
           "total_solar_kwh": {
@@ -5464,6 +5576,9 @@
             },
             "type": "array",
             "title": "Remaining Constraints"
+          },
+          "parts_cost": {
+            "$ref": "#/components/schemas/PartsCost"
           }
         },
         "additionalProperties": false,
@@ -6033,6 +6148,16 @@
           },
           "state": {
             "$ref": "#/components/schemas/PlanningState"
+          },
+          "failure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentFailure"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,

@@ -59,6 +59,14 @@ class RecoveryMetrics(StrictModel):
     conversion_losses_kwh: float
 
 
+class PartsCost(StrictModel):
+    status: Literal['not_estimated'] = 'not_estimated'
+    estimated_amount: float | None = None
+    currency: str | None = None
+    source: str | None = None
+    explanation: str = 'Cost not estimated: no verified local parts prices, currency or installation quote is configured.'
+
+
 class RecoveryOption(StrictModel):
     id: str
     label: str
@@ -78,6 +86,7 @@ class RecoveryOption(StrictModel):
     modeled_all_requirements_met: bool
     backup_deficits: list[BackupDeficit]
     remaining_constraints: list[str]
+    parts_cost: PartsCost = Field(default_factory=PartsCost)
 
 
 class RecoveryResponse(StrictModel):
