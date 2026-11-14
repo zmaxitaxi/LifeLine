@@ -1,0 +1,1806 @@
+{
+  "implementation_commit": "645aa84e328d002140c36b3c4395111d4bdf03ae",
+  "started_at": "2026-11-14T03:53:50.782138+00:00",
+  "model": "llama3.1:8b",
+  "basis": "SYNTHETIC DEMO WEATHER; actual local Llama; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.",
+  "first_visible_basis": "Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.",
+  "cases": [
+    {
+      "name": "conversation",
+      "question": "Hello",
+      "total_seconds": 48.3017269577831,
+      "first_visible_seconds": 48.3017269577831,
+      "model_calls": [
+        {
+          "seconds": 15.418266500346363,
+          "request_bytes": 9102,
+          "message_chars": 3351,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_ab7vqcd0",
+                "function": {
+                  "index": 0,
+                  "name": "inspect_planning_state",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 15395997625,
+            "load_duration": 17155208,
+            "prompt_eval_count": 1750,
+            "prompt_eval_duration": 14231881000,
+            "eval_count": 15,
+            "eval_duration": 924786000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 11.571395250037313,
+          "request_bytes": 10359,
+          "message_chars": 4606,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "Hello! It looks like we're starting from scratch. Our clinic's planning date is set to November 15, 2026. We have a battery capacity of 8 kWh, with an initial charge of 6 kWh and a reserve target of 1 kWh. Our PV system is rated at 1.5 kW, and we can charge at a maximum of 4 kW and discharge at 0.4 kW. We also have an essential evening equipment requirement for 1 kW, needed for 2 hours in the evening."
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 11546843042,
+            "load_duration": 7280292,
+            "prompt_eval_count": 973,
+            "prompt_eval_duration": 3711111000,
+            "eval_count": 109,
+            "eval_duration": 7717623000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 9.523951166775078,
+          "request_bytes": 11066,
+          "message_chars": 5311,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_sg8j8aff",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: Numerical claims need verified quantities with units, dates or local times. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 9481229916,
+            "load_duration": 8081750,
+            "prompt_eval_count": 2191,
+            "prompt_eval_duration": 8501955000,
+            "eval_count": 14,
+            "eval_duration": 946684000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 11.623904875013977,
+          "request_bytes": 10993,
+          "message_chars": 5237,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_0f75vigg",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": "false",
+                    "sunshine_factor": "1"
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: No current calculated plan is available to explain. Calculate only if needed; otherwise discuss the idea as unevaluated. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 11555480166,
+            "load_duration": 3797625,
+            "prompt_eval_count": 2139,
+            "prompt_eval_duration": 8964167000,
+            "eval_count": 29,
+            "eval_duration": 2353642000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "response_serialization": 0.004537791945040226,
+        "conversation_persistence": 0.0012429999187588692,
+        "model_http": 48.13751779217273,
+        "model_status_http": 0.03577462490648031,
+        "weather": 0.0007376670837402344,
+        "forecast_case_including_milp": 0.04858274990692735,
+        "milp": 0.04561612522229552,
+        "agent_total": 48.290208000224084
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.03577462490648031
+        },
+        {
+          "phase": "model_http",
+          "seconds": 15.418266500346363
+        },
+        {
+          "phase": "model_http",
+          "seconds": 11.571395250037313
+        },
+        {
+          "phase": "model_http",
+          "seconds": 9.523951166775078
+        },
+        {
+          "phase": "model_http",
+          "seconds": 11.623904875013977
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.0007376670837402344
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.04561612522229552
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.04858274990692735
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 48.290208000224084
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0012429999187588692
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.004537791945040226
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [
+          "inspect_planning_state",
+          "recompute_clinic_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "d6fa4164-9764-4bef-96c0-9133a3703944",
+        "user_message_id": "fe7b9a39-e324-4eb4-b620-2a6a5c32d945",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 48.29551924997941,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.001234459225088358,
+            "model": 48.15236587449908,
+            "weather": 0.0007691658101975918,
+            "simulation": 0.05027225008234382,
+            "persistence": 0.0013326248154044151
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 9105.0,
+              "message_chars": 3355.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1750.0,
+              "eval_count": 15.0,
+              "total_duration_ns": 15395997625.0,
+              "load_duration_ns": 17155208.0,
+              "prompt_eval_duration_ns": 14231881000.0,
+              "eval_duration_ns": 924786000.0,
+              "http_seconds": 15.419036833103746
+            },
+            {
+              "request_chars": 10362.0,
+              "message_chars": 4612.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 973.0,
+              "eval_count": 109.0,
+              "total_duration_ns": 11546843042.0,
+              "load_duration_ns": 7280292.0,
+              "prompt_eval_duration_ns": 3711111000.0,
+              "eval_duration_ns": 7717623000.0,
+              "http_seconds": 11.575088290963322
+            },
+            {
+              "request_chars": 11069.0,
+              "message_chars": 5319.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 2191.0,
+              "eval_count": 14.0,
+              "total_duration_ns": 9481229916.0,
+              "load_duration_ns": 8081750.0,
+              "prompt_eval_duration_ns": 8501955000.0,
+              "eval_duration_ns": 946684000.0,
+              "http_seconds": 9.525372709147632
+            },
+            {
+              "request_chars": 10996.0,
+              "message_chars": 5246.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 2139.0,
+              "eval_count": 29.0,
+              "total_duration_ns": 11555480166.0,
+              "load_duration_ns": 3797625.0,
+              "prompt_eval_duration_ns": 8964167000.0,
+              "eval_duration_ns": 2353642000.0,
+              "http_seconds": 11.633068124763668
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Inspect then known date in unsupported natural format; ultimately unrequested calculation and validation failure."
+      }
+    },
+    {
+      "name": "assessment",
+      "question": "Can our clinic safely operate tomorrow given the weather forecast?",
+      "total_seconds": 21.334409500006586,
+      "first_visible_seconds": 21.334409500006586,
+      "model_calls": [
+        {
+          "seconds": 4.690211666747928,
+          "request_bytes": 9221,
+          "message_chars": 3470,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_s3t1rn5b",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": "False",
+                    "sunshine_factor": "1"
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 4520464416,
+            "load_duration": 6210583,
+            "prompt_eval_count": 1776,
+            "prompt_eval_duration": 1580307000,
+            "eval_count": 29,
+            "eval_duration": 2240743000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 12.53603741619736,
+          "request_bytes": 9763,
+          "message_chars": 4009,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_bp5ydhre",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": "False",
+                    "sunshine_factor": "1"
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: include_recovery: Input should be a valid boolean You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 12432400958,
+            "load_duration": 6315708,
+            "prompt_eval_count": 1873,
+            "prompt_eval_duration": 10177279000,
+            "eval_count": 29,
+            "eval_duration": 1903048000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 1.9908298328518867,
+          "request_bytes": 9763,
+          "message_chars": 4009,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_4ff35vn0",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "sunshine_factor": "1",
+                    "include_recovery": "False"
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: include_recovery: Input should be a valid boolean You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 1958212500,
+            "load_duration": 11104291,
+            "prompt_eval_count": 1873,
+            "prompt_eval_duration": 59914000,
+            "eval_count": 29,
+            "eval_duration": 1867332000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 2.0384475830942392,
+          "request_bytes": 9763,
+          "message_chars": 4009,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_iwwin7wl",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": "False",
+                    "sunshine_factor": "1"
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: include_recovery: Input should be a valid boolean You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 1988748583,
+            "load_duration": 2513167,
+            "prompt_eval_count": 1873,
+            "prompt_eval_duration": 76023000,
+            "eval_count": 29,
+            "eval_duration": 1891327000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "response_serialization": 0.0006536250002682209,
+        "conversation_persistence": 0.0014329999685287476,
+        "model_http": 21.255526498891413,
+        "model_status_http": 0.04141762526705861,
+        "agent_total": 21.325773582793772
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.04141762526705861
+        },
+        {
+          "phase": "model_http",
+          "seconds": 4.690211666747928
+        },
+        {
+          "phase": "model_http",
+          "seconds": 12.53603741619736
+        },
+        {
+          "phase": "model_http",
+          "seconds": 1.9908298328518867
+        },
+        {
+          "phase": "model_http",
+          "seconds": 2.0384475830942392
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 21.325773582793772
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0014329999685287476
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0006536250002682209
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "31fdc8ab-d196-47a5-9232-748d9a95f635",
+        "user_message_id": "f0b460c9-ab42-4918-a3be-814d9e594280",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 21.3278289581649,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.000447083730250597,
+            "model": 21.264850666746497,
+            "persistence": 0.0015275408513844013
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 9224.0,
+              "message_chars": 3474.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1776.0,
+              "eval_count": 29.0,
+              "total_duration_ns": 4520464416.0,
+              "load_duration_ns": 6210583.0,
+              "prompt_eval_duration_ns": 1580307000.0,
+              "eval_duration_ns": 2240743000.0,
+              "http_seconds": 4.692043208051473
+            },
+            {
+              "request_chars": 9766.0,
+              "message_chars": 4016.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1873.0,
+              "eval_count": 29.0,
+              "total_duration_ns": 12432400958.0,
+              "load_duration_ns": 6315708.0,
+              "prompt_eval_duration_ns": 10177279000.0,
+              "eval_duration_ns": 1903048000.0,
+              "http_seconds": 12.538006042130291
+            },
+            {
+              "request_chars": 9766.0,
+              "message_chars": 4016.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1873.0,
+              "eval_count": 29.0,
+              "total_duration_ns": 1958212500.0,
+              "load_duration_ns": 11104291.0,
+              "prompt_eval_duration_ns": 59914000.0,
+              "eval_duration_ns": 1867332000.0,
+              "http_seconds": 1.9954944998025894
+            },
+            {
+              "request_chars": 9766.0,
+              "message_chars": 4016.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1873.0,
+              "eval_count": 29.0,
+              "total_duration_ns": 1988748583.0,
+              "load_duration_ns": 2513167.0,
+              "prompt_eval_duration_ns": 76023000.0,
+              "eval_duration_ns": 1891327000.0,
+              "http_seconds": 2.039665499702096
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Native include_recovery string False repeated; strict boolean adapter rejected it; no calculation."
+      }
+    },
+    {
+      "name": "vaccination",
+      "question": "What if I wanted to plan a vaccination clinic today at 10 AM?",
+      "total_seconds": 22.124958958942443,
+      "first_visible_seconds": 22.124958958942443,
+      "model_calls": [
+        {
+          "seconds": 7.356244374997914,
+          "request_bytes": 9215,
+          "message_chars": 3464,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_760vk9op",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "name": "Vaccination clinic",
+                    "start_hour": 10,
+                    "equipment_ids": [
+                      "evening"
+                    ],
+                    "duration_hours": 2,
+                    "deadline_hour": 12,
+                    "equipment_constraints": [
+                      {
+                        "equipment_id": "evening",
+                        "required_duration_hours": 2,
+                        "required_hours": [
+                          19,
+                          20
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 7289986875,
+            "load_duration": 2372500,
+            "prompt_eval_count": 1780,
+            "prompt_eval_duration": 1574407000,
+            "eval_count": 82,
+            "eval_duration": 5347411000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 14.688693292438984,
+          "request_bytes": 10250,
+          "message_chars": 4496,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_a5sf7j65",
+                "function": {
+                  "index": 0,
+                  "name": "respond_to_user",
+                  "arguments": {
+                    "message": "Please review and change the selected planning date to 2026-11-14 if you want to plan a vaccination clinic today at 10 AM.",
+                    "presentation": {
+                      "kind": "conversation"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: The operator requested 2026-11-14 but the selected planning date is 2026-11-15. Nothing was changed. Ask them to review/change the selected date first; do not ask for equipment power or repeatedly stage this activity. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 14640561708,
+            "load_duration": 5239125,
+            "prompt_eval_count": 1997,
+            "prompt_eval_duration": 10534448000,
+            "eval_count": 56,
+            "eval_duration": 3838044000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "response_serialization": 0.0002893749624490738,
+        "conversation_persistence": 0.000279333908110857,
+        "model_http": 22.044937667436898,
+        "model_status_http": 0.036504500079900026,
+        "agent_total": 22.1154602910392
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.036504500079900026
+        },
+        {
+          "phase": "model_http",
+          "seconds": 7.356244374997914
+        },
+        {
+          "phase": "model_http",
+          "seconds": 14.688693292438984
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 22.1154602910392
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.000279333908110857
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0002893749624490738
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "Please review and change the selected planning date to 2026-11-14 if you want to plan a vaccination clinic today at 10 AM.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "48e40bba-aeb7-4a08-9e61-e9a33ade550d",
+        "user_message_id": "c45ab563-a794-4de5-a78a-5ca65d1a8d96",
+        "failure": {
+          "code": "DATE_MISMATCH",
+          "retryable": false,
+          "suggested_action": "review_date",
+          "selected_date": "2026-11-15",
+          "requested_date": "2026-11-14"
+        },
+        "timings": {
+          "total_seconds": 22.11595508409664,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.00026399968191981316,
+            "model": 22.048444125335664,
+            "persistence": 0.00028625037521123886
+          },
+          "model_calls": 2,
+          "model_metrics": [
+            {
+              "request_chars": 9218.0,
+              "message_chars": 3468.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1780.0,
+              "eval_count": 82.0,
+              "total_duration_ns": 7289986875.0,
+              "load_duration_ns": 2372500.0,
+              "prompt_eval_duration_ns": 1574407000.0,
+              "eval_duration_ns": 5347411000.0,
+              "http_seconds": 7.358100249897689
+            },
+            {
+              "request_chars": 10253.0,
+              "message_chars": 4503.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1997.0,
+              "eval_count": 56.0,
+              "total_duration_ns": 14640561708.0,
+              "load_duration_ns": 5239125.0,
+              "prompt_eval_duration_ns": 10534448000.0,
+              "eval_duration_ns": 3838044000.0,
+              "http_seconds": 14.69044991582632
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "partial",
+        "note": "Genuinely authored date-review clarification, no mutation/weather/power request; structured failure supplies both dates, but prose does not explicitly restate selected tomorrow/date."
+      }
+    },
+    {
+      "name": "recovery",
+      "question": "What changes could resolve our modeled essential electricity shortfall? Please compare tested recovery alternatives.",
+      "total_seconds": 72.65216966718435,
+      "first_visible_seconds": 72.65216966718435,
+      "model_calls": [
+        {
+          "seconds": 3.845812125131488,
+          "request_bytes": 9213,
+          "message_chars": 3462,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_hxbc62c7",
+                "function": {
+                  "index": 0,
+                  "name": "recompute_clinic_plan",
+                  "arguments": {
+                    "include_recovery": "true",
+                    "sunshine_factor": 1
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 3819837708,
+            "load_duration": 4052958,
+            "prompt_eval_count": 1765,
+            "prompt_eval_duration": 1578150000,
+            "eval_count": 31,
+            "eval_duration": 1988018000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 27.804627750068903,
+          "request_bytes": 16717,
+          "message_chars": 10964,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "To resolve the modeled essential electricity shortfall, we can consider the following changes:\n\n1. Increase the maximum discharge power from 0.4 kW to 1.4 kW (Test output: 1.4 kW).\n2. Reschedule the essential work within the allowed hours (Reschedule within allowed hours).\n3. Upgrade the battery capacity from 8 kWh to 10 kWh (Test battery: 10 kWh).\n4. Increase the PV capacity from 1.5 kW to 2 kW (Test solar: 2 kW).\n5. Upgrade the battery capacity from 8 kWh to 12 kWh (Test battery: 12 kWh).\n6. Increase the PV capacity from 1.5 kW to 2.5 kW (Test solar: 2.5 kW).\n7. Upgrade the battery capacity from 8 kWh to 16 kWh (Test battery: 16 kWh).\n8. Increase the PV capacity from 1.5 kW to 3.5 kW (Test solar: 3.5 kW).\n\nThese changes can be evaluated based on their impact on the remaining unserved essential energy and flexible unfinished work."
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 27769457125,
+            "load_duration": 8795084,
+            "prompt_eval_count": 2439,
+            "prompt_eval_duration": 12668322000,
+            "eval_count": 230,
+            "eval_duration": 14733734000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 9.456655833870173,
+          "request_bytes": 17885,
+          "message_chars": 12130,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_32jazr5o",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: Do not make an affirmative availability claim without a sourced qualified calculation. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 9432967291,
+            "load_duration": 7085833,
+            "prompt_eval_count": 3777,
+            "prompt_eval_duration": 8593077000,
+            "eval_count": 14,
+            "eval_duration": 800886000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 30.930575874634087,
+          "request_bytes": 16670,
+          "message_chars": 10917,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "To resolve the modeled essential electricity shortfall, you could consider the following changes:\n\n1. Increase the maximum discharge power from 0.4 kW to 1.4 kW (Test output: 1.4 kW).\n2. Reschedule the essential work within the allowed hours (Reschedule within allowed hours).\n3. Upgrade the battery capacity from 8 kWh to 10 kWh (Test battery: 10 kWh).\n4. Increase the PV capacity from 1.5 kW to 2 kW (Test solar: 2 kW).\n5. Upgrade the battery capacity from 8 kWh to 12 kWh (Test battery: 12 kWh).\n6. Increase the PV capacity from 1.5 kW to 2.5 kW (Test solar: 2.5 kW).\n7. Upgrade the battery capacity from 8 kWh to 16 kWh (Test battery: 16 kWh).\n8. Increase the PV capacity from 1.5 kW to 3.5 kW (Test solar: 3.5 kW).\n\nThese changes are hypothetical and do not guarantee real-world availability or clinical safety. The existing recovery comparison ranks Test output: 1.4 kW first under its stated criteria."
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 30892655750,
+            "load_duration": 1756583,
+            "prompt_eval_count": 2427,
+            "prompt_eval_duration": 12299196000,
+            "eval_count": 243,
+            "eval_duration": 18390553000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "response_serialization": 0.0016457079909741879,
+        "conversation_persistence": 0.008734625298529863,
+        "recovery_forecast_case_including_milp": 0.13841099990531802,
+        "model_http": 72.03767158370465,
+        "model_status_http": 0.04379466734826565,
+        "weather": 0.000382500234991312,
+        "forecast_case_including_milp": 0.029729959089308977,
+        "milp": 0.15249316673725843,
+        "agent_total": 72.62316262535751
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.04379466734826565
+        },
+        {
+          "phase": "model_http",
+          "seconds": 3.845812125131488
+        },
+        {
+          "phase": "weather",
+          "seconds": 0.000382500234991312
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.02351437509059906
+        },
+        {
+          "phase": "forecast_case_including_milp",
+          "seconds": 0.029729959089308977
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.020925791934132576
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.022219667211174965
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.009537665639072657
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.010197415947914124
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.029140708968043327
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.03151595825329423
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.024294083006680012
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.025379125028848648
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.012452125083655119
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.013869499787688255
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.006349707953631878
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006861750036478043
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.005287500098347664
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.0057682497426867485
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.0056686666794121265
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.006148291751742363
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.007009334396570921
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.007526416797190905
+        },
+        {
+          "phase": "milp",
+          "seconds": 0.008313207887113094
+        },
+        {
+          "phase": "recovery_forecast_case_including_milp",
+          "seconds": 0.008924625348299742
+        },
+        {
+          "phase": "model_http",
+          "seconds": 27.804627750068903
+        },
+        {
+          "phase": "model_http",
+          "seconds": 9.456655833870173
+        },
+        {
+          "phase": "model_http",
+          "seconds": 30.930575874634087
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 72.62316262535751
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.008734625298529863
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.0016457079909741879
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [
+          "recompute_clinic_plan",
+          "explain_current_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "12370ab1-5033-49f9-949c-be6110a8a4ae",
+        "user_message_id": "e17b53fa-eb78-4bd7-8fc6-c5a6a7eeeaeb",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 72.64209087472409,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.001174707431346178,
+            "model": 72.05336354207247,
+            "weather": 0.0004397081211209297,
+            "simulation": 0.1707534152083099,
+            "persistence": 0.008747790940105915
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 9216.0,
+              "message_chars": 3466.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1765.0,
+              "eval_count": 31.0,
+              "total_duration_ns": 3819837708.0,
+              "load_duration_ns": 4052958.0,
+              "prompt_eval_duration_ns": 1578150000.0,
+              "eval_duration_ns": 1988018000.0,
+              "http_seconds": 3.84939141664654
+            },
+            {
+              "request_chars": 16720.0,
+              "message_chars": 10970.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 2439.0,
+              "eval_count": 230.0,
+              "total_duration_ns": 27769457125.0,
+              "load_duration_ns": 8795084.0,
+              "prompt_eval_duration_ns": 12668322000.0,
+              "eval_duration_ns": 14733734000.0,
+              "http_seconds": 27.80630333395675
+            },
+            {
+              "request_chars": 17888.0,
+              "message_chars": 12138.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 3777.0,
+              "eval_count": 14.0,
+              "total_duration_ns": 9432967291.0,
+              "load_duration_ns": 7085833.0,
+              "prompt_eval_duration_ns": 8593077000.0,
+              "eval_duration_ns": 800886000.0,
+              "http_seconds": 9.458990207873285
+            },
+            {
+              "request_chars": 16673.0,
+              "message_chars": 10923.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 2427.0,
+              "eval_count": 243.0,
+              "total_duration_ns": 30892655750.0,
+              "load_duration_ns": 1756583.0,
+              "prompt_eval_duration_ns": 12299196000.0,
+              "eval_duration_ns": 18390553000.0,
+              "http_seconds": 30.938896666280925
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 2,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Current real recovery computation exists but final prose failed coverage/source validation."
+      }
+    },
+    {
+      "name": "followup",
+      "question": "Please explain my exact selected plan against the existing baseline without recalculating or refreshing weather.",
+      "total_seconds": 58.72784108389169,
+      "first_visible_seconds": 58.72784108389169,
+      "model_calls": [
+        {
+          "seconds": 13.00903808278963,
+          "request_bytes": 15311,
+          "message_chars": 9560,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_qv2q15y5",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 12983845375,
+            "load_duration": 4809292,
+            "prompt_eval_count": 3195,
+            "prompt_eval_duration": 11944228000,
+            "eval_count": 14,
+            "eval_duration": 783319000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 25.2395185418427,
+          "request_bytes": 18855,
+          "message_chars": 13102,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "For the selected plan (Test output: 2.4 kW) against the existing baseline, the essential requested energy is 2.000 kWh, the essential shortfall is 1.200 kWh, and the flexible work unfinished is 0.000 kWh. The lowest battery level in the selected plan is 6.000 kWh, which is the same as the baseline."
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 25210840458,
+            "load_duration": 2935541,
+            "prompt_eval_count": 2884,
+            "prompt_eval_duration": 17585118000,
+            "eval_count": 76,
+            "eval_duration": 7443878000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 12.049643625039607,
+          "request_bytes": 19457,
+          "message_chars": 13702,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_uuej41qd",
+                "function": {
+                  "index": 0,
+                  "name": "explain_current_plan",
+                  "arguments": {}
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: Numerical claims need verified quantities with units, dates or local times. You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 11987465500,
+            "load_duration": 7496791,
+            "prompt_eval_count": 4069,
+            "prompt_eval_duration": 11046949000,
+            "eval_count": 14,
+            "eval_duration": 873860000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 8.243137957993895,
+          "request_bytes": 18855,
+          "message_chars": 13102,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "For the selected plan (Test output: 2.4 kW) against the existing baseline, the essential requested energy is 2.000 kWh, the essential shortfall is 1.200 kWh, and the flexible work unfinished is 0.000 kWh. The lowest battery level in the selected plan is 6.000 kWh, which is the same as the baseline."
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 8220836125,
+            "load_duration": 2820750,
+            "prompt_eval_count": 2884,
+            "prompt_eval_duration": 79746000,
+            "eval_count": 76,
+            "eval_duration": 8118417000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "response_serialization": 0.003214375115931034,
+        "conversation_persistence": 0.0072435420006513596,
+        "model_http": 58.54133820766583,
+        "model_status_http": 0.029342125169932842,
+        "agent_total": 58.700889457948506
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.029342125169932842
+        },
+        {
+          "phase": "model_http",
+          "seconds": 13.00903808278963
+        },
+        {
+          "phase": "model_http",
+          "seconds": 25.2395185418427
+        },
+        {
+          "phase": "model_http",
+          "seconds": 12.049643625039607
+        },
+        {
+          "phase": "model_http",
+          "seconds": 8.243137957993895
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 58.700889457948506
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.0072435420006513596
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.003214375115931034
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [
+          "explain_current_plan",
+          "explain_current_plan"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "5964a3c7-b0f5-46c9-9c08-5f8eec86f6ec",
+        "user_message_id": "dc7c5e52-b830-4565-bfd7-e52dc81267ce",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 58.71592887490988,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.001500581856817007,
+            "model": 58.54920312575996,
+            "persistence": 0.007249374873936176
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 15314.0,
+              "message_chars": 9564.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 3195.0,
+              "eval_count": 14.0,
+              "total_duration_ns": 12983845375.0,
+              "load_duration_ns": 4809292.0,
+              "prompt_eval_duration_ns": 11944228000.0,
+              "eval_duration_ns": 783319000.0,
+              "http_seconds": 13.01045245770365
+            },
+            {
+              "request_chars": 18858.0,
+              "message_chars": 13108.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 2884.0,
+              "eval_count": 76.0,
+              "total_duration_ns": 25210840458.0,
+              "load_duration_ns": 2935541.0,
+              "prompt_eval_duration_ns": 17585118000.0,
+              "eval_duration_ns": 7443878000.0,
+              "http_seconds": 25.2422247081995
+            },
+            {
+              "request_chars": 19460.0,
+              "message_chars": 13710.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 4069.0,
+              "eval_count": 14.0,
+              "total_duration_ns": 11987465500.0,
+              "load_duration_ns": 7496791.0,
+              "prompt_eval_duration_ns": 11046949000.0,
+              "eval_duration_ns": 873860000.0,
+              "http_seconds": 12.051359915640205
+            },
+            {
+              "request_chars": 18858.0,
+              "message_chars": 13108.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 2884.0,
+              "eval_count": 76.0,
+              "total_duration_ns": 8220836125.0,
+              "load_duration_ns": 2820750.0,
+              "prompt_eval_duration_ns": 79746000.0,
+              "eval_duration_ns": 8118417000.0,
+              "http_seconds": 8.245313290972263
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 3,
+        "revision_after": 3,
+        "plan_status": "current",
+        "plan_error": null,
+        "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Read-only selection preserved, but numerical-format validation prevented final reply."
+      }
+    },
+    {
+      "name": "history",
+      "question": "Actually, I mean tomorrow at 10 AM. What else do you need to plan that vaccination campaign?",
+      "total_seconds": 99.05735941696912,
+      "first_visible_seconds": 99.05735941696912,
+      "model_calls": [
+        {
+          "seconds": 31.677557833027095,
+          "request_bytes": 9738,
+          "message_chars": 3981,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_rl7zz1bp",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "equipment_constraints": [],
+                    "additional_equipment": [],
+                    "category": "critical",
+                    "required_duration_hours": 8,
+                    "name": "Vaccination campaign",
+                    "duration_hours": 8,
+                    "deadline_hour": 18,
+                    "end_hour": 18,
+                    "required_hours": [
+                      10,
+                      11,
+                      12,
+                      13,
+                      14,
+                      15,
+                      16,
+                      17
+                    ],
+                    "start_hour": 10,
+                    "equipment_ids": []
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [],
+          "ollama": {
+            "total_duration": 31227524375,
+            "load_duration": 3550416,
+            "prompt_eval_count": 1867,
+            "prompt_eval_duration": 15453082000,
+            "eval_count": 112,
+            "eval_duration": 15453636000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 20.669453542213887,
+          "request_bytes": 10724,
+          "message_chars": 4964,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_rdqilsgr",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "deadline_hour": 18,
+                    "end_hour": 18,
+                    "category": "critical",
+                    "name": "Vaccination campaign",
+                    "start_hour": 10,
+                    "duration_hours": 8,
+                    "equipment_ids": []
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: details.category: Extra inputs are not permitted; details.required_duration_hours: Extra inputs are not permitted; details.required_hours: Extra inputs are not permitted You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 20174510500,
+            "load_duration": 73927333,
+            "prompt_eval_count": 2060,
+            "prompt_eval_duration": 13395562000,
+            "eval_count": 60,
+            "eval_duration": 5918236000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 20.15036708395928,
+          "request_bytes": 10358,
+          "message_chars": 4598,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_8iwhx9xc",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "category": "critical",
+                    "deadline_hour": 18,
+                    "duration_hours": 8,
+                    "end_hour": 18,
+                    "equipment_ids": [],
+                    "name": "Vaccination campaign",
+                    "start_hour": 10
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: details.category: Extra inputs are not permitted You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 19326990125,
+            "load_duration": 26334417,
+            "prompt_eval_count": 1984,
+            "prompt_eval_duration": 12353270000,
+            "eval_count": 60,
+            "eval_duration": 6576204000,
+            "done_reason": "stop"
+          }
+        },
+        {
+          "seconds": 26.230170416645706,
+          "request_bytes": 10358,
+          "message_chars": 4598,
+          "tool_schema_chars": 5597,
+          "options": {
+            "temperature": 0,
+            "num_ctx": 8192,
+            "num_predict": 384
+          },
+          "native_message": {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+              {
+                "id": "call_6r5la32z",
+                "function": {
+                  "index": 0,
+                  "name": "propose_activity",
+                  "arguments": {
+                    "category": "critical",
+                    "deadline_hour": 18,
+                    "duration_hours": 8,
+                    "end_hour": 18,
+                    "equipment_ids": [],
+                    "name": "Vaccination campaign",
+                    "start_hour": 10
+                  }
+                }
+              }
+            ]
+          },
+          "prior_rejections": [
+            "That attempt was rejected: details.category: Extra inputs are not permitted You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change."
+          ],
+          "ollama": {
+            "total_duration": 25929429292,
+            "load_duration": 20989917,
+            "prompt_eval_count": 1984,
+            "prompt_eval_duration": 88223000,
+            "eval_count": 60,
+            "eval_duration": 6602538000,
+            "done_reason": "stop"
+          }
+        }
+      ],
+      "phases_seconds": {
+        "response_serialization": 0.007833458948880434,
+        "conversation_persistence": 0.005691458936780691,
+        "model_http": 98.72754887584597,
+        "model_status_http": 0.01873066695407033,
+        "agent_total": 99.02538858400658
+      },
+      "events": [
+        {
+          "phase": "model_status_http",
+          "seconds": 0.01873066695407033
+        },
+        {
+          "phase": "model_http",
+          "seconds": 31.677557833027095
+        },
+        {
+          "phase": "model_http",
+          "seconds": 20.669453542213887
+        },
+        {
+          "phase": "model_http",
+          "seconds": 20.15036708395928
+        },
+        {
+          "phase": "model_http",
+          "seconds": 26.230170416645706
+        },
+        {
+          "phase": "agent_total",
+          "seconds": 99.02538858400658
+        },
+        {
+          "phase": "conversation_persistence",
+          "seconds": 0.005691458936780691
+        },
+        {
+          "phase": "response_serialization",
+          "seconds": 0.007833458948880434
+        }
+      ],
+      "http_status": 200,
+      "correctness_check": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "733917a3-c1d9-4861-a1a0-258c476504d1",
+        "user_message_id": "399c43ef-a020-4558-ac20-212e1bea71b9",
+        "failure": {
+          "code": "MODEL_VALIDATION_FAILED",
+          "retryable": true,
+          "suggested_action": "review_inputs",
+          "selected_date": null,
+          "requested_date": null
+        },
+        "timings": {
+          "total_seconds": 99.03497291682288,
+          "first_progress_seconds": null,
+          "stages_seconds": {
+            "serialization": 0.00014133285731077194,
+            "model": 98.79272745922208,
+            "persistence": 0.005715417210012674
+          },
+          "model_calls": 4,
+          "model_metrics": [
+            {
+              "request_chars": 9741.0,
+              "message_chars": 3991.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1867.0,
+              "eval_count": 112.0,
+              "total_duration_ns": 31227524375.0,
+              "load_duration_ns": 3550416.0,
+              "prompt_eval_duration_ns": 15453082000.0,
+              "eval_duration_ns": 15453636000.0,
+              "http_seconds": 31.690927125047892
+            },
+            {
+              "request_chars": 10727.0,
+              "message_chars": 4977.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 2060.0,
+              "eval_count": 60.0,
+              "total_duration_ns": 20174510500.0,
+              "load_duration_ns": 73927333.0,
+              "prompt_eval_duration_ns": 13395562000.0,
+              "eval_duration_ns": 5918236000.0,
+              "http_seconds": 20.698748250026256
+            },
+            {
+              "request_chars": 10361.0,
+              "message_chars": 4611.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1984.0,
+              "eval_count": 60.0,
+              "total_duration_ns": 19326990125.0,
+              "load_duration_ns": 26334417.0,
+              "prompt_eval_duration_ns": 12353270000.0,
+              "eval_duration_ns": 6576204000.0,
+              "http_seconds": 20.166400833055377
+            },
+            {
+              "request_chars": 10361.0,
+              "message_chars": 4611.0,
+              "tool_schema_chars": 5597.0,
+              "prompt_eval_count": 1984.0,
+              "eval_count": 60.0,
+              "total_duration_ns": 25929429292.0,
+              "load_duration_ns": 20989917.0,
+              "prompt_eval_duration_ns": 88223000.0,
+              "eval_duration_ns": 6602538000.0,
+              "http_seconds": 26.244964083191007
+            }
+          ]
+        }
+      },
+      "state_summary": {
+        "revision_before": 0,
+        "revision_after": 0,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Invented/unsupported top-level activity fields rejected on all attempts; no mutation."
+      }
+    }
+  ],
+  "completed_at": "2026-11-14T03:59:13.723070+00:00"
+}

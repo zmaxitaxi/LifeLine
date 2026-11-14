@@ -253,6 +253,10 @@
         "plan_status": "current",
         "plan_error": null,
         "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Unrequested calculator/state change; did not answer greeting."
       }
     },
     {
@@ -465,6 +469,10 @@
         "plan_status": "current",
         "plan_error": null,
         "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "pass",
+        "note": "Native calculator and authored source-matching electrical shortfall/battery response."
       }
     },
     {
@@ -815,6 +823,10 @@
         "plan_status": "not_computed",
         "plan_error": null,
         "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Seven repeated native draft attempts; null collection arguments rejected, then timeout."
       }
     },
     {
@@ -1114,6 +1126,10 @@
         "plan_status": "current",
         "plan_error": null,
         "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Calculation ran, but no validated final authored explanation before timeout."
       }
     },
     {
@@ -1314,6 +1330,10 @@
         "plan_status": "current",
         "plan_error": null,
         "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "Read-only selection preserved; explanation never passed validation before timeout."
       }
     },
     {
@@ -1612,6 +1632,10 @@
         "plan_status": "not_computed",
         "plan_error": null,
         "proposal_count": 0
+      },
+      "manual_adjudication": {
+        "outcome": "fail",
+        "note": "No validated response before timeout."
       }
     }
   ],

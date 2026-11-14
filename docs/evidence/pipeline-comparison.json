@@ -1,0 +1,310 @@
+{
+  "basis": "Actual local llama3.1:8b; explicitly synthetic demo weather; real existing numerical engine. One sequential run per version, not a statistical reliability study.",
+  "before_behavior_commit": "387b1ce",
+  "after_implementation_commit": "645aa84e328d002140c36b3c4395111d4bdf03ae",
+  "limits": [
+    "No reliable local-chat success claim: before one complete pass; after no complete strict passes and one partial date clarification.",
+    "Fewer retries and output/context limits can shorten failed requests; these are not success-adjusted speedups.",
+    "The first before model call includes cold-load time; after model was warm. Actual load durations are reported separately.",
+    "Provider metrics can be absent for cancelled/incomplete HTTP attempts; reported token totals are not extrapolated.",
+    "MILP time is nested in numerical-case time; do not add them. Agent residual includes orchestration, context construction, validation and other work; it is not independently measured tool-selection time.",
+    "First-visible final content is nonstreaming HTTP completion, not browser DOM paint or the new stream first-progress event.",
+    "History benchmark uses explicitly labeled fixed prior dialogue fixture; it is not claimed to be prior real inference."
+  ],
+  "cases": [
+    {
+      "case": "conversation",
+      "before": {
+        "total_seconds": 63.701764749828726,
+        "first_visible_final_seconds": 63.701764749828726,
+        "model_calls": 5,
+        "model_http_seconds": 63.550954626407474,
+        "reported_provider_prefill_seconds": 42.898123999999996,
+        "reported_provider_decode_seconds": 16.116173,
+        "reported_provider_load_seconds": 4.1233531260000005,
+        "reported_prompt_eval_count": 12635,
+        "reported_eval_count": 250,
+        "first_request_bytes": 13089,
+        "max_request_bytes": 18493,
+        "weather_seconds": 0.000510042067617178,
+        "numerical_cases_including_milp_seconds": 0.03396575013175607,
+        "milp_seconds_nested_in_numerical": 0.03236912516877055,
+        "response_serialization_seconds": 0.0009011253714561462,
+        "persistence_seconds": 0.0017814170569181442,
+        "agent_other_residual_seconds": 0.06664079008623958,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Unrequested calculator/state change; did not answer greeting."
+        }
+      },
+      "after": {
+        "total_seconds": 48.3017269577831,
+        "first_visible_final_seconds": 48.3017269577831,
+        "model_calls": 4,
+        "model_http_seconds": 48.13751779217273,
+        "reported_provider_prefill_seconds": 35.409114,
+        "reported_provider_decode_seconds": 11.942734999999999,
+        "reported_provider_load_seconds": 0.036314875,
+        "reported_prompt_eval_count": 7053,
+        "reported_eval_count": 167,
+        "first_request_bytes": 9102,
+        "max_request_bytes": 11066,
+        "weather_seconds": 0.0007376670837402344,
+        "numerical_cases_including_milp_seconds": 0.04858274990692735,
+        "milp_seconds_nested_in_numerical": 0.04561612522229552,
+        "response_serialization_seconds": 0.004537791945040226,
+        "persistence_seconds": 0.0012429999187588692,
+        "agent_other_residual_seconds": 0.0675951661542058,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Inspect then known date in unsupported natural format; ultimately unrequested calculation and validation failure."
+        }
+      }
+    },
+    {
+      "case": "assessment",
+      "before": {
+        "total_seconds": 40.140881875064224,
+        "first_visible_final_seconds": 40.140881875064224,
+        "model_calls": 4,
+        "model_http_seconds": 40.01718545937911,
+        "reported_provider_prefill_seconds": 30.003144,
+        "reported_provider_decode_seconds": 9.193727999,
+        "reported_provider_load_seconds": 0.020523541,
+        "reported_prompt_eval_count": 10782,
+        "reported_eval_count": 133,
+        "first_request_bytes": 13211,
+        "max_request_bytes": 20264,
+        "weather_seconds": 0.0004166248254477978,
+        "numerical_cases_including_milp_seconds": 0.016215791925787926,
+        "milp_seconds_nested_in_numerical": 0.014507416170090437,
+        "response_serialization_seconds": 0.0007281252183020115,
+        "persistence_seconds": 0.002267667092382908,
+        "agent_other_residual_seconds": 0.07775683188810945,
+        "manual_outcome": {
+          "outcome": "pass",
+          "note": "Native calculator and authored source-matching electrical shortfall/battery response."
+        }
+      },
+      "after": {
+        "total_seconds": 21.334409500006586,
+        "first_visible_final_seconds": 21.334409500006586,
+        "model_calls": 4,
+        "model_http_seconds": 21.255526498891413,
+        "reported_provider_prefill_seconds": 11.893523,
+        "reported_provider_decode_seconds": 7.90245,
+        "reported_provider_load_seconds": 0.026143749,
+        "reported_prompt_eval_count": 7395,
+        "reported_eval_count": 116,
+        "first_request_bytes": 9221,
+        "max_request_bytes": 9763,
+        "weather_seconds": 0,
+        "numerical_cases_including_milp_seconds": 0,
+        "milp_seconds_nested_in_numerical": 0,
+        "response_serialization_seconds": 0.0006536250002682209,
+        "persistence_seconds": 0.0014329999685287476,
+        "agent_other_residual_seconds": 0.028829458635300398,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Native include_recovery string False repeated; strict boolean adapter rejected it; no calculation."
+        }
+      }
+    },
+    {
+      "case": "vaccination",
+      "before": {
+        "total_seconds": 100.02915045898408,
+        "first_visible_final_seconds": 100.02915045898408,
+        "model_calls": 7,
+        "model_http_seconds": 99.89556037308648,
+        "reported_provider_prefill_seconds": 66.919292,
+        "reported_provider_decode_seconds": 24.643836,
+        "reported_provider_load_seconds": 0.040570916,
+        "reported_prompt_eval_count": 18075,
+        "reported_eval_count": 354,
+        "first_request_bytes": 13201,
+        "max_request_bytes": 18049,
+        "weather_seconds": 0,
+        "numerical_cases_including_milp_seconds": 0,
+        "milp_seconds_nested_in_numerical": 0,
+        "response_serialization_seconds": 0.0026687076315283775,
+        "persistence_seconds": 0.0009171660058200359,
+        "agent_other_residual_seconds": 0.09305483475327492,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Seven repeated native draft attempts; null collection arguments rejected, then timeout."
+        }
+      },
+      "after": {
+        "total_seconds": 22.124958958942443,
+        "first_visible_final_seconds": 22.124958958942443,
+        "model_calls": 2,
+        "model_http_seconds": 22.044937667436898,
+        "reported_provider_prefill_seconds": 12.108854999999998,
+        "reported_provider_decode_seconds": 9.185455000000001,
+        "reported_provider_load_seconds": 0.007611625,
+        "reported_prompt_eval_count": 3777,
+        "reported_eval_count": 138,
+        "first_request_bytes": 9215,
+        "max_request_bytes": 10250,
+        "weather_seconds": 0,
+        "numerical_cases_including_milp_seconds": 0,
+        "milp_seconds_nested_in_numerical": 0,
+        "response_serialization_seconds": 0.0002893749624490738,
+        "persistence_seconds": 0.000279333908110857,
+        "agent_other_residual_seconds": 0.034018123522400856,
+        "manual_outcome": {
+          "outcome": "partial",
+          "note": "Genuinely authored date-review clarification, no mutation/weather/power request; structured failure supplies both dates, but prose does not explicitly restate selected tomorrow/date."
+        }
+      }
+    },
+    {
+      "case": "recovery",
+      "before": {
+        "total_seconds": 100.1410422087647,
+        "first_visible_final_seconds": 100.1410422087647,
+        "model_calls": 5,
+        "model_http_seconds": 99.6937274984084,
+        "reported_provider_prefill_seconds": 47.008368999999995,
+        "reported_provider_decode_seconds": 32.504977,
+        "reported_provider_load_seconds": 0.019137958,
+        "reported_prompt_eval_count": 11658,
+        "reported_eval_count": 349,
+        "first_request_bytes": 13311,
+        "max_request_bytes": 23639,
+        "weather_seconds": 0.0005752500146627426,
+        "numerical_cases_including_milp_seconds": 0.08680441742762923,
+        "milp_seconds_nested_in_numerical": 0.08031424973160028,
+        "response_serialization_seconds": 0.00189633434638381,
+        "persistence_seconds": 0.005282416008412838,
+        "agent_other_residual_seconds": 0.2136286273598671,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Calculation ran, but no validated final authored explanation before timeout."
+        }
+      },
+      "after": {
+        "total_seconds": 72.65216966718435,
+        "first_visible_final_seconds": 72.65216966718435,
+        "model_calls": 4,
+        "model_http_seconds": 72.03767158370465,
+        "reported_provider_prefill_seconds": 35.138745,
+        "reported_provider_decode_seconds": 35.913191,
+        "reported_provider_load_seconds": 0.021690458,
+        "reported_prompt_eval_count": 10408,
+        "reported_eval_count": 518,
+        "first_request_bytes": 9213,
+        "max_request_bytes": 17885,
+        "weather_seconds": 0.000382500234991312,
+        "numerical_cases_including_milp_seconds": 0.168140958994627,
+        "milp_seconds_nested_in_numerical": 0.15249316673725843,
+        "response_serialization_seconds": 0.0016457079909741879,
+        "persistence_seconds": 0.008734625298529863,
+        "agent_other_residual_seconds": 0.3731729150749743,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Current real recovery computation exists but final prose failed coverage/source validation."
+        }
+      }
+    },
+    {
+      "case": "followup",
+      "before": {
+        "total_seconds": 100.04025741573423,
+        "first_visible_final_seconds": 100.04025741573423,
+        "model_calls": 5,
+        "model_http_seconds": 99.86227012425661,
+        "reported_provider_prefill_seconds": 62.598244,
+        "reported_provider_decode_seconds": 29.525675,
+        "reported_provider_load_seconds": 0.010579583,
+        "reported_prompt_eval_count": 17000,
+        "reported_eval_count": 335,
+        "first_request_bytes": 19411,
+        "max_request_bytes": 28342,
+        "weather_seconds": 0,
+        "numerical_cases_including_milp_seconds": 0,
+        "milp_seconds_nested_in_numerical": 0,
+        "response_serialization_seconds": 0.0015568332746624947,
+        "persistence_seconds": 0.009928375016897917,
+        "agent_other_residual_seconds": 0.14538754196837544,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Read-only selection preserved; explanation never passed validation before timeout."
+        }
+      },
+      "after": {
+        "total_seconds": 58.72784108389169,
+        "first_visible_final_seconds": 58.72784108389169,
+        "model_calls": 4,
+        "model_http_seconds": 58.54133820766583,
+        "reported_provider_prefill_seconds": 40.656041,
+        "reported_provider_decode_seconds": 17.219474,
+        "reported_provider_load_seconds": 0.018062374,
+        "reported_prompt_eval_count": 13032,
+        "reported_eval_count": 180,
+        "first_request_bytes": 15311,
+        "max_request_bytes": 19457,
+        "weather_seconds": 0,
+        "numerical_cases_including_milp_seconds": 0,
+        "milp_seconds_nested_in_numerical": 0,
+        "response_serialization_seconds": 0.003214375115931034,
+        "persistence_seconds": 0.0072435420006513596,
+        "agent_other_residual_seconds": 0.13020912511274219,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Read-only selection preserved, but numerical-format validation prevented final reply."
+        }
+      }
+    },
+    {
+      "case": "history",
+      "before": {
+        "total_seconds": 100.00406862515956,
+        "first_visible_final_seconds": 100.00406862515956,
+        "model_calls": 6,
+        "model_http_seconds": 99.95080341724679,
+        "reported_provider_prefill_seconds": 60.454671000000005,
+        "reported_provider_decode_seconds": 21.769252999,
+        "reported_provider_load_seconds": 0.023493875,
+        "reported_prompt_eval_count": 15210,
+        "reported_eval_count": 295,
+        "first_request_bytes": 13918,
+        "max_request_bytes": 17888,
+        "weather_seconds": 0,
+        "numerical_cases_including_milp_seconds": 0,
+        "milp_seconds_nested_in_numerical": 0,
+        "response_serialization_seconds": 0.00015345774590969086,
+        "persistence_seconds": 0.0001927502453327179,
+        "agent_other_residual_seconds": 0.0221078316681087,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "No validated response before timeout."
+        }
+      },
+      "after": {
+        "total_seconds": 99.05735941696912,
+        "first_visible_final_seconds": 99.05735941696912,
+        "model_calls": 4,
+        "model_http_seconds": 98.72754887584597,
+        "reported_provider_prefill_seconds": 41.290137,
+        "reported_provider_decode_seconds": 34.550613999999996,
+        "reported_provider_load_seconds": 0.124802083,
+        "reported_prompt_eval_count": 7895,
+        "reported_eval_count": 292,
+        "first_request_bytes": 9738,
+        "max_request_bytes": 10724,
+        "weather_seconds": 0,
+        "numerical_cases_including_milp_seconds": 0,
+        "milp_seconds_nested_in_numerical": 0,
+        "response_serialization_seconds": 0.007833458948880434,
+        "persistence_seconds": 0.005691458936780691,
+        "agent_other_residual_seconds": 0.2791090412065387,
+        "manual_outcome": {
+          "outcome": "fail",
+          "note": "Invented/unsupported top-level activity fields rejected on all attempts; no mutation."
+        }
+      }
+    }
+  ]
+}
