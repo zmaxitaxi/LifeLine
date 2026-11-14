@@ -61,7 +61,8 @@ def main():
     sections=set(args.sections.split(','));model=LocalAgent();weather=CountedWeather();native=[];session_turn=model.session_turn
     async def recorded(messages,**kwargs):
         started=monotonic();turn=await session_turn(messages,**kwargs)
-        native.append({'turn':turn,'seconds':monotonic()-started,'offered_tools':[tool['name'] for tool in kwargs['toolset']]})
+        native.append({'turn':turn,'seconds':monotonic()-started,'offered_tools':[tool['name'] for tool in kwargs['toolset']],
+            'prior_rejections':[message['content'] for message in messages if message['role']=='user' and message['content'].startswith('That attempt was rejected:')][-2:]})
         print(json.dumps({'native':turn}),flush=True);return turn
     model.session_turn=recorded
     evidence={'started_at':datetime.now(timezone.utc).isoformat(),'implementation_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
@@ -79,7 +80,7 @@ def main():
             if response.status_code!=200:
                 latest=client.get(f"/api/planning/sessions/{state['id']}")
                 if latest.status_code==200: current=latest.json()
-            good=response.status_code==200 and data.get('mode')=='local_tool_agent' and authored(data,native)
+            good=response.status_code==200 and data.get('mode')=='local_tool_agent' and authored(data,native) and (len(question)<=20 or data.get('message','').strip().casefold()!=question.strip().casefold())
             try: good=bool(good and check(current,before,data,weather.calls-count))
             except (KeyError,TypeError,IndexError): good=False
             entry={'question':question,'seconds':monotonic()-started,'weather_calls':weather.calls-count,

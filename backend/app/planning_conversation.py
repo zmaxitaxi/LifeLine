@@ -33,6 +33,7 @@ def reply_definition():
             if '$ref' in value: return expand(definitions[value['$ref'].split('/')[-1]])
             return {key:expand(item) for key,item in value.items() if key not in ('title','default')}
         return value
+    schema['properties']['message']['description']='Your own answer to the person, not a quote or echo of their request. Answer their question or ask a genuinely needed clarification.'
     return dict(name='respond_to_user',description='Optionally send your natural reply with only the relevant review/result cards or schedule. Direct ordinary text is equally valid. Include only tested option IDs you actually want shown; omit cards for conversation, clarification or unevaluated ideas.',parameters=expand(schema))
 
 
@@ -424,7 +425,7 @@ def collect_reply_facts(state, calls=(), question=''):
             essential=metrics.critical_unserved_kwh<=1e-6
             all_work=essential and metrics.flexible_deferred_kwh<=1e-6
             facts['model_outcome_'+label]=(f'For the {label} schedule under the modeled forecast and assumptions: '
-                f'essential demand met: {essential}; all required essential and flexible work met: {all_work}. '
+                f'essential demand is {"met" if essential else "not met"}; all required essential and flexible work is {"met" if all_work else "not met"}. '
                 'This does not establish real-world availability or clinical safety.')
         computed,_,_=fact_references(state,['explain_current_plan'] if calls and calls[-1]=='explain_current_plan' else ['recompute_clinic_plan'])
         facts.update(computed)
@@ -540,6 +541,8 @@ def _non_operational_guards(message,state,calls):
 def validate_reply_content(message,state,question,calls=(),references=None):
     """Validate claims without deciding the user's intent or requiring a tool."""
     _non_operational_guards(message,state,calls)
+    if len(question.strip())>20 and message.strip().casefold()==question.strip().casefold():
+        raise PlanningError('INVALID_ACTIVITY','Answer the person or ask a useful clarification instead of echoing the entire request.')
     facts=collect_reply_facts(state,calls,question)
     if references:
         if len(references)!=len(set(references)) or not set(references)<=set(facts):
