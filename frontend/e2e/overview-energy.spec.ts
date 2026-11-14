@@ -57,3 +57,8 @@ test('a schedule-only result offers recovery evaluation without calculating it a
  await open(page,state);await overview(page).click();await expect(page.getByRole('button',{name:'Compare recovery options',exact:true})).toBeVisible();expect((await read(request,state.id)).computed_plan!.recovery).toBeNull();
  await page.getByRole('button',{name:'Compare recovery options',exact:true}).click();await expect(page.locator('.assistant-message').last()).toBeVisible();expect((await read(request,state.id)).computed_plan!.recovery).not.toBeNull();
 });
+
+test('the top outlook makes unconfirmed requirements explicitly excluded',async({page,request})=>{
+ let state=await calculate(request,await seed(request));const generation=state.computed_plan!.generation;const response=await request.post(`${apiBase}/${state.id}/proposals`,{data:{expected_revision:state.revision,details:{name:'Outreach draft',planning_date:state.planning_date,start_hour:10,end_hour:15,equipment_ids:['fridge']}}});expect(response.ok()).toBe(true);state=await response.json();await open(page,state);await overview(page).click();
+ await expect(page.getByRole('region',{name:'Will we have enough electricity?',exact:true})).toContainText('Results include confirmed requirements only');expect((await read(request,state.id)).computed_plan!.generation).toBe(generation);expect(state.confirmed_activities).toHaveLength(0);
+});
