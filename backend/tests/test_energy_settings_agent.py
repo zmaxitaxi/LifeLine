@@ -30,6 +30,7 @@ def test_native_percentages_converted_in_python_and_staged_without_adoption():
     ('battery_capacity_kwh', 2., 'Set battery capacity to 8 kWh and starting charge to 2 kWh.'),
     ('max_discharge_kw', 5., 'The solar capacity is 5 kW.'),
     ('pv_capacity_kw', 10., 'What happens tomorrow?'),
+    ('battery_capacity_kwh', 8., 'Set battery capacity to -8 kWh.'),
 ])
 def test_model_cannot_swap_or_invent_settings_values(field, value, question):
     assert not stated_quantity(question, field, value)

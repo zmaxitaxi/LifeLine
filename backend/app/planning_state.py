@@ -198,13 +198,23 @@ class PlanningStore:
     def _persist(self):
         if self.persistence.path is None:
             return
-        self.persistence.save({'schema_version': 1,
+        payload = {'schema_version': 1,
             'states': {key: value.model_dump(mode='json') for key, value in self.states.items()},
             'receipts': [[s, k, proposal] for (s, k), proposal in self.receipts.items()],
             'generations': self.generations, 'history': self.history,
             'last_edited_fields': self.last_edited_fields,
             'conversations': {key: [message.model_dump(mode='json') for message in values]
-                              for key, values in self.conversations.items()}})
+                              for key, values in self.conversations.items()}}
+        try:
+            self.persistence.save(payload)
+        except OSError:
+            # A failed write cannot leave an acknowledged in-memory-only
+            # confirmation or receipt. Reload the preceding durable snapshot.
+            self.states, self.receipts, self.generations = {}, {}, {}
+            self.history, self.last_edited_fields, self.conversations = {}, {}, {}
+            self._restore()
+            raise PlanningError('STATE_UNAVAILABLE',
+                'Local planning state could not be saved. Reload the last saved state and retry when storage is available.', 503) from None
 
     def conversation(self, session_id):
         self.read(session_id)

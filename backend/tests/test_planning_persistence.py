@@ -86,3 +86,25 @@ def test_failed_atomic_write_keeps_previous_snapshot_and_removes_temporary_file(
         persistence.save({'schema_version': 1, 'states': {}})
     assert path.read_bytes() == original
     assert not list(tmp_path.glob('.planning-*.tmp'))
+
+
+def test_failed_confirmation_save_rolls_back_memory_and_receipt(tmp_path, monkeypatch):
+    path = tmp_path / 'planning.json'
+    service, weather = service_for()
+    with TestClient(create_app(forecast_service=service, planning_state_path=path)) as client:
+        state = energy(client, create(client), {'battery_capacity_kwh': 8.})
+        pid = state['active_energy_proposal_id']
+        old_file = path.read_bytes()
+        def fail_replace(*_):
+            raise OSError('simulated disk failure')
+        with monkeypatch.context() as patch:
+            patch.setattr(os, 'replace', fail_replace)
+            response = client.post(f"{BASE}/{state['id']}/energy-proposals/{pid}/confirm", json={
+                'expected_revision': state['revision'], 'idempotency_key': 'retry-after-storage'})
+            assert response.status_code == 503 and response.json()['error']['code'] == 'STATE_UNAVAILABLE'
+        assert path.read_bytes() == old_file and not weather
+        assert client.get(f"{BASE}/{state['id']}").json() == state
+        retried = post(client, f"{BASE}/{state['id']}/energy-proposals/{pid}/confirm", {
+            'expected_revision': state['revision'], 'idempotency_key': 'retry-after-storage'})
+        assert retried['energy_settings']['battery_capacity_kwh'] == 8.
+        assert retried['plan_status'] == 'current'

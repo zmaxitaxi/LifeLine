@@ -64,7 +64,7 @@ def stated_quantity(question, field, value):
     for clause in clauses:
         if not re.search(PATTERNS[field], clause, re.I):
             continue
-        for match in re.finditer(r'(?<![\w.])(\d+(?:\.\d+)?)\s*((?:kwh|wh|kilowatt[ -]?hours?|watt[ -]?hours?|kw|kilowatts?|watts?|w|percent|%)(?!\w))?', clause, re.I):
+        for match in re.finditer(r'(?<![\w.\-])(\d+(?:\.\d+)?)\s*((?:kwh|wh|kilowatt[ -]?hours?|watt[ -]?hours?|kw|kilowatts?|watts?|w|percent|%)(?!\w))?', clause, re.I):
             raw = float(match[1])
             suffix = (match[2] or '').lower().replace(' ', '').replace('-', '')
             if unit == 'pct' and suffix in ('%', 'percent'):

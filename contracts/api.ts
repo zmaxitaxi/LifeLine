@@ -221,6 +221,7 @@ export interface ApiErrorResponse {
       | "PROPOSAL_INCOMPLETE"
       | "INVALID_ACTIVITY"
       | "INVALID_ENERGY_SETTINGS"
+      | "STATE_UNAVAILABLE"
       | "PROPOSAL_CLOSED"
       | "IDEMPOTENCY_CONFLICT"
       | "STALE_RESULT"

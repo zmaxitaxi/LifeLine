@@ -52,6 +52,8 @@ recovery selection, recent model context, and the last 80 conversation messages.
 Interrupted calculations restore as failed, never current. Corrupt snapshots
 stop startup with a recovery message rather than silently discarding confirmed
 inputs. Atomic replace and fsync protect the preceding snapshot if a write fails.
+A failed save reloads the last durable state and returns `503 STATE_UNAVAILABLE`;
+an unsaved confirmation or idempotency receipt cannot be acknowledged as saved.
 This remains a local, single-process prototype; do not run multiple workers
 against one state file. A saved forecast is still a dated forecast, not newly
 retrieved weather, and saved results retain their original modeled date.
