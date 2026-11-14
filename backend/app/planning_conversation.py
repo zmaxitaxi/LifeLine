@@ -4,7 +4,7 @@ import re
 from typing import Annotated, Literal
 from pydantic import Field, ValidationError
 from .models import StrictModel
-from .planning_state import PlanningError, equipment_from_draft
+from .planning_state import PlanningError, equipment_from_draft, compile_clinic
 
 
 class GroundedReply(StrictModel):
@@ -365,16 +365,34 @@ def collect_reply_facts(state, calls=(), question=''):
         f'Maximum battery output: {config.max_discharge_kw:g} kW. Charge efficiency: {config.charge_efficiency*100:g}%. '
         f'Discharge efficiency: {config.discharge_efficiency*100:g}%.')
     inventory=[]
-    for item in state.equipment_inventory:
+    effective_equipment=compile_clinic(state).equipment or []
+    runtime={}
+    for activity in state.confirmed_activities:
+        for constraint in activity.details.equipment_constraints:
+            duration=getattr(constraint,'required_duration_hours',None)
+            if duration is not None:
+                runtime[constraint.equipment_id]=max(runtime.get(constraint.equipment_id,0),duration)
+        for device in activity.details.additional_equipment:
+            if device.required_duration_hours is not None:
+                runtime[device.id]=max(runtime.get(device.id,0),device.required_duration_hours)
+    for item in effective_equipment:
         if item.category=='critical':
             inventory.append(f'{item.name}: essential, {item.power_kw:g} kW, {len(item.required_hours)} hours required in configured hourly slots '+', '.join(f'{hour:02d}:00' for hour in item.required_hours)+'.')
         else:
             inventory.append(f'{item.name}: flexible, {item.max_power_kw:g} kW, {item.required_energy_kwh:g} kWh required, allowed hourly slots '+', '.join(f'{hour:02d}:00' for hour in item.allowed_hours)+'.')
-    facts['equipment_inventory']=' '.join(inventory)
+        if item.id in runtime:
+            inventory.append(f'{item.name}: explicit confirmed minimum total daily device runtime {runtime[item.id]} hours, aggregated for this one physical device.')
+    facts['equipment_inventory']='Effective confirmed equipment requirements, compiled from baseline and confirmed activities: '+' '.join(inventory)
     facts['clinic_context']=f'Selected clinic: {state.clinic_name}. Planning date: {state.planning_date.isoformat()}. All names and settings are operator data.'
     for activity in state.confirmed_activities:
         detail=activity.details
-        facts['activity_'+activity.id]=f'Confirmed activity: {detail.name}, {detail.planning_date.isoformat()}, {detail.start_hour:02d}:00 to {detail.end_hour:02d}:00. Version {activity.version}.'
+        text=f'Confirmed activity: {detail.name}, {detail.planning_date.isoformat()}, {detail.start_hour:02d}:00 to {detail.end_hour:02d}:00.'
+        for constraint in detail.equipment_constraints:
+            device=next((item for item in effective_equipment if item.id==constraint.equipment_id),None)
+            duration=getattr(constraint,'required_duration_hours',None)
+            if device and duration is not None:
+                text+=f' Explicit device constraint for {device.name}: minimum total daily operating runtime {duration} hours.'
+        facts['activity_'+activity.id]=text
     if state.current_battery_reading:
         facts['current_battery_reading']=f'Operator-reported current stored energy: {state.current_battery_reading.energy_kwh:g} kWh. This is not the assumed day-start energy.'
     if state.active_energy_proposal_id:
@@ -423,10 +441,28 @@ def _non_operational_guards(message,state,calls):
         raise PlanningError('INVALID_ACTIVITY','Return a short authored reply or choose an available tool.')
     if re.search(r'[{}\[\]`<>]',message):
         raise PlanningError('INVALID_ACTIVITY','Return natural prose, not an internal template or serialized payload.')
-    if re.search(r'\b(?:your clinic has enough|we will have enough|you will have enough|everything is fine|all loads are met)\b',message,re.I):
-        raise PlanningError('INVALID_ACTIVITY','Do not assert unqualified electricity availability; describe actual modeled figures or an unevaluated idea.')
     if re.search(r'\b(?:source ids?|fact_references|essential_summary|selected_option|system prompt|tool arguments|rephrase.*verified)\b',message,re.I):
         raise PlanningError('INVALID_ACTIVITY','Speak naturally to the person; keep internal IDs and validation instructions out of the reply.')
+    for sentence in re.split(r'(?<=[.!?])\s+|\n+',message):
+        uncertain=bool(re.search(r"\b(?:cannot|can't|do not|don't|unable to)\s+(?:yet\s+)?(?:determine|know|tell|judge|assess|confirm)|\b(?:not evaluated|not assessed|not checked|haven't checked|haven't evaluated|uncertain whether)\b",sentence,re.I))
+        conditional=bool(re.search(r'\b(?:if|suppose|hypothetical|could|might|may|depends)\b',sentence,re.I))
+        question=sentence.rstrip().endswith('?')
+        if re.search(r'\bsafe(?:ly)?\b',sentence,re.I) and not uncertain and not question:
+            raise PlanningError('INVALID_ACTIVITY','Do not assert clinical or operational safety; acknowledge when it cannot be determined.')
+        availability=re.search(r'\b(?:we|you|(?:the|our|your|this)\s+clinic)\s+(?:have|has|will have)\s+(?:enough|sufficient|adequate)\b|\b(?:the|our|your|this)\s+battery\s+(?:will|can)\s+(?:last|power|supply|run)\b|\b(?:electricity|power|energy)\s+(?:is|will be)\s+(?:enough|sufficient|adequate)\b|\ball\s+(?:loads|needs|requirements)\s+(?:are|will be)\s+(?:met|covered|supplied)\b|\beverything is fine\b',sentence,re.I)
+        if availability and not (uncertain or conditional or question):
+            raise PlanningError('INVALID_ACTIVITY','Do not make an affirmative availability claim without a sourced qualified calculation.')
+    pending_activity=next((p for p in state.proposals if p.id==state.active_proposal_id),None)
+    pending_energy=state.active_energy_proposal_id is not None
+    passive_settings=re.search(r'\b(?:power |energy |battery |solar |proposed |new )?settings\s+(?:are|is|have been|has been)\s+(?:(?:now|already|just)\s+)?(?:active|applied|adopted|confirmed|updated)\b',message,re.I)
+    if pending_energy and passive_settings and not (re.search(r'\b(?:existing|original|previous|confirmed)\b',message,re.I) and re.search(r'\b(?:draft|proposal|new settings)\b.*\b(?:not|pending|unconfirmed)\b',message,re.I)):
+        raise PlanningError('INVALID_ACTIVITY','The pending energy settings are not active; only explicit operator confirmation can adopt them.')
+    passive_activity=re.search(r'\b(?:activity|campaign|draft|proposal|changes?)\s+(?:is|are|has been|have been)\s+(?:(?:now|already|just)\s+)?(?:confirmed|adopted|applied|active)\b',message,re.I)
+    if passive_activity:
+        named=[activity for activity in state.confirmed_activities if activity.details.name.casefold() in message.casefold()]
+        conflicting=pending_activity and (not named or any(activity.id==pending_activity.target_activity_id or activity.details.name==pending_activity.details.name for activity in named))
+        if (not state.confirmed_activities) or conflicting or (pending_activity and not named):
+            raise PlanningError('INVALID_ACTIVITY','The pending activity is unconfirmed. Distinguish previously confirmed activities from this draft.')
     if re.fullmatch(r'\s*(?:confirmed|approved|applied|done)[.!]?\s*',message,re.I) or re.search(r'\b(?:i have|i.ve|i)\s+(?:confirmed|approved|applied)\b',message,re.I):
         raise PlanningError('INVALID_ACTIVITY','Only explicit operator confirmation can apply reviewed changes.')
     if re.search(r'\b(?:i have|i.ve|i)\s+(?:created|added|updated|changed|staged|scheduled)\b',message,re.I) and not any(name in calls for name in ('propose_activity','update_activity_draft','correct_last_activity_time','propose_activity_revision','propose_energy_settings','update_energy_settings_draft')):

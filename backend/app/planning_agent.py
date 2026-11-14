@@ -325,6 +325,8 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
     history=store.history.get(session_id,[])
     latest_fields=store.last_edited_fields.get(session_id,[])
     context=state.model_dump(mode='json',exclude={'computed_plan','forecast_reference','proposals','energy_proposals'})
+    context['baseline_equipment_inventory']=context.pop('equipment_inventory')
+    context['clinic_configuration_basis']='Baseline physical inventory; effective confirmed operating requirements are in reply_context facts.'
     context['latest_edited_fields']=latest_fields
     context['reply_context']=reply_context(state,(),body.question)
     messages=[{'role':'system','content':PROMPT},{'role':'user','content':'Canonical clinic data: '+json.dumps(context,separators=(',',':'))}]
