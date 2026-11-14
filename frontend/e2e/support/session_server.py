@@ -94,7 +94,7 @@ def natural_session(payload):
     if 'vaccination campaign' in lower and 'change' not in lower:return wire('propose_activity',{'name':'vaccination campaign','start_hour':9,'end_hour':15})
     if '10 AM' in question:return wire('update_activity_draft',{'start_hour':10})
     if 'refrigerator' in lower:
-        device=next(e for e in context['equipment_inventory'] if 'refrigerator' in e['name'].lower());return wire('update_activity_draft',{'equipment_ids':[device['id']]})
+        device=next(e for e in context.get('baseline_equipment_inventory',context.get('equipment_inventory',[])) if 'refrigerator' in e['name'].lower());return wire('update_activity_draft',{'equipment_ids':[device['id']]})
     return wire('recompute_clinic_plan',{'include_recovery':True})
 
 
