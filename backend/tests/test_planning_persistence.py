@@ -108,3 +108,31 @@ def test_failed_confirmation_save_rolls_back_memory_and_receipt(tmp_path, monkey
             'expected_revision': state['revision'], 'idempotency_key': 'retry-after-storage'})
         assert retried['energy_settings']['battery_capacity_kwh'] == 8.
         assert retried['plan_status'] == 'current'
+
+
+def test_sourced_timezone_survives_restart_without_changing_physical_inputs(tmp_path):
+    path = tmp_path / 'planning.json'
+    service, _ = service_for()
+    with TestClient(create_app(forecast_service=service, planning_state_path=path)) as client:
+        state = create(client)
+        store = client.app.state.planning
+        resolved = asyncio.run(store.resolve_timezone(state['id'], state['revision'], 'America/Los_Angeles'))
+        assert resolved.revision == state['revision'] + 1
+        assert resolved.input_revision == state['input_revision']
+        assert resolved.clinic.model_dump(exclude_none=True) == state['clinic']
+    restored = PlanningStore(path).read(state['id'])
+    assert restored.timezone == 'America/Los_Angeles'
+
+
+def test_platform_without_directory_fsync_can_save_and_reload(tmp_path, monkeypatch):
+    import app.planning_persistence as module
+    monkeypatch.setattr(module, 'SUPPORTS_DIRECTORY_FSYNC', False)
+    original_open = os.open
+    def open_file_only(path, *args, **kwargs):
+        assert str(path) != str(tmp_path), 'Windows does not support opening a directory for fsync'
+        return original_open(path, *args, **kwargs)
+    monkeypatch.setattr(os, 'open', open_file_only)
+    persistence = LocalPlanningPersistence(tmp_path / 'state.json')
+    payload = {'schema_version': 1, 'states': {}}
+    persistence.save(payload)
+    assert persistence.load() == payload
