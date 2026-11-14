@@ -1,0 +1,177 @@
+{
+  "implementation_commit": "9e1b2edd63284d3a7cd79ebc7b8c65a9d6079122",
+  "backend_uncommitted_changes": false,
+  "recorded_at": "2026-11-14T00:30:14.823752+00:00",
+  "scope": "Real local native inference; no weather or numerical calculation is needed for this unconfirmed draft clarification.",
+  "native_calls": [
+    {
+      "index": 0,
+      "name": "propose_activity",
+      "arguments": {
+        "start_hour": 9,
+        "end_hour": 17,
+        "equipment_ids": [
+          "fridge"
+        ],
+        "name": "Vaccination campaign"
+      }
+    },
+    {
+      "index": 0,
+      "name": "compose_planning_reply",
+      "arguments": {
+        "fact_references": [
+          "Please provide the local start time."
+        ],
+        "message": "We have a vaccination campaign planned for tomorrow. However, we still need to confirm the local start time. Please provide this information so we can finalize the details. We will then be able to confirm the equipment requirements and make any necessary arrangements."
+      }
+    },
+    {
+      "index": 0,
+      "name": "compose_planning_reply",
+      "arguments": {
+        "message": "To finalize the vaccination campaign, we need to know the local start time for tomorrow. This will help us confirm the equipment requirements and ensure a smooth operation. Please provide the start time so we can proceed with the preparations.",
+        "fact_references": [
+          "draft_details",
+          "draft_status",
+          "missing_detail"
+        ]
+      }
+    }
+  ],
+  "weather_calls": 0,
+  "passed": true,
+  "response": {
+    "mode": "local_tool_agent",
+    "model": "llama3.1:8b",
+    "message": "To finalize the vaccination campaign, we need to know the local start time for tomorrow. This will help us confirm the equipment requirements and ensure a smooth operation. Please provide the start time so we can proceed with the preparations.",
+    "needs_clarification": true,
+    "clarification_fields": [
+      "start_hour",
+      "end_hour",
+      "equipment_ids"
+    ],
+    "tool_calls": [
+      "propose_activity"
+    ],
+    "state": {
+      "id": "e0229f63-afe5-41aa-b0cf-9f6da3be5845",
+      "revision": 1,
+      "input_revision": 0,
+      "selected_clinic_id": "native-draft-check",
+      "clinic_name": "Illustrative clinic",
+      "location": {
+        "latitude": -0.0917,
+        "longitude": 34.768
+      },
+      "planning_date": "2026-11-15",
+      "timezone": "Africa/Nairobi",
+      "clinic": {
+        "initial_battery_kwh": 2.0,
+        "scenario": "normal",
+        "equipment": [
+          {
+            "id": "fridge",
+            "name": "Vaccine refrigerator",
+            "category": "critical",
+            "power_kw": 0.1,
+            "required_hours": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23
+            ]
+          }
+        ],
+        "weather_dataset": "synthetic"
+      },
+      "equipment_inventory": [
+        {
+          "id": "fridge",
+          "name": "Vaccine refrigerator",
+          "category": "critical",
+          "power_kw": 0.1,
+          "required_hours": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ]
+        }
+      ],
+      "confirmed_activities": [],
+      "proposals": [
+        {
+          "id": "1b166d32-bb81-4a73-ac0a-2c23648c451f",
+          "status": "draft",
+          "target_activity_id": null,
+          "base_activity_version": null,
+          "details": {
+            "name": "Vaccination campaign",
+            "planning_date": "2026-11-15",
+            "start_hour": null,
+            "end_hour": null,
+            "deadline_hour": null,
+            "duration_hours": null,
+            "equipment_ids": null,
+            "equipment_constraints": [],
+            "additional_equipment": []
+          },
+          "missing_fields": [
+            "start_hour",
+            "end_hour",
+            "equipment_ids"
+          ],
+          "confirmed_activity_id": null
+        }
+      ],
+      "active_proposal_id": "1b166d32-bb81-4a73-ac0a-2c23648c451f",
+      "forecast_reference": null,
+      "computed_plan": null,
+      "plan_status": "not_computed",
+      "plan_error": null,
+      "selected_recovery_intervention_id": null,
+      "sunshine_factor": 1.0
+    }
+  }
+}
