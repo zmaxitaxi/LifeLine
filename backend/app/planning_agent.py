@@ -34,7 +34,10 @@ class RecomputeTool(StrictModel):
     include_recovery: bool = Field(default=False, description='Set true to investigate tested recovery alternatives such as output, battery or solar changes when the user requests alternatives; false calculates the existing and optimized schedules only.')
 
 
-PROMPT = """You are LifeLine, a local clinic planning assistant. Answer the person's latest message naturally and concisely, usually in 1–3 sentences. Do not report clinic status unless asked. Ordinary conversation, clarification and unevaluated ideas need no tool. All supplied tools remain available; choose them yourself.
+PROMPT = """You are LifeLine, a clinic planning assistant. Answer the person's latest message naturally and concisely, usually in 1–3 sentences. Do not report clinic status unless asked. Ordinary conversation, clarification and unevaluated ideas need no tool. All supplied tools remain available; choose them yourself.
+Output plain paragraphs, not numbered lists or tables. Use full ISO dates YYYY-MM-DD and HH:00 or AM/PM times. Every electrical number needs its own unit (write 10 kWh and 12 kWh, not 10 and 12 kWh). A greeting needs only a greeting and an invitation, not clinic settings or a date. If the requested day conflicts with the selected day, explain both dates and ask the person to review the date before any equipment questions; never offer to change the day yourself.
+For electrical assessments, report verified modeled deficits and limitations. Do not repeat 'safely operate' or make a clinical verdict, even a negative one. The scope is electrical planning only; no clinical safety or availability guarantee. Discuss one or two relevant tested alternatives concisely instead of listing every candidate.
+Use a separate sentence for each tested alternative, naming its kind, hypothetical size and result in that same sentence. Battery output power and battery storage capacity are different alternatives. Do not infer that all alternatives have the same minimum battery level. Selected-option outcomes belong to that exact comparison; baseline/optimized outcomes describe their own schedules, not the selected hardware test.
 Use native function calls with JSON true/false/null, never print a function envelope. Omit unknown/unchanged arguments instead of filling nulls. Latest tool data overrides the initial snapshot; prior messages provide conversational references only.
 Use configured facts without repeat questions. For a new electricity/forecast assessment use recompute_clinic_plan; Python owns weather, arithmetic and dispatch. A clinical-safety question can still receive a modeled electrical assessment, but no electrical result establishes clinical safety or guarantees availability. Disclose explicitly labeled demo weather. Never invent measurements, weather or numerical outcomes.
 Use explain_current_plan for the exact selected result versus its baseline, without recalculating or changing selection. Preserve sunshine sensitivity unless the person changes it. Recovery alternatives remain hypothetical.
@@ -349,7 +352,7 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
     state=store.check(session_id,body.expected_revision)
     status=await agent.status()
     if not status['available']:
-        return response(state,None,[],'The local model is unavailable. Your planning state is preserved; retry when it is available.',True,failure('MODEL_UNAVAILABLE'))
+        return response(state,None,[],'The AI model is unavailable. Your planning state is preserved; retry when it is available.',True,failure('MODEL_UNAVAILABLE'))
     history=store.history.get(session_id,[])
     latest_fields=store.last_edited_fields.get(session_id,[])
     with measured('serialization'):
@@ -364,7 +367,9 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
     messages.append({'role':'user','content':body.question})
     base_messages=list(messages)
     last_success_messages=list(messages)
-    turn_problem=None
+    calendar=context['calendar']
+    turn_problem=(failure('DATE_MISMATCH','review_date',False,selected_date=calendar['selected_date'],requested_date=calendar['requested_date'])
+        if calendar.get('date_conflict') else None)
     calls=[]
     offered_tools=definitions(state,latest_fields)
     error=None
@@ -380,7 +385,7 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
                 validate_reply_content(message,current,body.question,calls)
                 store.history[session_id]=(history+[body.question])[-8:]
                 return SessionAgentResponse(mode='local_tool_agent',model=agent.model,message=message,
-                    needs_clarification=False,clarification_fields=[],tool_calls=calls,state=current,failure=turn_problem)
+                    needs_clarification=bool(turn_problem),clarification_fields=[],tool_calls=calls,state=current,failure=turn_problem)
             call=turn['call']
             name,arguments=call['name'],normalize_activity_arguments(call['arguments'])
             if name not in {tool['name'] for tool in offered_tools}:
@@ -401,7 +406,7 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
                 missing=proposal.missing_fields if proposal and presentation.kind=='activity_review' else []
                 store.history[session_id]=(history+[body.question])[-8:]
                 return SessionAgentResponse(mode='local_tool_agent',model=agent.model,message=reply.message,
-                    needs_clarification=bool(missing),clarification_fields=missing,tool_calls=calls,
+                    needs_clarification=bool(missing or turn_problem),clarification_fields=missing,tool_calls=calls,
                     presentation=presentation,state=current,failure=turn_problem)
             if name in ('propose_activity','update_activity_draft','propose_activity_revision','correct_last_activity_time','recompute_clinic_plan'):
                 calendar=clinic_calendar(state,body.question)
@@ -515,7 +520,7 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
         except (AgentUnavailable,TimeoutError) as exc:
             reason=str(exc)
             code='MODEL_TIMEOUT' if isinstance(exc,TimeoutError) or 'TIMEOUT' in reason else 'MODEL_BUSY' if 'BUSY' in reason else 'MODEL_INVALID_OUTPUT' if 'INVALID' in reason or 'TRUNCATED' in reason else 'MODEL_UNAVAILABLE'
-            return response(store.read(session_id),None,calls,'The local model could not finish a validated response. Completed planning changes are preserved; retry the request.',True,failure(code,'wait_model' if code=='MODEL_BUSY' else 'retry'))
+            return response(store.read(session_id),None,calls,'The AI model could not finish a validated response. Completed planning changes are preserved; retry the request.',True,failure(code,'wait_model' if code=='MODEL_BUSY' else 'retry'))
         except ForecastError:
             return response(store.read(session_id),None,calls,'Live weather is unavailable. No forecast or new verified outcome has been invented; retry when weather is available.',True,failure('WEATHER_UNAVAILABLE'))
         except (ValidationError,PlanningError,ValueError,KeyError,TypeError) as exc:
@@ -532,12 +537,15 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
             elif turn.get('type')=='message':
                 messages.append({'role':'assistant','content':turn['content']})
             messages.append({'role':'user','content':'That attempt was rejected: '+error[:500]+' You may answer naturally, clarify an unknown fact or use a relevant available tool. Do not invent results or repeat an unexecuted change.'})
-    return response(store.read(session_id),None,calls,'The local model could not produce a validated response. Your current state is preserved; retry the request.',True,turn_problem or failure('MODEL_VALIDATION_FAILED','review_inputs'))
+    return response(store.read(session_id),None,calls,'The AI model could not produce a validated response. Your current state is preserved; retry the request.',True,turn_problem or failure('MODEL_VALIDATION_FAILED','review_inputs'))
 
 
 async def ask_session_agent(session_id, body, store, catalog, service, lock, agent):
     try:
         async with asyncio.timeout(100):
-            return await _ask_session_agent(session_id,body,store,catalog,service,lock,agent)
+            result=await _ask_session_agent(session_id,body,store,catalog,service,lock,agent)
+            if result.mode=='local_tool_agent' and getattr(agent,'response_mode',None)=='cloud_tool_agent':
+                result.mode='cloud_tool_agent'
+            return result
     except TimeoutError:
-        return response(store.read(session_id),None,[],'The local model exceeded its response time limit. Completed planning changes are preserved; retry the current request.',True,failure('MODEL_TIMEOUT'))
+        return response(store.read(session_id),None,[],'The AI model exceeded its response time limit. Completed planning changes are preserved; retry the current request.',True,failure('MODEL_TIMEOUT'))

@@ -2783,6 +2783,7 @@
             "type": "string",
             "enum": [
               "local_tool_agent",
+              "cloud_tool_agent",
               "deterministic_guided_fallback"
             ],
             "title": "Mode"
@@ -5020,6 +5021,7 @@
                 "type": "string",
                 "enum": [
                   "local_tool_agent",
+                  "cloud_tool_agent",
                   "local_agent_unavailable"
                 ]
               },
@@ -6235,6 +6237,7 @@
             "type": "string",
             "enum": [
               "local_tool_agent",
+              "cloud_tool_agent",
               "local_agent_unavailable"
             ],
             "title": "Mode"

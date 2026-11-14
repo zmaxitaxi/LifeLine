@@ -234,7 +234,7 @@ class PlanningMessage(StrictModel):
     content: Annotated[str, Field(min_length=1, max_length=12000)]
     created_at: datetime
     presentation: AgentPresentation | None = None
-    mode: Literal['local_tool_agent', 'local_agent_unavailable'] | None = None
+    mode: Literal['local_tool_agent', 'cloud_tool_agent', 'local_agent_unavailable'] | None = None
     imported: bool = False
     failure: AgentFailure | None = None
 
@@ -253,7 +253,7 @@ class AgentTimings(StrictModel):
 
 
 class SessionAgentResponse(StrictModel):
-    mode: Literal['local_tool_agent', 'local_agent_unavailable']
+    mode: Literal['local_tool_agent', 'cloud_tool_agent', 'local_agent_unavailable']
     model: str | None = None
     message: str
     needs_clarification: bool

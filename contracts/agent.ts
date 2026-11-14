@@ -43,11 +43,11 @@ export type AgentStreamEvent =
   | { type: "error"; code: string; message: string };
 
 export interface AgentStatus {
-  mode: "local_tool_agent" | "deterministic_guided_fallback";
+  mode: "local_tool_agent" | "cloud_tool_agent" | "deterministic_guided_fallback";
   available: boolean;
   model: string | null;
   provider: string;
-  cloud_ai: false;
+  cloud_ai: boolean;
   note: string;
 }
 export interface AgentResponse {

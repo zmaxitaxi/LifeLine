@@ -1,6 +1,7 @@
 """Authored direct replies, optional scoped presentation and current-fact grounding."""
 import json
 import re
+from datetime import date
 from typing import Annotated, Literal
 from pydantic import Field, ValidationError
 from .models import StrictModel
@@ -132,8 +133,11 @@ def fact_references(state, calls):
 
 
 NUMBER_WORDS={'zero':0.,'one':1.,'two':2.,'three':3.,'four':4.,'five':5.,'six':6.,'seven':7.,'eight':8.,'nine':9.,'ten':10.,'eleven':11.,'twelve':12.,'half':.5}
-QUANTITY = re.compile(r'(?<![\w.])(-?\d+(?:\.\d+)?|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|half)\s*(kWh|kilowatt[ -]?hours?|Wh|watt[ -]?hours?|kW|kilowatts?|W|watts?|%|percent|hours?|hrs?|h)(?=$|[\s.,;:!?])', re.I)
+QUANTITY = re.compile(r'(?<![\w.])(-?\d+(?:\.\d+)?|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|half)\s*(kWh|kilowatt[ -]?hours?|Wh|watt[ -]?hours?|kW|kilowatts?|W|watts?|%|percent|hours?|hrs?|h)(?=$|[\s.,;:!?()\"\x27*])', re.I)
 DATE = re.compile(r'\b\d{4}-\d{2}-\d{2}\b')
+MONTHS={name.lower():n for n,name in enumerate(('January','February','March','April','May','June','July','August','September','October','November','December'),1)}
+MONTH_PATTERN='|'.join(MONTHS)
+NATURAL_DATE=re.compile(r'\b(?:(?P<month>'+MONTH_PATTERN+r')\s+(?P<day>\d{1,2})(?:st|nd|rd|th)?,?\s+(?P<year>\d{4})|(?P<day_first>\d{1,2})(?:st|nd|rd|th)?\s+(?P<month_second>'+MONTH_PATTERN+r'),?\s+(?P<year_last>\d{4}))\b',re.I)
 TIME = re.compile(r'\b(\d{1,2})(?::(00))?\s*(AM|PM)\b|\b(\d{1,2}):00\b', re.I)
 
 
@@ -143,6 +147,13 @@ def quantities(text):
     for match in DATE.finditer(text):
         values.append((match.group(), 'date', match.start(), match.end()))
         covered.append((match.start(), match.end()))
+    for match in NATURAL_DATE.finditer(text):
+        try:
+            value=date(int(match['year'] or match['year_last']),MONTHS[(match['month'] or match['month_second']).lower()],int(match['day'] or match['day_first'])).isoformat()
+        except ValueError:
+            continue
+        values.append((value,'date',match.start(),match.end()))
+        covered.append((match.start(),match.end()))
     for match in TIME.finditer(text):
         value = int(match[1] or match[4])
         if match[3]:
@@ -193,6 +204,19 @@ def quantity_role(text, start, end):
         if earlier:
             return quantity_role(text,*earlier)
     return None
+
+
+def option_kinds(sentence):
+    output=bool(re.search(r'\b(?:output|inverter|discharge)\b',sentence,re.I))
+    battery=bool(re.search(r'\b(?:battery|storage)\b',sentence,re.I))
+    # "Battery output" describes output power, not an additional storage option.
+    if output and not re.search(r'\b(?:battery capacity|storage capacity|storage size)\b',sentence,re.I):
+        battery=False
+    return [kind for kind,found in (
+        ('output',output),('battery',battery),
+        ('solar',bool(re.search(r'\b(?:solar|pv|panels?)\b',sentence,re.I))),
+        ('scheduling',bool(re.search(r'\b(?:reschedul\w*|scheduling)\b',sentence,re.I))),
+        ('optional',bool(re.search(r'\b(?:optional|postpon\w*)\b',sentence,re.I)))) if found]
 
 
 def validate_grounded_prose(message, facts, selected, *, enforce_topics=True, natural=False):
@@ -268,11 +292,22 @@ def validate_grounded_prose(message, facts, selected, *, enforce_topics=True, na
         numbers, _ = quantities(sentence)
         if not numbers:
             continue
-        kinds = [kind for kind in ('output','scheduling','battery','solar','optional') if re.search(r'\b'+(r'(?:reschedul\w*|scheduling)' if kind=='scheduling' else kind)+r'\b',sentence,re.I)]
+        kinds = option_kinds(sentence)
         candidates = [key for key in selected if key.startswith('option_') and any(kind in key for kind in kinds)]
         if len(candidates) > 1 and len(kinds) > 1:
             raise PlanningError('INVALID_ACTIVITY', 'Use a separate numerical sentence for each tested alternative.')
         if candidates:
+            # Bind a mentioned hypothetical size to its own tested result, not
+            # every candidate of that kind (which may have different deficits).
+            sized=[]
+            for key in candidates:
+                after=re.findall(r'\bto\s+(-?\d+(?:\.\d+)?\s*(?:kWh|kW))',facts[key],re.I)
+                targets=[q for text in after for q in quantities(text)[0]]
+                if targets and all(any(unit==known_unit and abs(value-known)<=1e-6
+                    for value,unit,_,_ in numbers if unit!='date') for known,known_unit,_,_ in targets):
+                    sized.append(key)
+            if sized:
+                candidates=sized
             allowed = [entry for key in candidates for entry in quantities(facts[key])[0]]
             # Baseline battery/reserve explanations are not hardware-option claims.
             baseline = bool(re.search(r'lowest|minimum|reserve|current|existing|baseline',sentence,re.I))
@@ -331,7 +366,7 @@ def synthesis_data(state, facts):
         data['essential_summary'] = {'basis':'existing baseline schedule before any intervention', 'remaining_unserved_essential_energy':f'{metrics.critical_unserved_kwh:.3f} kWh',
             'flexible_unfinished':f'{metrics.flexible_deferred_kwh:.3f} kWh'}
         if 'battery_summary' in data:
-            data['battery_summary'] = {'lowest_stored_energy':f'{metrics.min_soc_kwh:.3f} kWh',
+            data['battery_summary'] = {'basis':'existing baseline schedule before any intervention','lowest_stored_energy':f'{metrics.min_soc_kwh:.3f} kWh',
                 'reserve_target':f'{plan.simulation.effective_config.reserve_kwh:.3f} kWh'}
         if 'weather_basis' in data:
             data['weather_basis'] = {'planning_date':state.planning_date.isoformat(),
@@ -346,6 +381,9 @@ def synthesis_data(state, facts):
             data['selected_option'] = {'exact_selected_option_id':selected.id,'label':selected.label,'kind':selected.kind,
                 'remaining_unserved_essential_energy':f'{m.essential_unserved_kwh:.3f} kWh',
                 'flexible_unfinished':f'{m.flexible_unfinished_kwh:.3f} kWh',
+                'lowest_stored_energy':f'{m.minimum_battery_kwh:.3f} kWh',
+                'essential_requirements_configured':m.essential_requested_kwh>1e-6,
+                'modeled_essential_demand_met':m.essential_requested_kwh>1e-6 and m.essential_unserved_kwh<=1e-6,
                 'hypothetical_changes':[{'field':c.field,'before':f'{c.before:g} {c.unit}','after':f'{c.after:g} {c.unit}'} for c in selected.infrastructure_changes]}
         for key in facts:
             if not key.startswith('option_'):
@@ -357,6 +395,9 @@ def synthesis_data(state, facts):
             data[key] = {'option_id':option.id,'kind':kind, 'label':option.label,
                 'remaining_unserved_essential_energy':f'{m.essential_unserved_kwh:.3f} kWh',
                 'flexible_unfinished':f'{m.flexible_unfinished_kwh:.3f} kWh',
+                'lowest_stored_energy':f'{m.minimum_battery_kwh:.3f} kWh',
+                'essential_requirements_configured':m.essential_requested_kwh>1e-6,
+                'modeled_essential_demand_met':m.essential_requested_kwh>1e-6 and m.essential_unserved_kwh<=1e-6,
                 'hypothetical_changes':[{
                     'field':c.field,'before':f'{c.before:g} {c.unit}','after':f'{c.after:g} {c.unit}'} for c in option.infrastructure_changes]}
     return data
@@ -497,10 +538,13 @@ def _qualified_coverage(state,sentence,message,calls):
         if exact:
             contexts=exact
         else:
-            expressions={'battery':r'\bbattery|\bstorage','solar':r'\bsolar|\bpanels?|\bpv\b',
-                'output':r'\boutput|\binverter|\bdischarge','scheduling':r'\bschedul\w*|\breschedul\w*'}
-            kinds=[kind for kind,pattern in expressions.items() if re.search(pattern,sentence,re.I)]
-            contexts=[option.metrics for option in recovery.options if option.kind in kinds]
+            kinds=option_kinds(sentence)
+            candidates=[option for option in recovery.options if option.kind in kinds]
+            numbers=quantities(sentence)[0]
+            sized=[option for option in candidates if option.infrastructure_changes and all(
+                any(unit==change.unit.lower() and abs(value-change.after)<=1e-6 for value,unit,_,_ in numbers if unit!='date')
+                for change in option.infrastructure_changes)]
+            contexts=[option.metrics for option in (sized or candidates)]
     else:
         contexts=[plan.simulation.baseline.metrics]
     essential_only=bool(re.search(r'\b(?:essential|critical|protected)\b',sentence,re.I)) and not re.search(r'\b(?:all loads|all needs|all requirements|flexible)\b',sentence,re.I)
@@ -512,7 +556,7 @@ def _qualified_coverage(state,sentence,message,calls):
         return essential<=1e-6 and (essential_only or unfinished<=1e-6)
     if any(getattr(metrics,'essential_requested_kwh',getattr(metrics,'critical_requested_kwh',0.))<=1e-6 for metrics in contexts):
         return False  # Missing requirements do not establish coverage or shortage.
-    negative=bool(re.search(r'\bnot\s+(?:have\s+)?(?:fully\s+)?(?:met|covered|supplied|sufficient|enough)\b|\b(?:does not|cannot|can.t)\s+(?:meet|cover|supply)\b',sentence,re.I))
+    negative=bool(re.search(r'\bnot\s+(?:have\s+)?(?:fully\s+)?(?:met|covered|supplied|sufficient|enough|resolved|solved|eliminated)\b|\b(?:does not|did not|do not|cannot|can.t)\s+(?:meet|cover|supply|resolve|solve|eliminate)\b',sentence,re.I))
     return bool(contexts) and all(covered(metrics)!=negative for metrics in contexts)
 
 

@@ -25,7 +25,7 @@ from .scenarios import CONFIG_PATH, load_catalog, load_weather
 from .assistant import AssistantRequest, AssistantResponse, prepare, summarize
 from .forecast_routes import router as forecast_router
 from .weather_forecast import ForecastError, ForecastService
-from .local_agent import LocalAgent
+from .agent_provider import configured_agent, load_local_settings
 from .agent_routes import router as agent_router
 from .demos import competing_windows, recovery_demo
 from .simulation import simulate_case
@@ -50,7 +50,7 @@ def validation_details(errors, prefix=()):
 
 
 def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_service=None, outlook_service=None,
-               planning_state_path=None, weather_mode='live'):
+               planning_state_path=None, weather_mode='live', agent_provider=None):
     if weather_mode not in ('live', 'demo'):
         raise ValueError('Weather mode must be live or demo')
     @asynccontextmanager
@@ -61,7 +61,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
         app.state.solve_lock = asyncio.Lock()
         from .demo_weather import DemoWeatherService, DemoOutlookService
         app.state.forecasts = forecast_service or (DemoWeatherService() if weather_mode=='demo' else ForecastService())
-        app.state.agent = agent_service or LocalAgent()
+        app.state.agent = agent_service or configured_agent(agent_provider)
         app.state.planning = PlanningStore(planning_state_path)
         app.state.outlooks = outlook_service or (DemoOutlookService() if weather_mode=='demo' else WeatherOutlookService())
         app.state.weather_mode = weather_mode
@@ -74,7 +74,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
     async def configured_weather_mode(request: Request):
         return {'mode': request.app.state.weather_mode,
                 'label': 'Demo weather · synthetic sample conditions' if request.app.state.weather_mode=='demo' else 'Live weather · Open-Meteo',
-                'description': 'Sample weather, actual local Llama and real physical calculations.' if request.app.state.weather_mode=='demo' else 'Actual forecasts require a reachable weather provider.'}
+                'description': 'Sample weather and real physical calculations; the configured AI provider authors replies.' if request.app.state.weather_mode=='demo' else 'Actual forecasts require a reachable weather provider.'}
 
     @app.exception_handler(PlanningError)
     async def planning_error(request, exc):
@@ -234,4 +234,5 @@ def local_state_path():
 
 
 import os
+load_local_settings()
 app = create_app(planning_state_path=local_state_path(), weather_mode=os.environ.get('LIFELINE_WEATHER_MODE', 'live'))

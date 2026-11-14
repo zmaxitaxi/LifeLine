@@ -1,0 +1,57 @@
+"""Regression cases found by genuine model runs, including false positives."""
+import json
+import pytest
+from fastapi.testclient import TestClient
+from app.main import create_app
+from app.planning_models import PlanningState
+from app.planning_conversation import validate_reply_content, reply_context
+from app.planning_state import PlanningError
+from test_planning_state import create, post, BASE
+from test_weather_forecast import service_for
+
+
+def model_state(value):
+    return PlanningState.model_validate_json(json.dumps(value))
+
+
+def test_verified_natural_calendar_dates_and_parenthesized_units_are_allowed():
+    with TestClient(create_app()) as client:
+        state=model_state(create(client))
+    value=state.planning_date
+    message=f'The selected date is {value.strftime("%B")} {value.day}, {value.year}.'
+    assert validate_reply_content(message,state,'Which date?')==message
+    message=f'The selected date is {value.day} {value.strftime("%B %Y")}.'
+    assert validate_reply_content(message,state,'Which date?')==message
+    message=f'The configured output limit is ({state.energy_settings.max_discharge_kw:g} kW).'
+    assert validate_reply_content(message,state,'Which output limit?')==message
+    for bad in ('The selected date is November 15, 2039.','The selected date is February 31, 2026.',
+                'The configured output limit is (9999 kW).'):
+        with pytest.raises(PlanningError):
+            validate_reply_content(bad,state,'Tell me the settings.')
+
+
+def test_output_and_storage_options_bind_their_own_tested_size_and_result():
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service)) as client:
+        state=create(client)
+        # Use an output bottleneck with ample energy; all sizes are real solves.
+        body={key:state[key] for key in ('selected_clinic_id','clinic_name','location','planning_date','timezone')}
+        body.update(midnight_battery_kwh=6.,clinic={'scenario':'normal','battery_capacity_kwh':8.,
+            'initial_battery_kwh':6.,'reserve_kwh':1.,'pv_capacity_kw':1.5,'max_discharge_kw':.4,
+            'equipment':[{'id':'evening','name':'Essential evening equipment','category':'critical','power_kw':1.,'required_hours':[19,20]}]})
+        state=post(client,BASE,body)
+        state=post(client,f"{BASE}/{state['id']}/recompute",{'expected_revision':state['revision'],'include_recovery':True})
+        parsed=model_state(state)
+        good='The tested battery output alternative at 1.4 kW meets the modeled essential demand and leaves 0.000 kWh of essential shortfall.'
+        assert validate_reply_content(good,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==good
+        negative='The tested battery capacity alternative at 10 kWh did not resolve the modeled essential shortfall of 1.200 kWh.'
+        assert validate_reply_content(negative,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==negative
+        for bad in ('The tested battery output alternative at 0.9 kW meets the modeled essential demand.',
+                    'The tested battery output alternative at 1.4 kW leaves 0.200 kWh of essential shortfall.'):
+            with pytest.raises(PlanningError):
+                validate_reply_content(bad,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))
+        option=next(o for o in parsed.computed_plan.recovery.options if o.kind=='output' and o.config.max_discharge_kw==1.4)
+        parsed.selected_recovery_intervention_id=option.id
+        data=reply_context(parsed,('explain_current_plan',))['facts']['selected_option']
+        assert data['lowest_stored_energy']==f'{option.metrics.minimum_battery_kwh:.3f} kWh'
+        assert data['modeled_essential_demand_met'] is True

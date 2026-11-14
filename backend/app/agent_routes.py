@@ -31,8 +31,11 @@ async def tools():
 async def ask(body:AgentRequest,request:Request):
     try:
         async with asyncio.timeout(75):
-            return await ask_agent(body,request.app.state.catalog,request.app.state.forecasts,
+            result=await ask_agent(body,request.app.state.catalog,request.app.state.forecasts,
                                    request.app.state.solve_lock,request.app.state.agent)
+            if result.mode=='local_tool_agent' and getattr(request.app.state.agent,'response_mode',None)=='cloud_tool_agent':
+                result.mode='cloud_tool_agent'
+            return result
     except TimeoutError:
         return AgentResponse(mode='deterministic_guided_fallback',message='The local agent exceeded its time limit. No new verified answer is available. Select guided fallback and retry.',
             needs_clarification=True,tool_calls=[],fallback_reason='LOCAL_AGENT_TIME_LIMIT',input_basis=body.input_basis)
@@ -56,6 +59,8 @@ async def stream(body:AgentRequest,request:Request):
                 async with asyncio.timeout(75):
                     result=await ask_agent(body,request.app.state.catalog,request.app.state.forecasts,
                                            request.app.state.solve_lock,request.app.state.agent,progress=progress)
+                if result.mode=='local_tool_agent' and getattr(request.app.state.agent,'response_mode',None)=='cloud_tool_agent':
+                    result.mode='cloud_tool_agent'
                 await queue.put({'type':'answer','response':result.model_dump(mode='json')})
             except TimeoutError:
                 await queue.put({'type':'error','code':'LOCAL_AGENT_TIME_LIMIT',

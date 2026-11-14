@@ -22,6 +22,8 @@ import httpx
 from fastapi.testclient import TestClient
 from app.main import create_app
 from app.local_agent import LocalAgent
+from app.claude_agent import ClaudeAgent
+from app.agent_provider import load_local_settings
 from app.demo_weather import DemoWeatherService
 import app.planning_state as planning_state
 import app.recovery_planner as recovery_planner
@@ -72,7 +74,36 @@ class OllamaTransport(httpx.AsyncBaseTransport):
                 'ollama':{key:data.get(key) for key in ('total_duration','load_duration','prompt_eval_count','prompt_eval_duration','eval_count','eval_duration','done_reason')}}
             self.calls.append(call);self.metrics.add('model_http',elapsed)
         else:self.metrics.add('model_status_http',elapsed)
-        return httpx.Response(response.status_code,headers=response.headers,content=response.content,request=request)
+        return httpx.Response(response.status_code,headers={k:v for k,v in response.headers.items() if k.lower() not in ('content-encoding','content-length','transfer-encoding')},content=response.content,request=request)
+
+
+class ClaudeTransport(httpx.AsyncBaseTransport):
+    def __init__(self,metrics): self.metrics=metrics;self.calls=[]
+    async def handle_async_request(self,request):
+        started=monotonic()
+        try:
+            async with httpx.AsyncClient(trust_env=False,timeout=httpx.Timeout(35.,connect=5.)) as client:
+                response=await client.request(request.method,str(request.url),content=request.content,headers=request.headers)
+        except BaseException as exc:
+            if request.url.path=='/v1/messages':
+                elapsed=monotonic()-started
+                self.calls.append({'seconds':elapsed,'error':type(exc).__name__})
+                self.metrics.add('model_http',elapsed)
+            raise
+        elapsed=monotonic()-started
+        if request.url.path=='/v1/messages':
+            body=json.loads(request.content);data=response.json()
+            # Never record headers, keys or private thinking blocks.
+            public=[b for b in data.get('content',[]) if b.get('type') in ('text','tool_use')]
+            self.calls.append({'seconds':elapsed,'request_bytes':len(request.content),
+                'message_chars':len(json.dumps(body['messages'])),
+                'tool_schema_chars':len(json.dumps(body.get('tools',[]))),
+                'native_message':public,'usage':data.get('usage'),
+                'correction':[b.get('text') for m in body['messages'] for b in m.get('content',[]) if b.get('type')=='text' and b.get('text','').startswith('That attempt was rejected:')],
+                'stop_reason':data.get('stop_reason'),'http_status':response.status_code})
+            self.metrics.add('model_http',elapsed)
+        else:self.metrics.add('model_status_http',elapsed)
+        return httpx.Response(response.status_code,headers={k:v for k,v in response.headers.items() if k.lower() not in ('content-encoding','content-length','transfer-encoding')},content=response.content,request=request)
 
 
 def clinic_body():
@@ -87,12 +118,16 @@ def clinic_body():
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--cases',default='conversation,assessment,vaccination,recovery,followup,history')
-    args=parser.parse_args();metrics=Instrumentation();transport=OllamaTransport(metrics)
-    agent=LocalAgent(transport=transport);weather=DemoWeatherService()
+    parser.add_argument('--provider',choices=('local','claude'),default='local')
+    args=parser.parse_args();metrics=Instrumentation()
+    load_local_settings()
+    transport=ClaudeTransport(metrics) if args.provider=='claude' else OllamaTransport(metrics)
+    agent=ClaudeAgent(transport=transport) if args.provider=='claude' else LocalAgent(transport=transport)
+    weather=DemoWeatherService()
     weather.get=metrics.asynchronous('weather',weather.get)
     report={'implementation_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
-        'started_at':datetime.now(timezone.utc).isoformat(),'model':'llama3.1:8b',
-        'basis':'SYNTHETIC DEMO WEATHER; actual local Llama; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.',
+        'started_at':datetime.now(timezone.utc).isoformat(),'model':agent.model,'provider':args.provider,
+        'basis':'SYNTHETIC DEMO WEATHER; actual selected AI provider; existing real simulator/MILP. Illustrative explicit fixture, no UI requests.',
         'first_visible_basis':'Current session endpoint is not streaming; first visible assistant content equals completed HTTP response time.',
         'cases':[]}
     def save():args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(report,indent=2)+'\n')
@@ -127,7 +162,7 @@ def main():
                 metrics.events.clear();transport.calls.clear();before=deepcopy(state);started=monotonic()
                 response=client.post(f"/api/planning/sessions/{state['id']}/agent",json={'expected_revision':state['revision'],'question':question})
                 total=monotonic()-started;data=response.json();current=data.get('state',before)
-                text=data.get('message','');success=response.status_code==200 and data.get('mode')=='local_tool_agent'
+                text=data.get('message','');success=response.status_code==200 and data.get('mode') in ('local_tool_agent','cloud_tool_agent')
                 if name=='conversation':correct=success and current==before and not data.get('tool_calls')
                 elif name=='assessment':correct=success and current['plan_status']=='current' and 'recompute_clinic_plan' in data.get('tool_calls',[])
                 elif name=='vaccination':correct=success and current==before and (('today' in text.lower() and 'tomorrow' in text.lower()) or (datetime.now(ZoneInfo('Africa/Nairobi')).date().isoformat() in text and before['planning_date'] in text)) and 'power rating' not in text.lower()

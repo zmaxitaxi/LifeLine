@@ -88,7 +88,7 @@ class RequirementResult(StrictModel):
 
 
 class AgentResponse(StrictModel):
-    mode: Literal['local_tool_agent', 'deterministic_guided_fallback']
+    mode: Literal['local_tool_agent', 'cloud_tool_agent', 'deterministic_guided_fallback']
     model: str | None = None
     message: str
     needs_clarification: bool
