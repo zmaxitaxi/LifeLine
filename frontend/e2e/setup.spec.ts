@@ -16,6 +16,7 @@ test('first launch asks for the clinic without creating an example or calling pl
  let posts=0;page.on('request',r=>{if(r.method()==='POST')posts++;});await page.goto('/');
  await expect(page.getByRole('heading',{name:'First, where is your clinic?',exact:true})).toBeVisible();
  await expect(page.getByRole('textbox',{name:'Clinic name',exact:true})).toHaveValue('');
+ await expect(page.getByRole('link',{name:'Skip to clinic setup',exact:true})).toHaveAttribute('href','#setup-name');
  await expect(page.getByRole('combobox',{name:'Clinic location',exact:true})).toHaveValue('');
  await expect(page.getByText('Battery may run too low',{exact:true})).toHaveCount(0);
  await expect(page.getByTestId('current-plan-summary')).toHaveCount(0);expect(posts).toBe(0);

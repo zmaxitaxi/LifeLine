@@ -583,6 +583,7 @@ export default function App() {
   );
   return (<>
     <Workspace
+      setup={!state}
       page={route.page}
       section={route.section}
       context={context}

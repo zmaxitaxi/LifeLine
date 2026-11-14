@@ -29,6 +29,7 @@ export function Workspace({
   context,
   assistant,
   overview,
+  setup = false,
 }: {
   page: "assistant" | "overview";
   section?: OverviewSection;
@@ -36,6 +37,7 @@ export function Workspace({
   context: ReactNode;
   assistant: ReactNode;
   overview: ReactNode;
+  setup?: boolean;
 }) {
   const overviewRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -50,9 +52,9 @@ export function Workspace({
     <div className="chat-app two-page-app" data-page={page}>
       <a
         className="skip-link"
-        href={page === "assistant" ? "#chat-input" : "#overview-title"}
+        href={page === "assistant" ? setup ? "#setup-name" : "#chat-input" : "#overview-title"}
       >
-        Skip to {page === "assistant" ? "message" : "clinic overview"}
+        Skip to {page === "assistant" ? setup ? "clinic setup" : "message" : "clinic overview"}
       </a>
       <header className="chat-header">
         <div>
