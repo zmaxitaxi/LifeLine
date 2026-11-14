@@ -44,6 +44,11 @@ call. Its recorded model wall time was 6.521s, versus 0.034s numerical work.
 Progress DOM commit is not model first-token time or completed answer latency.
 [Browser evidence](evidence/claude-genuine-browser.json),
 [full API timings, failures and limits](HAIKU_VALIDATION.md).
+After cutover, a separate read-only browser check verified the actual saved
+clinic, unchanged canonical inputs and result timestamp, Claude status, hourly
+chart values and both editing dialogs, with no POSTs or inference. The first CI
+browser failure was a Mac-only screenshot output path; the test now uses
+Playwright's portable per-test output directory.
 Browser regression weather/model transports are fixtures; those 56 tests do not
 measure genuine inference. Earlier failed runs remain evidence, and the previous
 local-model evaluation score does not transfer to Claude.

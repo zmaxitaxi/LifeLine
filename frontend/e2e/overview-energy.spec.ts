@@ -1,6 +1,6 @@
 import { test,expect } from '@playwright/test';
 import { apiBase,seed,calculate,open,overview,read,say,initial } from './support/planning';
-test('hourly chart, shared timeline and selected comparison use actual backend values',async({page,request})=>{
+test('hourly chart, shared timeline and selected comparison use actual backend values',async({page,request},testInfo)=>{
  const state=await calculate(request,await seed(request));await open(page,state);await overview(page).click();const chart=page.getByRole('region',{name:'Energy through the day',exact:true});
  for(const r of state.computed_plan!.simulation.baseline.hourly){expect(Number(await page.getByTestId(`solar-hour-${r.hour}`).getAttribute('data-kwh'))).toBeCloseTo(r.pv_kwh,9);expect(Number(await page.getByTestId(`used-hour-${r.hour}`).getAttribute('data-kwh'))).toBeCloseTo(r.critical_served_kwh+r.flexible_served_kwh,9);}
  await chart.getByRole('group',{name:'Inspect an energy hour'}).getByRole('button',{name:'10:00',exact:true}).click();await expect(page.getByLabel('Selected simulation time',{exact:true})).toHaveText('10:00');
@@ -8,7 +8,7 @@ test('hourly chart, shared timeline and selected comparison use actual backend v
  expect(Number(await page.getByTestId('existing-battery').getAttribute('data-energy-kwh'))).toBeCloseTo(state.computed_plan!.simulation.baseline.hourly[10].soc_start_kwh,9);
  await page.getByRole('button',{name:/All calculated plans/}).click();const option=state.computed_plan!.recovery!.options.find(o=>o.kind==='solar')!;await page.locator(`input[name=clinic-plan][value="${option.id}"]`).click();
  await expect(page.getByLabel('Selected simulation time',{exact:true})).toHaveText('00:00');expect(Number(await page.getByTestId('solar-hour-12').getAttribute('data-kwh'))).toBeCloseTo(option.plan.hourly[12].pv_kwh,9);expect((await read(request,state.id)).computed_plan!.generation).toBe(state.computed_plan!.generation);
- await chart.screenshot({path:'/private/tmp/lifeline-energy-day-evidence.png'});
+ await chart.screenshot({path:testInfo.outputPath('energy-day-evidence.png')});
 });
 
 test('only confirmed activities become chart markers and shared devices are not counted twice',async({page,request})=>{

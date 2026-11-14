@@ -31,3 +31,10 @@ These are DOM commit proxies, not GPU timings, first model token timings or meas
 The browser suite covers navigation and chat persistence, explicit activity/equipment/energy confirmation, critical-load protection, hourly chart and battery values, distinct missing demand, scenario capacity differences, no stale result after failure, persisted date guidance, interrupted-stream non-replay, public progress before a final reply, and keyboard/mobile behavior.
 
 Run `npm --prefix frontend run build` and `npm --prefix frontend run test:e2e`. Tests use isolated model/weather transports with the actual review APIs, compiler, simulator, optimizer and result validators. Main Chat owns the separate real Llama before/after benchmark and final backend regression report; no real-model speed improvement is inferred from frontend fixtures.
+
+The current demonstration uses Claude Haiku only. Its actual API/browser timing
+evidence is in [Haiku validation](../docs/HAIKU_VALIDATION.md); the older Llama
+benchmark remains historical. The first release CI passed both Python jobs and
+55 browser tests, but failed saving one screenshot to a Mac-only `/private/tmp`
+path. Evidence now uses Playwright's per-test `outputPath`, verified in all ten
+affected Overview journeys. This changes test artifact storage, not the app.
