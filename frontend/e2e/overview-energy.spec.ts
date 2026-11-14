@@ -51,3 +51,9 @@ test('provider status and a verified cloud reply are displayed without calling i
  await page.route(`**/api/planning/sessions/${state.id}/agent/stream`,route=>route.fulfill({json:{mode:'cloud_tool_agent',model:'verified-cloud-test',message:'Hello! How can I help with the clinic?',needs_clarification:false,clarification_fields:[],tool_calls:[],presentation:{kind:'conversation',input_revision:null,generation:null,option_ids:[],show_schedule:false},state,message_id:null,user_message_id:null,failure:null,timings:null}}));
  await open(page,state);await say(page,'Hello');await expect(page.locator('.assistant-message')).toContainText('Hello! How can I help with the clinic?');await expect(page.locator('.model-status')).toContainText('Anthropic Claude API');await expect(page.locator('.model-status')).not.toContainText('Local model');await expect(page.getByTestId('current-plan-summary')).toHaveCount(0);
 });
+
+test('a schedule-only result offers recovery evaluation without calculating it automatically',async({page,request})=>{
+ let state=await seed(request);const result=await request.post(`${apiBase}/${state.id}/recompute`,{data:{expected_revision:state.revision,include_recovery:false}});expect(result.ok()).toBe(true);state=await result.json();expect(state.computed_plan!.recovery).toBeNull();
+ await open(page,state);await overview(page).click();await expect(page.getByRole('button',{name:'Compare recovery options',exact:true})).toBeVisible();expect((await read(request,state.id)).computed_plan!.recovery).toBeNull();
+ await page.getByRole('button',{name:'Compare recovery options',exact:true}).click();await expect(page.locator('.assistant-message').last()).toBeVisible();expect((await read(request,state.id)).computed_plan!.recovery).not.toBeNull();
+});

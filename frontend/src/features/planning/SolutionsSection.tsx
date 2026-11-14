@@ -53,5 +53,6 @@ export function SolutionsSection({computed,busy,onChat,selected,onSelect}:{compu
    </article>)}</div></fieldset></Disclosure>:null}
   </>:<p className="panel-lead">{computed?'Essential requirements need review.':'Confirm your equipment and activities, then ask LifeLine to assess electricity.'}</p>}
   <Button variant="outline" disabled={busy} onClick={()=>onChat(computed?'Explain the selected plan and the most relevant next action in plain English. Use the existing calculated result; do not recalculate.':'Assess the clinic electricity requirements and recommend what to do next.')}>{computed?'Ask LifeLine about this plan':'Ask LifeLine to check the day'}</Button>
+  {computed&&!recovery?<Button variant="outline" disabled={busy} onClick={()=>onChat('Compare recovery options for our confirmed clinic requirements and recommend the most useful next action.')}>Compare recovery options</Button>:null}
  </section>;
 }

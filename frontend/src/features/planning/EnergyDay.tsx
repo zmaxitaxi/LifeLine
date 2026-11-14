@@ -5,6 +5,7 @@ import type { PlanningState, ComputedPlan } from "../../../../contracts/planning
 import type { RecoveryOption } from "../../../../contracts/recovery";
 import { BatterySummary } from "./BatterySummary";
 import { num } from "@/lib/clinic";
+import { recoveryTitle } from "./plan-language";
 
 const clock=(h:number)=>`${String(h).padStart(2,'0')}:00`;
 export function EnergyDay({state,computed,selected,busy,onSettings}:{state:PlanningState;computed:ComputedPlan|null;selected?:RecoveryOption;busy:boolean;onSettings:()=>void}){
@@ -20,7 +21,7 @@ export function EnergyDay({state,computed,selected,busy,onSettings}:{state:Plann
  return <section className="energy-day overview-section" data-overview-section="energy" aria-labelledby="energy-title">
   <div className="panel-heading"><h2 id="energy-title">Energy through the day</h2><Button variant="outline" disabled={busy} onClick={onSettings}>Power setup</Button></div>
   {!computed||!plan?<p className="panel-lead">{state.equipment_inventory.length?'Ask LifeLine to calculate the day’s electricity, then inspect its hourly results here.':'Add equipment requirements before assessing electricity.'}</p>:<>
-   <p className="panel-footnote">{state.planning_date} · {computed.simulation.timezone} · {computed.weather_mode==='demo'?'Simulated with sample weather':'Forecast-based simulation'} · {selected?.kind==='existing'||!selected?'Current plan':'Selected comparison'}</p>
+   <p className="panel-footnote">{state.planning_date} · {computed.simulation.timezone} · {computed.weather_mode==='demo'?'Simulated with sample weather':'Forecast-based simulation'} · {selected?.kind==='existing'||!selected?'Current plan':`Selected comparison: ${recoveryTitle(selected.kind)}`}</p>
    {busy?<p role="status" className="panel-footnote">LifeLine is working. Showing the last verified calculation.</p>:null}
    <div className="energy-day-layout">
     <div className="energy-chart-column">

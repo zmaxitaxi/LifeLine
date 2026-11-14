@@ -11,7 +11,7 @@ LIFELINE_STATE_PATH=/Users/maxli/Documents/ChatGPT/LifeLine/.local/final-plannin
   .venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8020
 ```
 
-Open `http://127.0.0.1:8020/`. Ollama with `llama3.1:8b` supplies conversation. Keep one backend worker for the local atomic JSON store. Use `LIFELINE_STATE_PATH=:memory:` only for disposable sessions. The state file is private and git ignored; it should remain outside temporary worktrees. For development run the backend plus `LIFELINE_API_PORT=8020 npm --prefix frontend run dev`.
+Open `http://127.0.0.1:8020/`. The backend-configured provider supplies conversation; the header shows its actual provider/model. The local option uses Ollama with `llama3.1:8b`; the cloud option is explicit, not a silent fallback. Keep one backend worker for the local atomic JSON store. Use `LIFELINE_STATE_PATH=:memory:` only for disposable sessions. The state file is private and git ignored; it should remain outside temporary worktrees. For development run the backend plus `LIFELINE_API_PORT=8020 npm --prefix frontend run dev`.
 
 For an older in-memory server, preserve its GET session state and actual browser transcript before stopping or refreshing it. Main Chat's `scripts/migrate_planning_snapshot.py` validates an offline export into a new private snapshot without overwriting an existing file. See `docs/ENERGY_SETTINGS_AND_LOCAL_STATE.md`. Keep original exports private. The migration preserves session/result IDs and source times, records imported chat explicitly, and never invents a current battery reading.
 
