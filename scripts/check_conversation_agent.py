@@ -100,7 +100,7 @@ def main():
                 state=ask(state,question,no_change)
             state=ask(state,'Can our clinic safely operate tomorrow given the weather forecast? Please compare only relevant modeled alternatives.',
                 lambda current,before,data,calls:current['plan_status']=='current' and bool(current['computed_plan'].get('recovery')) and calls>=1 and len(data['presentation']['option_ids'])<len(current['computed_plan']['recovery']['options']))
-            if state.get('computed_plan') and state['computed_plan'].get('recovery'):
+            if state.get('computed_plan') and state['computed_plan'].get('recovery') and ('conversation' in sections or 'selected' in sections):
                 option=max((o for o in state['computed_plan']['recovery']['options'] if o['kind']=='output'),key=lambda item:item['config']['max_discharge_kw'])
                 response=client.post(f"/api/planning/sessions/{state['id']}/recovery-selection",json={'expected_revision':state['revision'],
                     'input_revision':state['input_revision'],'generation':state['computed_plan']['generation'],'option_id':option['id']})
