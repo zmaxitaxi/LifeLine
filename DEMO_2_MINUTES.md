@@ -7,8 +7,9 @@ rehearsed path, not a guarantee that an API or generated reply cannot fail.
 
 ## Before the timer
 
-1. Open `http://127.0.0.1:8020/`. Check the header says **Anthropic Claude API ·
-   claude-haiku-5-5**, with the **sample weather, not a live forecast** label.
+1. Open `http://127.0.0.1:8020/`. Check the **sample weather, not a live forecast**
+   label and that the message box is available. The ready provider/model label
+   is intentionally hidden from the header; `/api/agent/status` reports Haiku.
    The assistant needs internet even though sample weather does not.
 2. Click **Change clinic** if a clinic is already open. Create a **separate**
    clinic named `LifeLine presentation`; choose **Kisumu**. This preserves your

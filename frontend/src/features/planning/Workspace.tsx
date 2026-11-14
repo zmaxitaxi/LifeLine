@@ -66,9 +66,9 @@ export function Workspace({
             <Activity aria-hidden="true" />
             <span>LifeLine</span>
           </a>
-          <div className="model-status" role="status">
+          {modelStatus ? <div className="model-status" role="status">
             {modelStatus}
-          </div>
+          </div> : null}
         </div>
       </header>
       <div className="workspace-navigation">

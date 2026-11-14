@@ -50,7 +50,7 @@ test('provider status and a verified cloud reply are displayed without calling i
  const state=await seed(request);
  await page.route('**/api/agent/status',route=>route.fulfill({json:{mode:'cloud_tool_agent',available:true,model:'verified-cloud-test',provider:'Anthropic Claude API',cloud_ai:true,note:'Fixture status'}}));
  await page.route(`**/api/planning/sessions/${state.id}/agent/stream`,route=>route.fulfill({json:{mode:'cloud_tool_agent',model:'verified-cloud-test',message:'Hello! How can I help with the clinic?',needs_clarification:false,clarification_fields:[],tool_calls:[],presentation:{kind:'conversation',input_revision:null,generation:null,option_ids:[],show_schedule:false},state,message_id:null,user_message_id:null,failure:null,timings:null}}));
- await open(page,state);await say(page,'Hello');await expect(page.locator('.assistant-message')).toContainText('Hello! How can I help with the clinic?');await expect(page.locator('.model-status')).toContainText('Anthropic Claude API');await expect(page.locator('.model-status')).not.toContainText('Local model');await expect(page.getByTestId('current-plan-summary')).toHaveCount(0);
+ await open(page,state);await say(page,'Hello');await expect(page.locator('.assistant-message')).toContainText('Hello! How can I help with the clinic?');await expect(page.locator('.model-status')).toHaveCount(0);await expect(page.locator('.chat-composer-note')).toContainText('Anthropic Claude API');await expect(page.getByTestId('current-plan-summary')).toHaveCount(0);
 });
 
 test('a schedule-only result offers recovery evaluation without calculating it automatically',async({page,request})=>{

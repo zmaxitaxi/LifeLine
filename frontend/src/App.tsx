@@ -562,7 +562,7 @@ export default function App() {
       context={context}
       assistant={state ? assistant : session.loading ? <p className="chat-loading" role="status">Checking for a saved clinic…</p> : <ClinicSetup saved={session.resumeCandidate} busy={Boolean(busy)} error={session.error} demoWeather={weatherMode?.mode === "demo"} onResume={()=>void session.resume()} onCreate={session.create}/>}
       overview={overview}
-      modelStatus={
+      modelStatus={agent?.available && !modelError ? null :
         <>
           <span
             className={agent?.available ? "status-dot ready" : "status-dot"}
