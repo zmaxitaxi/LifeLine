@@ -1,5 +1,5 @@
 {
-  "id": "2d1e2ed0-dffb-4760-a239-a33616f4bcfe",
+  "id": "8599a97e-3147-4290-a983-6a2c6da4c8b8",
   "revision": 5,
   "input_revision": 1,
   "selected_clinic_id": "reviewed-clinic",
@@ -162,7 +162,7 @@
   "current_battery_reading": null,
   "energy_proposals": [
     {
-      "id": "b607c41f-e686-4595-aff7-3b1d69471365",
+      "id": "4d6f83dd-c590-4089-a4ce-068ac9a53521",
       "status": "draft",
       "base_input_revision": 1,
       "settings": {
@@ -183,10 +183,10 @@
       "updates_current_battery_reading": false
     }
   ],
-  "active_energy_proposal_id": "b607c41f-e686-4595-aff7-3b1d69471365",
+  "active_energy_proposal_id": "4d6f83dd-c590-4089-a4ce-068ac9a53521",
   "confirmed_activities": [
     {
-      "id": "79d6275e-44f6-439d-9c9b-2c12e8396a1c",
+      "id": "8b3f5d76-7e26-47a2-8a26-9c26402c097b",
       "version": 1,
       "status": "confirmed",
       "details": {
@@ -206,7 +206,7 @@
   ],
   "proposals": [
     {
-      "id": "2674bd72-3729-4a59-bc85-f7913ad38d46",
+      "id": "bedf4b6f-2ab3-4bee-a996-3c5df469ab09",
       "status": "confirmed",
       "target_activity_id": null,
       "base_activity_version": null,
@@ -224,13 +224,14 @@
         "additional_equipment": []
       },
       "missing_fields": [],
-      "confirmed_activity_id": "79d6275e-44f6-439d-9c9b-2c12e8396a1c"
+      "confirmed_activity_id": "8b3f5d76-7e26-47a2-8a26-9c26402c097b"
     }
   ],
   "active_proposal_id": null,
   "forecast_reference": {
     "source": "Open-Meteo Forecast API",
     "data_kind": "weather_model_forecast",
+    "weather_mode": "live",
     "requested_location": {
       "latitude": -0.0917,
       "longitude": 34.768
@@ -557,9 +558,10 @@
     ]
   },
   "computed_plan": {
+    "weather_mode": "live",
     "input_revision": 1,
     "generation": 1,
-    "computed_at": "2026-11-14T01:07:35.464329Z",
+    "computed_at": "2026-11-14T02:57:02.280699Z",
     "sunshine_factor": 1.0,
     "simulation": {
       "api_version": "1.0",
@@ -688,8 +690,10 @@
       ],
       "assumptions": [
         "24 hourly slots for 2026-11-14 in Africa/Nairobi.",
-        "Forecast retrieved at 2026-11-13T09:00:00+00:00; cache status: live.",
+        "Open-Meteo Forecast API: weather_model_forecast; generated/retrieved at 2026-11-13T09:00:00+00:00; cache status: live.",
         "Radiation profile multiplied by 1; identical profile supplied to all three schedules.",
+        "Numerical weather-model forecast, not a ground observation or measured clinic electricity generation.",
+        "Today includes elapsed hours from the current forecast series; it is not a now-to-midnight simulation.",
         "This evaluates energy feasibility under stated assumptions, not whether clinical operations are safe. No electricity guarantee or equipment control.",
         "The starting battery is the operator\u2019s assumed stored energy at local midnight. Tomorrow\u2019s charge is not predicted by carrying today\u2019s simulation forward.",
         "Today is a complete local calendar-day scenario, including elapsed hours; this is not a real-time remaining-day controller.",

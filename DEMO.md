@@ -2,7 +2,7 @@
 
 LifeLine is a clinic electricity planning prototype, aligned with SDGs 7 and 3.
 Llama 3.1 8B authors conversation and selects native tools locally; Python
-retrieves weather and computes every energy result. No provider API key is needed.
+uses explicit sample weather and computes every energy result. No provider API key is needed.
 Do not claim clinical validation, guaranteed electricity or measured clinic savings.
 
 ## Exact startup commands
@@ -12,7 +12,7 @@ From the repository root, with dependencies already installed:
 ```bash
 ollama list
 npm --prefix frontend run build
-.venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+LIFELINE_WEATHER_MODE=demo .venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
 Open [LifeLine](http://127.0.0.1:8000/) and check
@@ -30,22 +30,23 @@ For a stable location when launching different checkouts, set
 `LIFELINE_STATE_PATH=:memory:` deliberately disables persistence. A restart
 retains dated results; it does not turn saved weather into a newly fetched forecast.
 
-Windows: replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
+Windows: set `$env:LIFELINE_WEATHER_MODE="demo"`, omit the POSIX prefix and replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
 See [README](README.md) for first-time dependency installation.
 
 ## Two-minute story
 
-1. **Configure:** select a clinic/location. In **Clinic Overview → Power setup**,
-   show battery/solar capacity and the explicit midnight starting-energy
-   assumption. A timestamped current reading is separate. Review a change before
-   confirming it; capacity changes retain absolute stored energy unless edited.
+1. **Configure:** enter a clinic name and choose its location first. On the
+   electrical step, click **Autofill demo setup**, review its editable battery,
+   solar, midnight-charge assumption and example equipment, then open the example
+   clinic. Alternatively enter real ratings; that custom path adds no example
+   devices or automatic calculation. Existing work is explicitly resumable.
 2. **Describe work:** ask, “We have a Vaccination campaign from 10 AM to 3 PM
    using the existing refrigerator.” Review the proposed activity. A reference
    to the existing refrigerator does not create another refrigerator. Use the
    explicit confirmation control; chat alone cannot confirm it.
 3. **Calculate:** ask, “Can our clinic safely operate tomorrow given the weather
-   forecast?” Show the actual forecast source, location, selected date, timezone
-   and retrieval time. Explain essential coverage, the battery minimum, any
+   forecast?” Show the **synthetic demo weather** label, location, selected date,
+   assumed timezone and generation time. Explain essential coverage, the battery minimum, any
    unfinished work and limits as computed findings, not a medical safety verdict.
 4. **Compare:** show the relevant before/after schedule or tested recovery
    alternative, then the battery timeline. Point to the device/hour changes and
@@ -55,10 +56,18 @@ See [README](README.md) for first-time dependency installation.
    the newly calculated deficit/reserve. If extra supply or output is needed,
    say so. More empty battery capacity cannot repair every shortage.
 
-Allow time for cold-start inference and network retrieval. Simple greetings and
+Allow time for local inference; live mode also needs network retrieval. Simple greetings and
 discussion do not require a calculation. Ideas remain unevaluated until a tool
 calculates them. Primary chat model failures show a retry and retain the state;
 do not present a template or prerecorded answer as a genuine model reply.
+
+The current default scheduling demo completes all **2.1 kWh** flexible work and
+all **5.34 kWh** essential demand in every schedule. MILP preserves **1.115 kWh**
+more energy at midnight and improves the minimum by **0.368 kWh**, removing the
+baseline's modeled reserve breaches. Sunshine-first is nearly as good: its final
+battery is **5.682 kWh**, versus **5.700 kWh** for MILP and **4.585 kWh** fixed.
+These are freshly calculated sample-weather results, not measured clinic savings.
+[Inputs, schedules and metrics](docs/evidence/demo-weather-scheduling-proof.json).
 
 In Overview, edit an existing activity, change its time or an explicitly reviewed
 device requirement, and confirm. The prior activity stays active until then.
@@ -116,17 +125,19 @@ No presentation video or official submission is implied by these checks.
 
 ## Reproduce primary native conversation checks
 
-With Ollama running and the network available, use an isolated local test session:
+With Ollama running, use an isolated sample-weather test session:
 
 ```bash
 .venv/bin/python scripts/check_conversation_agent.py \
+  --weather synthetic-demo --sections primary \
   --output /private/tmp/lifeline-native-conversation-check.json
 ```
 
-The runner uses actual local model inference and actual Open-Meteo weather,
+The runner uses actual local model inference and explicitly synthetic demo weather,
 records native content/calls and timings, and checks review boundaries, repeated
 confirmation, selected-plan explanation and effective device runtime. It does
 not install hardware or alter the preview's saved session. Run it without
-competing model requests. `--sections conversation`, `--sections energy`, or
+competing model requests. Omit `--sections primary` for the longer full journey.
+`--weather live` explicitly exercises actual Open-Meteo access. `--sections conversation`, `--sections energy`, or
 `--sections activity` isolates a section. A failed real run is a failed check;
-neither canned prose nor synthetic forecasts replace it.
+neither canned prose nor an undisclosed weather substitution replaces it.

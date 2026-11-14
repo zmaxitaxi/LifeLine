@@ -1,0 +1,49 @@
+{
+  "recorded_at": "2026-11-14T02:58:38.567353+00:00",
+  "verified_code_revision": "1e34a3b481af9153a32986c1174dc80e0f06b12f",
+  "code_uncommitted_changes": false,
+  "backend": {
+    "passed": 503,
+    "failed": 0,
+    "python": "3.12.5"
+  },
+  "frontend": {
+    "passed": 46,
+    "failed": 0,
+    "tool": "project Playwright Chromium",
+    "browser_plugin": "not available",
+    "api_port": 8076,
+    "ui_port": 5188,
+    "viewports": [
+      "1280x900",
+      "631x955",
+      "375x812"
+    ],
+    "transports": "test-only model/weather wire; actual compiler/simulator/MILP",
+    "production_build": "passed",
+    "typescript": "passed",
+    "setup_flow": "blank location/electrical inputs; explicit demo autofill; explicit saved-clinic resume; no automatic create/calculation"
+  },
+  "genuine_local_model": {
+    "model": "llama3.1:8b",
+    "weather_mode": "explicit synthetic demo weather",
+    "primary_question": "passed",
+    "primary_seconds": 44.32,
+    "energy_turns_passed": 2,
+    "activity_turns_passed": 4,
+    "no_cloud_provider_key_required": true,
+    "not_a_comprehensive_benchmark": true
+  },
+  "deployment": {
+    "url": "http://127.0.0.1:8020/",
+    "weather_mode": "demo",
+    "private_state": "durable external git-ignored snapshot",
+    "read_only_browser_smoke": "passed: initial setup/autofill perform zero POSTs; no page errors; saved confirmed activity retained",
+    "legacy_preservation": "canonical configuration/draft retained; some late UI-only greeting text exists only in private backup"
+  },
+  "limitations": [
+    "actual live weather currently unavailable on this Mac route; dated failure retained",
+    "local inference latency/retries remain; no speed optimization claim",
+    "clinical/field validation and guaranteed power are not established"
+  ]
+}

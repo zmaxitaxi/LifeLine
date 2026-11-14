@@ -25,16 +25,19 @@ There is no implicit migration of activities between clinics or dates.
 
 ## Verification record
 
-- Assembled backend through the native pending-update fix: **490 tests passed**, including settings, restart
+- Final assembled backend: **503 tests passed**, including settings, restart
   recovery, source/unit validation, shared-device runtime, migration and all
   existing numerical/API checks.
-- Final assembled frontend: **38/38 browser journeys**, TypeScript and production
+- Final assembled frontend: **46/46 browser journeys**, TypeScript and production
   build pass against the real Python compiler, simulator and MILP, with injected
   test-only weather/model transport. Desktop, narrow preview and phone layouts
-  are covered. This is separate from genuine model/weather evidence.
-- Genuine settings proposal/correction checks pass with actual local Llama and
-  no weather calls. Final actual-forecast/activity journeys and release rollout
-  are still being verified; the earlier CI run is not evidence for latest code.
+  are covered, including blank setup, explicit demo autofill and saved-clinic resume.
+  This is separate from genuine model/weather evidence.
+- Actual local Llama passed the exact clinic-weather question using explicitly
+  synthetic demo weather, settings proposal/correction, and four activity/runtime
+  checks. The demo is running with preserved canonical inputs and the Vaccination
+  draft. [Final release and timings](docs/FINAL_RELEASE.md). These are targeted
+  checks; the earlier CI run is not evidence for latest code.
 - The teammates' [comprehensive evaluation](LLM_EVALUATION.md) records
   **87.5/100** on the previous tool set. New targeted checks do not inherit that
   score and do not establish arbitrary-language or clinical reliability.
@@ -61,6 +64,12 @@ sunshine-first heuristic ties MILP. The competing-window benchmark shows
 **3.8 / 3.470 / 2.770 kWh** completed by MILP / sunshine-first / fixed scheduling;
 a different greedy ordering closes that gap. See [inputs and caveats](STRONGEST_DEMO.md).
 Runtime endpoints calculate fresh results rather than reading evidence fixtures.
+
+The current labeled sample-weather demo completes all **2.1 kWh** flexible work
+and all **5.34 kWh** essential demand. Final stored energy is **4.585 kWh fixed**,
+**5.682 kWh sunshine-first**, and **5.700 kWh MILP**. MILP gains **1.115 kWh** over
+fixed scheduling and improves the minimum by **0.368 kWh**; the heuristic is
+nearly as good. [Computed proof](docs/evidence/demo-weather-scheduling-proof.json).
 
 ## Remaining external work
 

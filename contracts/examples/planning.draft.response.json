@@ -1,5 +1,5 @@
 {
-  "id": "2d1e2ed0-dffb-4760-a239-a33616f4bcfe",
+  "id": "8599a97e-3147-4290-a983-6a2c6da4c8b8",
   "revision": 1,
   "input_revision": 0,
   "selected_clinic_id": "reviewed-clinic",
@@ -165,7 +165,7 @@
   "confirmed_activities": [],
   "proposals": [
     {
-      "id": "2674bd72-3729-4a59-bc85-f7913ad38d46",
+      "id": "bedf4b6f-2ab3-4bee-a996-3c5df469ab09",
       "status": "draft",
       "target_activity_id": null,
       "base_activity_version": null,
@@ -186,7 +186,7 @@
       "confirmed_activity_id": null
     }
   ],
-  "active_proposal_id": "2674bd72-3729-4a59-bc85-f7913ad38d46",
+  "active_proposal_id": "bedf4b6f-2ab3-4bee-a996-3c5df469ab09",
   "forecast_reference": null,
   "computed_plan": null,
   "plan_status": "not_computed",

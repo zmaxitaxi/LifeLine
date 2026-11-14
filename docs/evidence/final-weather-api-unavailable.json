@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-11-14T02:02:31.857941+00:00",
+  "scope": "Independent actual Open-Meteo integration check; no LLM or injected weather",
+  "http_status": 503,
+  "response": {
+    "error": {
+      "code": "FORECAST_UNAVAILABLE",
+      "message": "Live weather is unavailable. Retry, or explicitly select historical NASA data or a synthetic scenario. No fallback weather has been presented as a live forecast.",
+      "details": []
+    }
+  }
+}

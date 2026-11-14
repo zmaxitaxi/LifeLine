@@ -1,0 +1,98 @@
+{
+  "checked_at": "2026-11-14T02:03:04.440748+00:00",
+  "platform": "Darwin",
+  "python": "3.12.5",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+  "httpx": "0.28.1",
+  "location": {
+    "latitude": -0.0917,
+    "longitude": 34.768
+  },
+  "system_dns": {
+    "addresses": [
+      "51.81.167.44"
+    ]
+  },
+  "proxy_variables_present": {
+    "HTTP_PROXY": false,
+    "HTTPS_PROXY": false,
+    "ALL_PROXY": false,
+    "http_proxy": false,
+    "https_proxy": false,
+    "all_proxy": false
+  },
+  "scope": "Run from an ordinary terminal or an approved host context. Restricted-runner DNS failures do not establish a Mac/Windows defect. No OS settings, DNS cache, hosts file or certificate policy were changed.",
+  "public_dns": [],
+  "probes": [
+    {
+      "client": "httpx",
+      "connect_ip": null,
+      "trust_env": true,
+      "tls_hostname": "api.open-meteo.com",
+      "certificate_verification": true,
+      "validated_forecast": false,
+      "error_type": "ConnectTimeout",
+      "seconds": 4.063,
+      "events": [
+        {
+          "event": "connection.connect_tcp.started"
+        },
+        {
+          "event": "connection.connect_tcp.complete"
+        },
+        {
+          "event": "connection.start_tls.started"
+        },
+        {
+          "event": "connection.start_tls.failed",
+          "error_type": "ConnectTimeout"
+        }
+      ],
+      "failed_stage": "tls_handshake"
+    },
+    {
+      "client": "httpx",
+      "connect_ip": null,
+      "trust_env": false,
+      "tls_hostname": "api.open-meteo.com",
+      "certificate_verification": true,
+      "validated_forecast": false,
+      "error_type": "ConnectTimeout",
+      "seconds": 4.063,
+      "events": [
+        {
+          "event": "connection.connect_tcp.started"
+        },
+        {
+          "event": "connection.connect_tcp.complete"
+        },
+        {
+          "event": "connection.start_tls.started"
+        },
+        {
+          "event": "connection.start_tls.failed",
+          "error_type": "ConnectTimeout"
+        }
+      ],
+      "failed_stage": "tls_handshake"
+    },
+    {
+      "client": "native_curl",
+      "exit_code": 28,
+      "measurements": {
+        "http_status": "000",
+        "remote_ip": "51.81.167.44",
+        "tcp_seconds": 0.025914,
+        "tls_seconds": 0.0,
+        "total_seconds": 4.006464
+      }
+    }
+  ],
+  "verified_candidate_addresses": [],
+  "interpretation": "Inspect the recorded stages and compare both machines at the same time; these measurements alone do not identify an ISP, firewall or operating-system cause.",
+  "limitations": [
+    "Public DNS/addresses and availability change. Reverify a candidate before each temporary use; never hardcode it permanently.",
+    "An alternate route does not identify who drops/stalls the original TLS handshake or which address another machine used.",
+    "Exit success means at least one actual forecast was validated, not that the normal route is healthy."
+  ]
+}

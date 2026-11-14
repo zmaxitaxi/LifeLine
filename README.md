@@ -1,16 +1,23 @@
 # LifeLine
 
-LifeLine helps clinic staff compare electricity schedules and understand shortages before making decisions. It combines actual Open-Meteo forecasts, the existing physical battery simulator and MILP, and a local Llama assistant. It supports SDG 7 and SDG 3 through energy-planning decision support; it does not guarantee electricity or control medical equipment.
+LifeLine helps clinic staff compare electricity schedules and understand shortages before making decisions. It combines clearly labeled weather inputs, the existing physical battery simulator and MILP, and a local Llama assistant. It supports SDG 7 and SDG 3 through energy-planning decision support; it does not guarantee electricity or control medical equipment.
 
-**Weather investigation, November 13:** the Mac's normal Open-Meteo route recovered without a code, DNS or TLS-setting change. Fresh forecast-to-model execution passed. The earlier failure was traced to a TLS-handshake stall before HTTP, also reproduced outside Python. See [Mac/Windows diagnosis and recovery evidence](WEATHER_NETWORK.md); continue checking live availability before the demo.
+**Ready-to-demo mode:** launch with `LIFELINE_WEATHER_MODE=demo` to use explicit synthetic sample weather offline. Llama and all numerical calculations remain real. The user authorized this mode after the Mac's Open-Meteo TLS route failed again. Use `live` for actual forecasts when reachable; there is no hidden substitution. [Sample assumptions](docs/DEMO_WEATHER.md), [network evidence](WEATHER_NETWORK.md), [final release checks](docs/FINAL_RELEASE.md).
 
 **Local AI is implemented:** Llama 3.1 8B through Ollama authors conversation, selects validated tools and explains their results. Python computes all schedules and energy figures. No cloud AI key is required. See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).
 
-Live weather planning retrieves today's/tomorrow's Open-Meteo forecasts when reachable; historical NASA and synthetic APIs remain available. **The Mac's normal route recovered and passed fresh forecast-to-model verification at 12:35 PM Pacific November 13.** The earlier TLS-handshake failure and its recovery are documented in [the network investigation](WEATHER_NETWORK.md). Recorded local-model replays remain separately labeled; they are not fresh weather or a comprehensive evaluation.
+Live weather planning still retrieves today's/tomorrow's Open-Meteo forecasts when reachable; historical NASA and synthetic APIs remain available. Earlier live success and the later TLS-handshake failure are dated separately in [the network investigation](WEATHER_NETWORK.md). Sample weather and recorded forecasts are never presented as a newly fetched live forecast.
 
 LifeLine is an offline-capable electricity planning prototype for staff supporting resource-constrained healthcare clinics. It helps check equipment requirements and compare schedules and infrastructure alternatives; it does not guarantee power or control medical devices.
 
-The application has two pages: **AI Assistant** for conversation and reviewed proposals, and **Clinic Overview** for activities/equipment, battery forecasts, tested plans and actual weather. Use **Power setup** to review solar/battery capacity, the explicit midnight-charge assumption, a separate timestamped current reading, and expandable technical limits. Edits remain proposals until confirmed; confirmed changes recalculate using the same physical model.
+The application has two pages: **AI Assistant** for conversation and reviewed proposals, and **Clinic Overview** for activities/equipment, battery forecasts, tested plans and labeled weather inputs. Use **Power setup** to review solar/battery capacity, the explicit midnight-charge assumption, a separate timestamped current reading, and expandable technical limits. Edits remain proposals until confirmed; confirmed changes recalculate using the same physical model.
+
+Startup asks for clinic name/location, then electrical inputs, then review. Fields
+start blank; **Autofill demo setup** is an explicit secondary option after
+choosing a location. A custom setup adds no preset equipment and calculates
+nothing automatically. Saved work is available through an explicit **Resume**
+choice. Add and review the clinic's equipment before assessing essential power;
+zero configured demand is not evidence of reliable electricity.
 
 Before → After scheduling, battery forecasts and relevant tested alternatives explain what changes. Full fixed/sunshine-first/MILP calculations remain available through the numerical contracts. Recovery compares scheduling, solar, storage and battery output with the same weather and absolute starting energy. The seven-day weather outlook is weather information; electrical calculations cover the selected supported 24-hour day, not a week-long reliability prediction.
 
@@ -26,10 +33,10 @@ source .venv/bin/activate
 python -m pip install -r backend/requirements-dev.txt
 npm --prefix frontend ci
 npm --prefix frontend run build
-python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+LIFELINE_WEATHER_MODE=demo python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-On Windows PowerShell, create the environment with `python -m venv .venv`. Skip the `source` line and use `.\.venv\Scripts\python.exe` for the remaining Python commands. The pinned requirements install the IANA timezone data used by the forecast planner on Windows.
+On Windows PowerShell, create the environment with `python -m venv .venv`. Skip the `source` line and use `.\.venv\Scripts\python.exe` for the remaining Python commands. Set `$env:LIFELINE_WEATHER_MODE="demo"` before the server command instead of its POSIX environment prefix. The pinned requirements install the IANA timezone data used by the forecast planner on Windows.
 
 Open [LifeLine](http://127.0.0.1:8000/). Build before starting the backend; it serves `frontend/dist` and the API from one local origin. Synthetic/historical planning works offline after installation; fresh forecasts require internet. The optional Swagger explorer uses external assets.
 

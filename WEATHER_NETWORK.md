@@ -1,5 +1,19 @@
 # Mac versus Windows live-weather investigation
 
+## Latest release condition
+
+At **2026-11-14 02:03–02:06 UTC** (November 13 Pacific), the Mac route failed
+again: DNS selected `51.81.167.44`, TCP connected, but TLS handshaking timed out
+before HTTP in Python with/without proxy environment handling and native curl.
+The actual planner returned `503 FORECAST_UNAVAILABLE`. A public-DNS query
+returned the same address. No OS, DNS or certificate settings were changed.
+This does not establish a global provider outage or a Windows/macOS code defect.
+
+The user then explicitly authorized filler weather for an ASAP working Llama
+demo. [Demo mode](docs/DEMO_WEATHER.md) is clearly synthetic and uses the real
+model/optimizer. Successful synthetic-weather Llama checks are not reported as
+fresh live-weather success. The earlier live recovery below remains dated history.
+
 Investigated **November 13, 2026, approximately 12:22–12:35 PM Pacific**. The normal Mac connection recovered during the investigation. Fresh forecast retrieval and model execution subsequently succeeded through the unchanged application, without an IP override, OS/DNS change, new certificate, or disabled TLS verification.
 
 ## Finding
