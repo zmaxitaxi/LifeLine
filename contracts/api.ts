@@ -215,7 +215,16 @@ export interface ApiErrorResponse {
       | "FORECAST_UNAVAILABLE"
       | "FORECAST_DATA_INVALID"
       | "UNSUPPORTED_FORECAST_DAY"
-      | "AGENT_UNAVAILABLE";
+      | "AGENT_UNAVAILABLE"
+      | "RECOVERY_TIME_LIMIT"
+      | "REVISION_CONFLICT"
+      | "PROPOSAL_INCOMPLETE"
+      | "INVALID_ACTIVITY"
+      | "INVALID_ENERGY_SETTINGS"
+      | "PROPOSAL_CLOSED"
+      | "IDEMPOTENCY_CONFLICT"
+      | "STALE_RESULT"
+      | "NOT_FOUND";
     message: string;
     /** Empty unless individual request fields need correction. */
     details: Array<{

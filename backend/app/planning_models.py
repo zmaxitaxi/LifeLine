@@ -4,7 +4,8 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator, field_validator, field_serializer
 import re
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
-from .models import StrictModel, SimulationRequest, Equipment, Hour, Boundary
+from .models import StrictModel, SimulationRequest, Equipment, Hour, Boundary, EffectiveConfig
+from .energy_settings_models import BatteryReading, EnergySettingsProposal
 from .forecast_models import ForecastLocation, SolarForecast
 from .models import SimulationResponse
 from .recovery_models import RecoveryResponse
@@ -127,6 +128,10 @@ class PlanningState(StrictModel):
     timezone: str | None = None
     clinic: SimulationRequest
     equipment_inventory: list[Equipment]
+    energy_settings: EffectiveConfig
+    current_battery_reading: BatteryReading | None = None
+    energy_proposals: list[EnergySettingsProposal] = []
+    active_energy_proposal_id: ID | None = None
     confirmed_activities: list[Activity] = []
     proposals: list[ActivityProposal] = []
     active_proposal_id: ID | None = None
@@ -151,6 +156,7 @@ class CreatePlanningSession(StrictModel):
     clinic: SimulationRequest
     # Never derive a midnight assumption from a current reading.
     midnight_battery_kwh: Annotated[float, Field(ge=0)]
+    current_battery_reading: BatteryReading | None = None
     timezone: str | None = None
 
     @field_validator('timezone')
@@ -201,6 +207,28 @@ class SessionAgentRequest(RevisionRequest):
     question: Annotated[str, Field(min_length=1, max_length=2000)]
 
 
+class AgentPresentation(StrictModel):
+    kind: Literal['conversation', 'activity_review', 'energy_review', 'calculation', 'explanation'] = 'conversation'
+    input_revision: Revision | None = None
+    generation: Annotated[int, Field(ge=1)] | None = None
+    option_ids: list[ID] = []
+    show_schedule: bool = False
+
+
+class PlanningMessage(StrictModel):
+    id: ID
+    role: Literal['user', 'assistant']
+    content: Annotated[str, Field(min_length=1, max_length=12000)]
+    created_at: datetime
+    presentation: AgentPresentation | None = None
+    mode: Literal['local_tool_agent', 'local_agent_unavailable'] | None = None
+
+
+class PlanningConversation(StrictModel):
+    session_id: ID
+    messages: list[PlanningMessage] = []
+
+
 class SessionAgentResponse(StrictModel):
     mode: Literal['local_tool_agent', 'local_agent_unavailable']
     model: str | None = None
@@ -208,4 +236,7 @@ class SessionAgentResponse(StrictModel):
     needs_clarification: bool
     clarification_fields: list[str] = []
     tool_calls: list[str] = []
+    presentation: AgentPresentation = Field(default_factory=AgentPresentation)
+    message_id: ID | None = None
+    user_message_id: ID | None = None
     state: PlanningState

@@ -16,3 +16,4 @@ coverage/
 .playwright-mcp/
 frontend/test-results/
 frontend/playwright-report/
+.local/

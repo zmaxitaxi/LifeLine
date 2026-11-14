@@ -49,7 +49,8 @@ def validation_details(errors, prefix=()):
     return [dict(loc=list(prefix)+list(e['loc']), message=e['msg'], type=e['type']) for e in errors]
 
 
-def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_service=None, outlook_service=None):
+def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_service=None, outlook_service=None,
+               planning_state_path=None):
     @asynccontextmanager
     async def lifespan(app):
         app.state.catalog = load_catalog(config_path)
@@ -58,7 +59,7 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
         app.state.solve_lock = asyncio.Lock()
         app.state.forecasts = forecast_service or ForecastService()
         app.state.agent = agent_service or LocalAgent()
-        app.state.planning = PlanningStore()
+        app.state.planning = PlanningStore(planning_state_path)
         app.state.outlooks = outlook_service or WeatherOutlookService()
         yield
 
@@ -214,4 +215,12 @@ def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_ser
     return app
 
 
-app = create_app()
+def local_state_path():
+    import os
+    configured = os.environ.get('LIFELINE_STATE_PATH')
+    if configured == ':memory:':
+        return None
+    return Path(configured).expanduser() if configured else CONFIG_PATH.parent.parent / '.local' / 'planning-state.json'
+
+
+app = create_app(planning_state_path=local_state_path())

@@ -2,7 +2,7 @@
 
 Complete JSON request/response examples are in `contracts/examples/planning.*.json`; their computed confirmation response uses clearly synthetic test-transport weather and the real numerical model. Live-weather/native evidence is separate below.
 
-Authoritative contracts: `contracts/planning.ts`, `/openapi.json` (snapshot `contracts/openapi.json`). All new routes use `/api/planning/sessions`. Existing simulation, forecast, recovery and stateless agent APIs remain compatible. New sessions are local process-memory state; retain their returned ID in the UI. Restart discards sessions. No account or database. Clinic/location/date/energy/inventory configuration is immutable within a session; deliberately create a new session when editing that context, keeping any unconfirmed proposals visibly separate. No implicit migration of activities between clinics or dates.
+Authoritative contracts: `contracts/planning.ts`, `/openapi.json` (snapshot `contracts/openapi.json`). All new routes use `/api/planning/sessions`. Existing simulation, forecast, recovery and stateless agent APIs remain compatible. Retain the returned session ID in the UI. Production sessions, receipts and recent conversation now survive restart in a private atomic local snapshot; test applications remain isolated in memory. Energy settings can be staged, reviewed and confirmed inside the session, retaining activities. See [reviewed energy settings and local state](ENERGY_SETTINGS_AND_LOCAL_STATE.md) for endpoints and persistence limits. Clinic/location/date and base inventory still require deliberately creating a new session; there is no implicit migration of activities between clinics or dates and no account system.
 
 ## Routes
 
