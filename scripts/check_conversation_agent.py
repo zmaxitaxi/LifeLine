@@ -57,8 +57,11 @@ def authored(data,native):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--sections',default='conversation,energy,activity');args=parser.parse_args()
+    parser.add_argument('--sections',default='conversation,energy,activity');parser.add_argument('--weather',choices=['live','synthetic-demo'],default='live');args=parser.parse_args()
     sections=set(args.sections.split(','));model=LocalAgent();weather=CountedWeather();native=[];session_turn=model.session_turn
+    if args.weather=='synthetic-demo':
+        from app.demo_weather import DemoWeatherService
+        weather.service=DemoWeatherService()
     async def recorded(messages,**kwargs):
         started=monotonic();turn=await session_turn(messages,**kwargs)
         native.append({'turn':turn,'seconds':monotonic()-started,'offered_tools':[tool['name'] for tool in kwargs['toolset']],
@@ -67,7 +70,7 @@ def main():
     model.session_turn=recorded
     evidence={'started_at':datetime.now(timezone.utc).isoformat(),'implementation_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         'backend_uncommitted_changes':subprocess.run(['git','diff','--quiet','HEAD','--','backend/app','scripts/check_conversation_agent.py'],cwd=ROOT).returncode!=0,
-        'scope':'Genuine local native content/tool choices. Weather is actual Open-Meteo; all numerical state comes from the existing model. Compact snapshots retain computed metrics, tested alternatives and forecast provenance.','turns':[]}
+        'scope':('SYNTHETIC DEMO WEATHER; actual local Llama native choices and real existing physics. Not live forecast validation.' if args.weather=='synthetic-demo' else 'Genuine local native content/tool choices. Weather is actual Open-Meteo; all numerical state comes from the existing model. Compact snapshots retain computed metrics, tested alternatives and forecast provenance.'),'turns':[]}
     with TestClient(create_app(forecast_service=weather,agent_service=model)) as client:
         assert client.get('/api/agent/status').json()['available']
         def create(identity,body=None):
@@ -90,10 +93,10 @@ def main():
             print(json.dumps({key:entry[key] for key in ('question','seconds','weather_calls','passed')}),flush=True)
             return current
         no_change=lambda current,before,data,calls:current==before and calls==0 and data['presentation']['kind']=='conversation' and not data['presentation']['option_ids'] and not data['presentation']['show_schedule']
-        if 'conversation' in sections:
+        if 'conversation' in sections or 'primary' in sections:
             state=create('conversation')
             for question in ('Hello, how are things?','What can you help me do here?',
-                'Could more battery storage help? I am just discussing an unevaluated idea, not asking for a calculation yet.'):
+                'Could more battery storage help? I am just discussing an unevaluated idea, not asking for a calculation yet.') if 'conversation' in sections else ():
                 state=ask(state,question,no_change)
             state=ask(state,'Can our clinic safely operate tomorrow given the weather forecast? Please compare only relevant modeled alternatives.',
                 lambda current,before,data,calls:current['plan_status']=='current' and bool(current['computed_plan'].get('recovery')) and calls>=1 and len(data['presentation']['option_ids'])<len(current['computed_plan']['recovery']['options']))

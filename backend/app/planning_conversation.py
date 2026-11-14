@@ -335,7 +335,10 @@ def synthesis_data(state, facts):
                 'reserve_target':f'{plan.simulation.effective_config.reserve_kwh:.3f} kWh'}
         if 'weather_basis' in data:
             data['weather_basis'] = {'planning_date':state.planning_date.isoformat(),
-                'forecast_irradiation_used':f'{plan.sunshine_factor*100:g}%'}
+                'forecast_irradiation_used':f'{plan.sunshine_factor*100:g}%',
+                'source':state.forecast_reference.source if state.forecast_reference else 'unavailable',
+                'data_kind':state.forecast_reference.data_kind if state.forecast_reference else 'unavailable',
+                'warnings':state.forecast_reference.warnings if state.forecast_reference else []}
     if plan.recovery:
         if 'selected_option' in facts:
             selected = next(o for o in plan.recovery.options + [plan.recovery.existing] if o.id == state.selected_recovery_intervention_id)
@@ -367,7 +370,7 @@ def collect_reply_facts(state, calls=(), question=''):
     if state.plan_status=='failed':
         facts['calculation_status']=('The latest calculation failed. No current verified result is available. '
             +('Live forecast retrieval is unavailable; its underlying cause is not established by this status. ' if state.plan_error=='FORECAST_UNAVAILABLE' else 'The calculation failure code is '+str(state.plan_error)+'. ')
-            +'Do not infer a settings or data conflict. Session calculations require real Open-Meteo weather; no synthetic fallback was used.')
+            +'Do not infer a settings or data conflict. No weather fallback or new verified outcome may be inferred from this error.')
     if state.active_proposal_id:
         facts.update(fact_references(state,['review_activity_proposal'])[0])
     config=state.energy_settings
