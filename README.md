@@ -1,20 +1,20 @@
 # LifeLine
 
-**Recovery backend:** the [Energy Recovery Planner](RECOVERY_PLANNER.md) investigates scheduling, solar, storage and output limits against the same actual forecast, with explicit hourly deficits and human-review boundaries. It is available through `/api/recovery/plan` and local agent tools. [Recovery demo commands](DEMO.md#energy-recovery-backend-demonstration) and [typed contracts](contracts/recovery.ts) are ready for the separate UI integration branch. Existing frontend navigation is preserved on this backend branch.
+LifeLine helps clinic staff compare electricity schedules and understand shortages before making decisions. It combines actual Open-Meteo forecasts, the existing physical battery simulator and MILP, and a local Llama assistant. It supports SDG 7 and SDG 3 through energy-planning decision support; it does not guarantee electricity or control medical equipment.
 
 **Weather investigation, November 13:** the Mac's normal Open-Meteo route recovered without a code, DNS or TLS-setting change. Fresh forecast-to-model execution passed. The earlier failure was traced to a TLS-handshake stall before HTTP, also reproduced outside Python. See [Mac/Windows diagnosis and recovery evidence](WEATHER_NETWORK.md); continue checking live availability before the demo.
 
-**Local AI is implemented:** Llama 3.1 8B through Ollama understands questions and selects LifeLine's validated tools. Python computes all schedules, energy figures and assessments. No cloud AI key is required. See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).
+**Local AI is implemented:** Llama 3.1 8B through Ollama authors conversation, selects validated tools and explains their results. Python computes all schedules and energy figures. No cloud AI key is required. See the [current demo](DEMO.md), [architecture](ARCHITECTURE.md), [Wajo investigation](WAJO_INVESTIGATION.md) and [objective checklist](FINAL_CHECKLIST.md).
 
 Live weather planning retrieves today's/tomorrow's Open-Meteo forecasts when reachable; historical NASA and synthetic APIs remain available. **The Mac's normal route recovered and passed fresh forecast-to-model verification at 12:35 PM Pacific November 13.** The earlier TLS-handshake failure and its recovery are documented in [the network investigation](WEATHER_NETWORK.md). Recorded local-model replays remain separately labeled; they are not fresh weather or a comprehensive evaluation.
 
 LifeLine is an offline-capable electricity planning prototype for staff supporting resource-constrained healthcare clinics. It helps check equipment requirements and compare schedules and infrastructure alternatives; it does not guarantee power or control medical devices.
 
-**The interactive application is implemented:** editable clinic/equipment, computed reliability assessment, three operating schedules, battery charts, adverse-weather testing, and Capacity Explorer. It reuses the original simulator, MILP, and FastAPI architecture.
+The application has two pages: **AI Assistant** for conversation and reviewed proposals, and **Clinic Overview** for activities/equipment, battery forecasts, tested plans and actual weather. Use **Power setup** to review solar/battery capacity, the explicit midnight-charge assumption, a separate timestamped current reading, and expandable technical limits. Edits remain proposals until confirmed; confirmed changes recalculate using the same physical model.
 
-The shadcn/ui + Tailwind interface opens in **Simple mode**: choose a demonstration clinic, ask a question, or choose **Plan tomorrow’s electricity**, **Prepare for cloudy weather**, or **Check battery reliability**. A plan shows an overall assessment, its main limitation, at most three actions, and an equipment timeline. Exact model values and warnings are expandable. **Detailed mode** retains equipment editing, all three schedules, battery charts, computed comparisons, capacity alternatives, and JSON export. **Advanced settings** contains solar/battery capacities, charge, reserve, power limits, efficiencies, sunshine adjustments, and model details.
+Before → After scheduling, battery forecasts and relevant tested alternatives explain what changes. Full fixed/sunshine-first/MILP calculations remain available through the numerical contracts. Recovery compares scheduling, solar, storage and battery output with the same weather and absolute starting energy. The seven-day weather outlook is weather information; electrical calculations cover the selected supported 24-hour day, not a week-long reliability prediction.
 
-The primary **local AI assistant** retrieves reviewed configuration and chooses forecast, consecutive-load, capacity or clarification tools. It cannot change existing medical priorities, generate weather, calculate energy independently or control equipment. A hypothetical additional appliance must be explicitly adopted before the inventory changes. Generated prose is not used as numerical evidence. The original **rule-based offline assistant** and **deterministic guided fallback** remain labeled separately. Forecasts require internet; synthetic/historical planning works locally after installation.
+The primary local assistant uses **Llama 3.1 8B through Ollama** for conversation and native tool selection. Python owns weather retrieval, unit conversion, schedules and numerical verification. Activity and energy-setting changes require explicit operator confirmation. Hypothetical recovery hardware is not installed or adopted by selecting a comparison. The primary chat reports model failure with a retry; legacy rule-based/guided APIs remain separate. Forecasts require internet; explicitly selected historical/synthetic simulation works offline after installation. See [recovery](RECOVERY_PLANNER.md), [activity contracts](docs/ACTIVITY_PLANNING.md), [local conversation](docs/LOCAL_CONVERSATION.md), and [settings/persistence](docs/ENERGY_SETTINGS_AND_LOCAL_STATE.md).
 
 ## Run the complete demo
 
@@ -43,7 +43,7 @@ On a fresh machine, `ollama pull llama3.1:8b` downloads the model first. The app
 
 For development, run the backend as above and `npm --prefix frontend run dev` in another terminal; open [localhost:5173](http://127.0.0.1:5173/). `npm --prefix frontend run preview` serves the build on port 4173 with an API proxy.
 
-Workflow: choose a clinic example → ask or choose an action → read the assessment and timeline → change a requirement → inspect updated results. Valid edits recalculate after a short debounce once a plan exists. Previous results are hidden while inputs differ or a conversational requirement is unresolved. Invalid requirements have plain-language errors. If the assistant endpoint fails, **Retry with local planner** runs the entered requirements directly. Equipment is capped at 20 rows to bound the local prototype's solve size.
+Workflow: choose a clinic example → ask a question → review and confirm proposed changes → compare the calculated result → test reduced sunshine. Existing activities can be revised through reviewed proposals without adding another physical device. Power settings can be edited manually even when the language model is unavailable. Failed calculations preserve confirmed inputs and expose a retry; outdated results are not presented as the current plan. Equipment is capped at 20 physical devices to bound the prototype's solve size.
 
 Critical hours stay fixed. Flexible duration × power defines energy; the selected existing start fills subsequent allowed slots, with partial-hour energy supported. Flexible work is divisible/interruptible, **not a validated appliance cycle**. Users supply critical/flexible classification; the app does not make medical priorities.
 
@@ -64,7 +64,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The backend suite has **274 passing tests**. The browser suite now contains **22 Chromium journeys**, including local-agent tools, provider failure, explicit requirement adoption, capacity search and the competing-window demo; the final run is recorded in [the objective checklist](FINAL_CHECKLIST.md). TypeScript/production-build and built-application/API checks are required. CI covers Python 3.11/3.12 and Chromium; remote results are in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
+The backend suite verifies physics, forecast conversion, native tool boundaries, reviewed activity/settings edits and restart recovery. Browser journeys exercise the actual Python API and model with explicitly injected test weather/model transport; real Llama/live-weather evidence is recorded separately. See [the objective checklist](FINAL_CHECKLIST.md) for the latest verification scope. TypeScript/production build and end-to-end checks are required. CI covers Python 3.11/3.12 and Chromium; remote results are in [Actions](https://github.com/zmaxitaxi/LifeLine/actions).
 
 For an isolated local backend, set `LIFELINE_API_PORT` for the frontend and Playwright commands, and start the backend on that port. The default remains 8000. Playwright uses the repo's `.venv` on Windows and Unix, and writes artifacts to `lifeline-playwright-results` in the OS temporary directory unless `LIFELINE_TEST_OUTPUT` is set.
 
@@ -86,7 +86,7 @@ python -m pytest backend/tests -q
 python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-Open [API docs](http://127.0.0.1:8000/docs) or [OpenAPI JSON](http://127.0.0.1:8000/openapi.json). The JSON endpoints work without external services after installation; the optional Swagger UI uses externally hosted JavaScript/CSS.
+Open [API docs](http://127.0.0.1:8000/docs) or [OpenAPI JSON](http://127.0.0.1:8000/openapi.json). Synthetic/historical numerical endpoints work without external services after installation; actual forecasts require internet and model chat requires local Ollama. The optional Swagger UI uses externally hosted JavaScript/CSS.
 
 In another terminal:
 
