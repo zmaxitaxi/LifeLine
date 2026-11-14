@@ -17,6 +17,7 @@ from .forecast_models import ForecastLocation
 from .agent_tools import SnapshotService
 from .recovery_models import RecoveryRequest
 from .recovery_planner import generate_recovery_plan
+from .agent_telemetry import measured
 
 
 class PlanningError(Exception):
@@ -523,7 +524,8 @@ class PlanningStore:
             snapshot = state.model_copy(deep=True)
         try:
             clinic = compile_clinic(snapshot)
-            forecast = await service.get(ForecastLocation(**snapshot.location.model_dump()))
+            with measured('weather'):
+                forecast = await service.get(ForecastLocation(**snapshot.location.model_dump()))
             index = next((n for n, day in enumerate(forecast.days) if day.date == snapshot.planning_date), None)
             if index is None or index > 1:
                 raise PlanningError('UNSUPPORTED_FORECAST_DAY', 'Selected date is outside the supported today/tomorrow forecast.')
@@ -534,7 +536,8 @@ class PlanningStore:
                 midnight_battery_kwh=clinic.initial_battery_kwh, day='today' if index == 0 else 'tomorrow',
                 sunshine_factor=snapshot.sunshine_factor)
             async with solve_lock:
-                simulation = await run_in_threadpool(forecast_case, catalog, context, day, forecast, snapshot.sunshine_factor)
+                with measured('simulation'):
+                    simulation = await run_in_threadpool(forecast_case, catalog, context, day, forecast, snapshot.sunshine_factor)
             recovery = None
             if body.include_recovery:
                 recovery = await generate_recovery_plan(context, catalog, SnapshotService(forecast), solve_lock)

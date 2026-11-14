@@ -14,6 +14,7 @@ from .recovery_models import (RecoveryMetrics, RecoveryOption, RecoveryResponse,
 from .simulation import simulate_case
 from .scenarios import load_weather
 from .weather_forecast import ForecastError
+from .agent_telemetry import measured
 
 
 def recovery_metrics(plan, config, original_work, postponed=0.):
@@ -114,12 +115,13 @@ async def generate_recovery_plan(body, catalog, service, solve_lock, progress=No
             await progress({'type':'activity','id':'recovery-weather','label':'Weather snapshot retrieved','status':'completed'})
 
     def solve(candidate):
-        if forecast:
-            request = ForecastPlanRequest(latitude=body.latitude,longitude=body.longitude,clinic=candidate,
-                midnight_battery_kwh=body.midnight_battery_kwh,day=body.day,reduced_sunshine_factors=[])
-            return forecast_case(catalog,request,day,forecast,body.sunshine_factor)
-        factors = candidate.cloud_factors if candidate.cloud_factors is not None else catalog.preset(candidate.scenario).cloud_factors
-        return simulate_case(catalog,candidate_clinic(candidate,cloud_factors=[f*body.sunshine_factor for f in factors]))
+        with measured('simulation'):
+            if forecast:
+                request = ForecastPlanRequest(latitude=body.latitude,longitude=body.longitude,clinic=candidate,
+                    midnight_battery_kwh=body.midnight_battery_kwh,day=body.day,reduced_sunshine_factors=[])
+                return forecast_case(catalog,request,day,forecast,body.sunshine_factor)
+            factors = candidate.cloud_factors if candidate.cloud_factors is not None else catalog.preset(candidate.scenario).cloud_factors
+            return simulate_case(catalog,candidate_clinic(candidate,cloud_factors=[f*body.sunshine_factor for f in factors]))
 
     async with solve_lock:
         reference = await run_in_threadpool(solve,clinic)

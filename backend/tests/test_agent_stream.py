@@ -31,6 +31,23 @@ def test_stale_stream_request_fails_before_starting_or_mutating_history():
         assert client.get(f"{BASE}/{state['id']}/conversation").json()['messages']==[]
 
 
+def test_stream_reports_real_weather_and_numerical_phases_including_threaded_recovery():
+    model,_=agent_with([{'name':'recompute_clinic_plan','arguments':{'include_recovery':True}}])
+    service,_=service_for()
+    with TestClient(create_app(agent_service=model,forecast_service=service)) as client:
+        state=create(client)
+        response=client.post(f"{BASE}/{state['id']}/agent/stream",json={'expected_revision':state['revision'],'question':'Calculate recovery alternatives for the clinic.'})
+        events=[json.loads(line[6:]) for line in response.text.splitlines() if line.startswith('data: ')]
+        phases=[e for e in events if e['type']=='progress']
+        assert {'weather','simulation'} <= {e['stage'] for e in phases}
+        assert sum(e['stage']=='simulation' and e['status']=='completed' for e in phases)>1
+        final=events[-1]['response']
+        assert final['state']['plan_status']=='current'
+        assert final['state']['computed_plan']['recovery'] is not None
+        assert final['timings']['stages_seconds']['weather']>=0
+        assert final['timings']['stages_seconds']['simulation']>0
+
+
 def test_stream_sanitizes_unexpected_failures_without_persisting_partial_reply(monkeypatch):
     async def fail(*args, **kwargs):
         raise RuntimeError('private provider response and internal prompt')
