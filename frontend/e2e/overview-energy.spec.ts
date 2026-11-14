@@ -26,6 +26,7 @@ test('plans show computed tradeoffs, exactly postponed work and unknown prices',
 test('empty electrical requirements never produce a safe overview assessment',async({page,request})=>{
  const base=initial();const state=await calculate(request,await seed(request,{clinic:{...base.clinic,equipment:[]}}));expect(state.computed_plan!.simulation.baseline.metrics.critical_coverage_pct).toBeNull();await open(page,state);await overview(page).click();
  const outlook=page.getByRole('region',{name:'Will we have enough electricity?',exact:true});await expect(outlook).toContainText('Add essential equipment before assessing reliability');await expect(outlook).not.toContainText('Modeled needs covered');await expect(page.getByRole('region',{name:'Plans',exact:true})).toContainText('Not configured');
+ await page.getByRole('button',{name:/All calculated plans/}).click();await expect(page.locator('.plan-options-grid')).not.toContainText('Other requested work has power');await expect(page.locator('.plan-options-grid')).not.toContainText('Battery stays at or above');
 });
 
 test('public progress arrives before the verified reply and browser commit timing is observable',async({page,request})=>{

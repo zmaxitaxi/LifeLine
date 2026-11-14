@@ -12,8 +12,8 @@ function Tradeoffs({option}:{option:RecoveryOption}){
  if(m.essential_requested_kwh<=1e-6)limits.push('Essential equipment requirements are incomplete.');
  else if(m.essential_unserved_kwh<=1e-6)benefits.push('Essential equipment needs covered in the model.');
  else limits.push(`${num(m.essential_unserved_kwh)} kWh of essential power still missing.`);
- if(m.reserve_shortfall_kwh<=1e-6)benefits.push('Battery stays at or above its reserve target.');else limits.push(`Battery still falls ${num(m.reserve_shortfall_kwh)} kWh below reserve.`);
- if(m.flexible_unfinished_kwh<=1e-6)benefits.push('All requested work has power in the model.');else limits.push(`${num(m.flexible_unfinished_kwh)} kWh of original work remains unfinished.`);
+ if(m.reserve_shortfall_kwh>1e-6)limits.push(`Battery still falls ${num(m.reserve_shortfall_kwh)} kWh below reserve.`);else if(m.essential_requested_kwh>1e-6)benefits.push('Battery stays at or above its reserve target for the entered loads.');
+ if(m.flexible_unfinished_kwh>1e-6)limits.push(`${num(m.flexible_unfinished_kwh)} kWh of original work remains unfinished.`);else if(m.original_flexible_required_kwh>1e-6)benefits.push('Other requested work has power in the model.');
  if(option.infrastructure_changes.length)limits.push('Requires a technical review; hardware changes are hypothetical.');
  return <div className="plan-tradeoffs"><div><h4>Benefits</h4><ul>{benefits.length?benefits.map(s=><li key={s}>{s}</li>):<li>No complete resolution in this result.</li>}</ul></div><div><h4>Limits</h4><ul>{limits.length?limits.map(s=><li key={s}>{s}</li>):<li>Depends on the weather and equipment assumptions.</li>}</ul></div></div>;
 }
