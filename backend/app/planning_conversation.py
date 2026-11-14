@@ -70,6 +70,8 @@ def validate_conversation(arguments, question):
     reply = ConversationalReply.model_validate(arguments)
     if not conversation_allowed(question):
         raise PlanningError('INVALID_ACTIVITY', 'This request requires activity or calculation tools, not a conversational answer.')
+    if re.search(r'\b(?:schemas?|source[_ ]ids?|verified facts|rephras\w*|validation|parameters?|inspect (?:the )?(?:planning )?state|tool (?:calls?|arguments?)|system prompt)\b',reply.message,re.I):
+        raise PlanningError('INVALID_ACTIVITY','Respond naturally to the person without internal verification jargon or asking them to rephrase a greeting.')
     validate_plain_prose(reply.message)
     return reply.message.strip()
 

@@ -340,6 +340,18 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
     messages.append({'role':'user', 'content':'Current operator request: ' + body.question})
     calls = []
     social_intent = conversational_intent(body.question)
+    if social_intent:
+        # Social turns need neither the engineering prompt nor clinic facts.
+        # Keeping those out avoids a greeting becoming a request to rephrase
+        # data or satisfy a validation schema.
+        messages=[{'role':'system','content':
+            "You are LifeLine, a friendly local assistant for clinic staff. This is an ordinary social or help turn. "
+            "Use conversational_reply and write a brief natural reply in your own words. Greet the person, acknowledge thanks, "
+            "or explain that you can help describe clinic activities, review their equipment needs and discuss calculated plans. "
+            "Do not request measurements for a greeting. Do not mention internal state, source IDs, rules, verification, tools, "
+            "schemas or rephrasing. Do not claim any weather, numerical result, equipment action or clinical assurance. "
+            "Keep it warm, useful and concise; no scripted example is required."},
+            {'role':'user','content':body.question}]
     # Read-only explanation must not swallow an explicit calculation request.
     # Negated requests such as "explain without recalculating" stay read-only.
     calculation_text=re.sub(r"\b(?:do not|don't|without|avoid|skip|no need to)\s+(?:a\s+)?(?:recalculat\w*|calculat\w*|recomput\w*|rerun\w*|refresh\w*)\b",'',body.question,flags=re.I)

@@ -34,6 +34,19 @@ def test_social_native_reply_is_model_text_without_weather_or_state_mutation(que
         assert c.get(f"{BASE}/{s['id']}").json()==before
         sent=json.loads(next(call.content for call in calls if call.method=='POST'))
         assert {t['function']['name'] for t in sent['tools']}=={'conversational_reply'}
+        assert 'Canonical state' not in json.dumps(sent['messages'])
+        assert 'ordinary social or help turn' in sent['messages'][0]['content']
+
+
+def test_greeting_rejects_meta_verification_instructions_then_uses_model_greeting():
+    meta='Please rephrase the question to use only verified facts from the current state.'
+    natural='Hello! What would you like to plan for your clinic?'
+    agent,_=agent_with([conversation('greeting',meta),conversation('greeting',natural)])
+    service,weather=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        state=create(c);reply=ask(c,state,'Hello')
+        assert reply['message']==natural and reply['mode']=='local_tool_agent'
+        assert reply['state']==state and not weather
 
 
 @pytest.mark.parametrize('message',[
