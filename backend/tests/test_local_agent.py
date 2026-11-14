@@ -17,6 +17,15 @@ def agent_with(calls=None, *, failure=None, remote=False, syntheses=None, synthe
     requests=[]
     calls=list(calls or [])
     syntheses=None if syntheses is None else list(syntheses)
+    def wire(call,session):
+        if 'content' in call and 'name' not in call:
+            return httpx.Response(200,json={'message':{'role':'assistant','content':call['content'],'tool_calls':[]}})
+        if session and call.get('name')=='conversational_reply':
+            return wire({'content':call['arguments']['message']},session)
+        if session and call.get('name')=='compose_planning_reply':
+            call={'name':'respond_to_user','arguments':call['arguments']}
+        return httpx.Response(200,json={'message':{'role':'assistant','content':'INVENTED ANSWER 99999 kWh — must never be displayed',
+            'tool_calls':[{'function':call}]}})
     def handler(request):
         requests.append(request)
         if request.url.path=='/api/tags':
@@ -24,39 +33,44 @@ def agent_with(calls=None, *, failure=None, remote=False, syntheses=None, synthe
         if failure:
             return httpx.Response(failure,json={'error':'private provider error must not be reflected'})
         body=json.loads(request.content)
-        assert body['model']=='llama3.1:8b'
-        assert body['stream'] is False
+        assert body['model']=='llama3.1:8b' and body['stream'] is False
         assert not any(t['function']['name'] in ('send_email','run_python','update_clinic') for t in body['tools'])
-        if {t['function']['name'] for t in body['tools']} == {'compose_planning_reply'}:
+        session=body['options']['num_predict']==800
+        results=[]
+        for message in body['messages']:
+            if message['role']=='tool':
+                value=json.loads(message['content'])
+                if 'facts' in value: results.append((message['tool_name'],value))
+        if session and results and (body['messages'][-1]['role']=='tool' or syntheses is not None) and not (results[-1][0]=='inspect_planning_state' and calls):
             if synthesis_failure:
                 return httpx.Response(synthesis_failure,json={'error':'private synthesis failure'})
             if syntheses is not None:
-                call=syntheses.pop(0) if syntheses else {'name':'compose_planning_reply','arguments':{'message':'invalid missing references'}}
-                return httpx.Response(200,json={'message':{'role':'assistant','content':'','tool_calls':[{'function':call}]}})
-            # Synthetic synthesis fixture: verified facts still come from the real numerical model.
-            facts=json.loads(body['messages'][1]['content'])
-            keys=list(facts['required_references'])
-            keys += facts['recovery_options'][:3]
-            sentences=['Please review this modeled result.']
-            for key in keys:
-                item=facts['verified_facts'][key]
-                if key=='scope' and isinstance(item,dict):
-                    sentences.append('This is a modeled comparison for review, not a clinical guarantee. Hypothetical changes remain unadopted.')
-                elif isinstance(item,str):
-                    sentences.append(item)
-                elif key=='essential_summary':
-                    sentences.append(f"The existing baseline leaves {item['remaining_unserved_essential_energy']} of essential energy unserved. Flexible work unfinished is {item['flexible_unfinished']}.")
-                elif key=='selected_option':
-                    sentences.append(f"The selected {item['kind']} comparison leaves {item['remaining_unserved_essential_energy']} of essential energy unserved.")
-                    for change in item['hypothetical_changes']:
-                        sentences.append(f"The selected hypothetical change is {change['field']}: {change['before']} to {change['after']}.")
-                elif key.startswith('option_'):
-                    sentences.append(f"Tested option: {item['kind']} leaves {item['remaining_unserved_essential_energy']} of essential energy unserved.")
-            call={'name':'compose_planning_reply','arguments':{'message':' '.join(sentences),'fact_references':keys}}
-        else:
-            call=calls.pop(0) if calls else {'name':'clarify','arguments':{'field':'intent'}}
-        return httpx.Response(200,json={'message':{'role':'assistant','content':'INVENTED ANSWER 99999 kWh — must never be displayed',
-            'tool_calls':[{'function':call}]}})
+                return wire(syntheses.pop(0) if syntheses else {'name':'respond_to_user','arguments':{'message':'99 kWh is available.','fact_references':[]}},session)
+            # Explicitly synthetic authored reply over actual tool results.
+            name,value=results[-1];facts=value['facts'];kind='conversation';ids=[];refs=[]
+            if name in ('propose_energy_settings','update_energy_settings_draft'):
+                message='The energy settings draft is ready for review. Please review and explicitly confirm or reject it.';kind='energy_review'
+            elif value.get('active_draft') and name not in ('recompute_clinic_plan','explain_current_plan'):
+                draft=value['active_draft'];kind='activity_review'
+                message='The activity remains a draft. '+(facts.get('missing_detail') if draft['missing_fields'] else facts['review_boundary'])
+            elif value['plan_status']=='current':
+                kind='explanation' if name=='explain_current_plan' else 'calculation'
+                base=facts['essential_summary'];refs=['essential_summary','scope']
+                message=f"The existing baseline leaves {base['remaining_unserved_essential_energy']} of essential energy unserved in the model."
+                if 'selected_option' in facts:
+                    option=facts['selected_option'];ids=[option['exact_selected_option_id']];refs.append('selected_option')
+                    message+=f" The selected {option['kind']} comparison leaves {option['remaining_unserved_essential_energy']} unserved."
+                    for change in option['hypothetical_changes']:
+                        message+=f" The selected hypothetical change is {change['before']} to {change['after']}."
+                if 'unconfirmed_notice' in facts:
+                    refs.append('unconfirmed_notice');message+=' '+facts['unconfirmed_notice']
+                message+=' Please review this modeled result; it is not a clinical guarantee.'
+            else:
+                message='What would you like to review next?'
+            return wire({'name':'respond_to_user','arguments':{'message':message,'fact_references':refs,
+                'presentation':{'kind':kind,'option_ids':ids,'show_schedule':False}}},session)
+        call=calls.pop(0) if calls else ({'content':'What would you like to review next?'} if session else {'name':'clarify','arguments':{'field':'intent'}})
+        return wire(call,session)
     return LocalAgent(transport=httpx.MockTransport(handler)),requests
 
 
@@ -416,3 +430,14 @@ def test_rejected_call_feedback_names_the_invalid_field_and_points_to_clarify():
     retry=json.loads(chats[1].content)['messages'][-1]['content']
     assert 'power_kw' in retry and 'greater than 0' in retry and 'call clarify' in retry and 'Do not repeat it' in retry
     assert d['mode']=='local_tool_agent' and d['clarification_field']=='intent'
+
+
+def test_session_turn_accepts_native_direct_content_while_legacy_decide_stays_tool_only():
+    from app.local_agent import AgentUnavailable
+    def handler(request):
+        return httpx.Response(200,json={'message':{'role':'assistant','content':'Hello! What would you like to explore?','tool_calls':[]}})
+    agent=LocalAgent(transport=httpx.MockTransport(handler))
+    turn=asyncio.run(agent.session_turn([{'role':'user','content':'Hello'}],toolset=[]))
+    assert turn=={'type':'message','content':'Hello! What would you like to explore?'}
+    with pytest.raises(AgentUnavailable):
+        asyncio.run(agent.decide([{'role':'user','content':'Hello'}]))

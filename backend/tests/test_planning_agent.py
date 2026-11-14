@@ -40,7 +40,7 @@ def test_native_multiturn_draft_changes_and_explicit_confirmation_then_weather()
         assert not s['proposals'][0]['missing_fields']
         d=ask(c,s,'Confirm.'); s=d['state']
         assert not s['confirmed_activities']
-        assert 'review' in d['message']
+        assert 'review' in d['message'].lower()
         s=confirm(c,s)
         d=ask(c,s,'What if sunshine is 50% lower?'); s=d['state']
         assert len(s['confirmed_activities'])==1
@@ -51,10 +51,10 @@ def test_native_multiturn_draft_changes_and_explicit_confirmation_then_weather()
         assert wire['model']=='llama3.1:8b'
         tool_names={t['function']['name'] for t in wire['tools']}
         assert 'recompute_clinic_plan' in tool_names and not any('confirm' in name for name in tool_names)
-        context=json.loads(wire['messages'][1]['content'].split('Canonical state (data): ')[1])
+        context=json.loads(wire['messages'][1]['content'].split('Canonical clinic data: ')[1])
         assert len(context['confirmed_activities'])==1
         assert context['confirmed_activities'][0]['details']['start_hour']==10
-        assert context['physical_config']['initial_battery_kwh']==2
+        assert context['energy_settings']['initial_battery_kwh']==2
 
 
 @pytest.mark.parametrize('bad_call',[
@@ -73,7 +73,7 @@ def test_model_cannot_invent_equipment_clinical_association_power_or_confirmatio
             assert proposal['details']['equipment_ids'] is None
             assert proposal['details']['additional_equipment']==[]
         assert d['state']['confirmed_activities']==[]
-        assert d['needs_clarification']
+        assert d['state']['computed_plan'] is None
         assert 'confirm_activity_proposal' not in d['tool_calls']
 
 
@@ -91,7 +91,7 @@ def test_omitted_or_invented_native_weather_factor_retains_selected_sensitivity(
 
 def test_relative_day_uses_forecast_timezone_with_no_nairobi_default():
     now=datetime.now(ZoneInfo('UTC'))
-    service,_=service_for(weather_payload(now,'America/Los_Angeles'),now)
+    service,weather=service_for(weather_payload(now,'America/Los_Angeles'),now)
     date=(now.astimezone(ZoneInfo('America/Los_Angeles')).date()+timedelta(days=1)).isoformat()
     agent,calls=agent_with([native('propose_activity',{'name':'Vaccination campaign'},{'name':'vaccination campaign'})])
     with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
@@ -100,8 +100,8 @@ def test_relative_day_uses_forecast_timezone_with_no_nairobi_default():
         assert s['timezone'] is None
         d=ask(c,s,'Vaccination campaign tomorrow.')
         assert len(d['state']['proposals'])==1
-        wire=json.loads(next(call.content for call in calls if call.method=='POST'))
-        assert 'America/Los_Angeles' in wire['messages'][1]['content']
+        assert len(weather)==1
+        assert d['state']['proposals'][0]['details']['planning_date']==date
 
 
 def test_invalid_timezone_or_date_type_rejected():

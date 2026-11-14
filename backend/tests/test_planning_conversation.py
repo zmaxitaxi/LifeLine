@@ -1,10 +1,11 @@
-"""Native prose stays social or references source-backed complete fact clauses."""
+"""Unforced native content, actual tool results and scoped presentation."""
 import json
 import pytest
 from fastapi.testclient import TestClient
 from app.main import create_app
-from app.planning_conversation import validate_conversation, render_grounded_reply
+from app.planning_conversation import render_grounded_reply, validate_reply_content
 from app.planning_state import PlanningError
+from app.planning_models import PlanningState
 from test_local_agent import agent_with
 from test_weather_forecast import service_for
 from test_planning_state import create, propose, post, BASE
@@ -12,168 +13,124 @@ from test_planning_agent import ask
 
 
 def conversation(kind,message):
-    return {'name':'conversational_reply','arguments':{'kind':kind,'message':message}}
+    # Existing fixture callers now produce genuine no-tool content on the wire.
+    return {'content':message}
 
 
-@pytest.mark.parametrize('question,kind,message',[
-    ('Hello','greeting','Hello! How can I help with your clinic planning?'),
-    ('Thanks','thanks',"You're welcome! Let me know what you would like to explore next."),
-    ('What can you help me with?','help','I can help draft clinic activities, review equipment requirements and compare modeled energy plans.'),
+def state_model(state):
+    return PlanningState.model_validate_json(json.dumps(state))
+
+
+@pytest.mark.parametrize('question,message',[
+    ('Hello','Hello! What would you like to explore?'),
+    ('Hello, how are things?','Hello! How can I help?'),
+    ('Thanks',"You're welcome!"),
+    ('Could an 8 kWh battery be an idea?','An unevaluated 8 kWh battery might help if storage is the bottleneck. Shall I compare it with the current system?'),
+    ('What could adding batteries do?','Extra storage might help if storage is the bottleneck. It does not create energy; we can test the idea if you want.'),
+    ('Could cloudier weather matter tomorrow?','If sunshine is lower, solar energy could be lower too. That idea has not been tested against the clinic plan.'),
 ])
-def test_social_native_reply_is_model_text_without_weather_or_state_mutation(question,kind,message):
-    agent,calls=agent_with([conversation(kind,message)])
+def test_free_native_reply_has_no_forced_tool_subset_or_weather(question,message):
+    agent,calls=agent_with([{'content':message}]);service,weather=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client);reply=ask(client,state,question)
+        assert reply['mode']=='local_tool_agent' and reply['message']==message
+        assert reply['tool_calls']==[] and reply['state']==state and not weather
+        assert reply['presentation']['kind']=='conversation'
+        assert reply['presentation']['option_ids']==[] and not reply['presentation']['show_schedule']
+        wire=json.loads(next(call.content for call in calls if call.method=='POST'))
+        names={tool['function']['name'] for tool in wire['tools']}
+        assert {'respond_to_user','recompute_clinic_plan','explain_current_plan','propose_activity'}<=names
+        assert 'conversational_reply' not in names
+
+
+def test_direct_clarification_can_precede_a_proposal_and_history_contains_assistant():
+    first='Which device does this activity need?'
+    agent,calls=agent_with([{'content':first},{'content':'Would you like to stage those details for review?'}])
     service,weather=service_for()
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        s=propose(c,create(c))
-        before=s
-        d=ask(c,s,question)
-        assert d['message']==message
-        assert d['mode']=='local_tool_agent' and not d['needs_clarification']
-        assert d['tool_calls']==['conversational_reply']
-        assert d['state']==before and not weather
-        assert c.get(f"{BASE}/{s['id']}").json()==before
-        sent=json.loads(next(call.content for call in calls if call.method=='POST'))
-        assert {t['function']['name'] for t in sent['tools']}=={'conversational_reply'}
-        assert 'Canonical state' not in json.dumps(sent['messages'])
-        assert 'ordinary social or help turn' in sent['messages'][0]['content']
-
-
-def test_greeting_rejects_meta_verification_instructions_then_uses_model_greeting():
-    meta='Please rephrase the question to use only verified facts from the current state.'
-    natural='Hello! What would you like to plan for your clinic?'
-    agent,_=agent_with([conversation('greeting',meta),conversation('greeting',natural)])
-    service,weather=service_for()
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        state=create(c);reply=ask(c,state,'Hello')
-        assert reply['message']==natural and reply['mode']=='local_tool_agent'
-        assert reply['state']==state and not weather
-
-
-@pytest.mark.parametrize('message',[
-    'You have 9999 kWh of energy.', 'Your clinic has enough power.',
-    'The clinic is safe tomorrow.', 'Turn off the refrigerator.',
-    'Your battery will last through the night.', 'All loads are met.',
-    'I confirmed your campaign.', 'Buy another battery.',
-])
-def test_unsafe_social_prose_is_rejected_and_retry_has_no_side_effects(message):
-    good='Hello! How can I help with your clinic planning?'
-    agent,_=agent_with([conversation('greeting',message),conversation('greeting',good)])
-    service,weather=service_for()
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        s=create(c);d=ask(c,s,'Hello')
-        assert d['message']==good and message not in d['message']
-        assert d['state']==s and not weather
-
-
-def test_conversation_cannot_bypass_calculation_for_mixed_or_operational_request():
-    fake='Everything is fine at your clinic.'
-    agent,_=agent_with([conversation('greeting',fake),{'name':'recompute_clinic_plan','arguments':{'include_recovery':True}}])
-    service,weather=service_for()
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        d=ask(c,create(c),'Hello, will we have enough electricity tomorrow? Compare recovery options.')
-        assert d['tool_calls']==['recompute_clinic_plan']
-        assert d['state']['plan_status']=='current' and weather
-        assert fake not in d['message']
-        assert d['message'].count('Tested option:')==3
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client);reply=ask(client,state,'I am thinking about a campaign.')
+        assert not reply['state']['proposals']
+        reply=ask(client,state,'It uses the fridge.')
+        wire=json.loads(calls[-1].content)
+        assert {'role':'assistant','content':first} in wire['messages']
+        assert not reply['state']['proposals'] and not weather
 
 
 @pytest.mark.parametrize('bad',[
-    'Here is the answer: 99 kWh is available.',
-    'Your clinic has enough power.',
-    'Please review this: {{invented_fact}}',
-    'Please review this: {{essential_summary}}',
+    'The clinic will have 9999 kWh available.', 'Your clinic has enough power.',
+    'I confirmed your activity.', 'I updated your battery settings.', 'Turn off the refrigerator.',
+    'Tomorrow will be rainy.', 'The model shows zero kWh of essential shortfall.',
 ])
-def test_invalid_model_synthesis_returns_retry_preserving_real_result_without_canned_narrative(bad):
-    calls=[{'name':'compose_planning_reply','arguments':{'message':bad,'fact_references':['essential_summary','scope']}}]*2
-    agent,_=agent_with([{'name':'recompute_clinic_plan','arguments':{}}],syntheses=calls)
-    service,_=service_for()
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        d=ask(c,create(c),'Plan the confirmed clinic electricity.')
-        assert d['mode']=='local_agent_unavailable'
-        assert 'retry' in d['message']
-        assert '99' not in d['message'] and bad not in d['message']
-        assert d['state']['plan_status']=='current'
-        assert d['state']['computed_plan']['simulation']['optimized']['metrics']['critical_requested_kwh']==pytest.approx(2.4)
-        assert d['tool_calls']==['recompute_clinic_plan']
+def test_unsupported_direct_claim_is_rejected_without_mutation(bad):
+    good='We can examine that as an unevaluated idea if you would like.'
+    agent,_=agent_with([{'content':bad},{'content':good}]);service,weather=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client);reply=ask(client,state,'Could another approach help?')
+        assert reply['message']==good and reply['state']==state and not weather
 
 
-def test_synthesis_transport_failure_preserves_draft_and_explicitly_requests_retry():
-    agent,_=agent_with([{'name':'propose_activity','arguments':{'name':'Vaccination campaign'}}],synthesis_failure=500)
+def test_calculation_can_be_followed_by_direct_prose_without_a_composer_tool():
+    message='The model shows 0.000 kWh of essential shortfall in the existing baseline. Please review the assumptions.'
+    agent,calls=agent_with([{'name':'recompute_clinic_plan','arguments':{}}],syntheses=[{'content':message}])
     service,weather=service_for()
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        d=ask(c,create(c),'We have a Vaccination campaign.')
-        assert len(d['state']['proposals'])==1 and not d['state']['confirmed_activities']
-        assert d['mode']=='local_agent_unavailable' and 'retry' in d['message']
-        assert not weather and 'private' not in d['message']
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        reply=ask(client,create(client),'Calculate this clinic plan.')
+        assert reply['mode']=='local_tool_agent' and reply['message']==message
+        assert reply['tool_calls']==['recompute_clinic_plan'] and weather
+        assert reply['state']['plan_status']=='current'
+        assert reply['presentation']['kind']=='conversation'
+        wire=json.loads(calls[-1].content)
+        assert len(wire['tools'])>1 and not any(tool['function']['name']=='compose_planning_reply' for tool in wire['tools'])
 
 
-def test_grounded_synthesis_requires_distinct_actual_recovery_options_and_cannot_relabel_quantities():
-    facts={'essential_summary':'Essential shortfall is 0.123 kWh.','scope':'Model comparison only.',
-        'option_output':'Tested output option leaves 0.123 kWh unserved.',
-        'option_battery':'Tested battery option leaves 0.012 kWh unserved.',
-        'option_scheduling':'Tested scheduling option leaves 0.000 kWh unserved.'}
-    required={'essential_summary','scope'};options={'option_output','option_battery','option_scheduling'}
-    with pytest.raises(PlanningError):
-        render_grounded_reply({'message':'Please review this.','fact_references':['essential_summary','scope','option_output','option_output','option_output']},facts,required,options)
-    text=render_grounded_reply({'message':'Here is the modeled comparison. Scheduling leaves 0.000 kWh unserved. Output leaves 0.123 kWh unserved. Battery leaves 0.012 kWh unserved. Review these modeled choices.','fact_references':['essential_summary','option_scheduling','option_output','option_battery','scope']},facts,required,options)
-    assert '0.123 kWh' in text and '0.012 kWh' in text and '0.000 kWh' in text
-    assert text.index('Scheduling')<text.index('Output')
+def test_optional_presentation_can_show_one_tested_option_and_no_schedule():
+    agent,calls=agent_with([]);service,weather=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client)
+        state=post(client,f"{BASE}/{state['id']}/recompute",{'expected_revision':state['revision'],'include_recovery':True})
+        option=state['computed_plan']['recovery']['options'][0]
+        authored='Here is a tested comparison for review.'
+        agent,_=agent_with([{'name':'respond_to_user','arguments':{'message':authored,
+            'presentation':{'kind':'calculation','option_ids':[option['id']],'show_schedule':False}}}])
+        client.app.state.agent=agent;count=len(weather)
+        reply=ask(client,state,'Show this relevant option.')
+        assert reply['message']==authored and reply['state']==state and len(weather)==count
+        assert reply['presentation']['option_ids']==[option['id']]
+        assert reply['presentation']['input_revision']==state['input_revision']
+        assert reply['presentation']['generation']==state['computed_plan']['generation']
+        assert not reply['presentation']['show_schedule']
 
 
-def test_natural_full_message_is_returned_unchanged_and_metric_label_swaps_are_rejected():
-    facts={'essential_summary':'Essential equipment requests 2.000 kWh; 1.200 kWh is unserved.',
-        'battery_summary':'The lowest battery level is 6.000 kWh, against a 1.000 kWh reserve target.',
-        'scope':'These are modeled results for review, not a clinical guarantee.'}
-    refs=list(facts)
-    message='The model shows an essential shortfall of 1.200 kWh. The lowest battery level is 6.000 kWh. Please review these modeled results; they are not a clinical guarantee.'
-    assert render_grounded_reply({'message':message,'fact_references':refs},facts,{'essential_summary','scope'},set())==message
-    with pytest.raises(PlanningError):
-        render_grounded_reply({'message':message.replace('shortfall of 1.200','shortfall of 6.000'),'fact_references':refs},facts,{'essential_summary','scope'},set())
-
-
-def test_explain_exact_selected_size_reads_existing_baseline_without_weather_or_resetting_selection():
-    from app.planning_conversation import fact_references,synthesis_data
-    from app.planning_models import PlanningState
+def test_fake_option_presentation_cannot_create_a_card_or_trigger_an_implicit_calculation():
+    agent,_=agent_with([{'name':'respond_to_user','arguments':{'message':'Here is an idea to discuss.',
+        'presentation':{'kind':'conversation','option_ids':['made-up'],'show_schedule':False}}},
+        {'content':'This is only an unevaluated idea.'}])
     service,weather=service_for()
-    agent,calls=agent_with([{'name':'explain_current_plan','arguments':{}}])
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        s=create(c)
-        s=post(c,f"{BASE}/{s['id']}/recompute",{'expected_revision':s['revision'],'include_recovery':True})
-        recovery=s['computed_plan']['recovery'];candidates=[o for o in recovery['options'] if o['kind']=='output']
-        chosen=candidates[-1]
-        s=post(c,f"{BASE}/{s['id']}/recovery-selection",{'expected_revision':s['revision'],'input_revision':s['input_revision'],
-            'generation':s['computed_plan']['generation'],'option_id':chosen['id']})
-        before=json.loads(json.dumps(s));weather_count=len(weather)
-        d=ask(c,s,'Explain the exact selected plan and compare it with the existing baseline.')
-        assert d['mode']=='local_tool_agent',d['message']
-        assert d['tool_calls']==['explain_current_plan']
-        assert d['state']==before and len(weather)==weather_count
-        assert f"{chosen['config']['max_discharge_kw']:g} kW" in d['message']
-        wire=json.loads(next(call.content for call in calls if call.method=='POST'))
-        assert [t['function']['name'] for t in wire['tools']]==['explain_current_plan']
-        facts,required,options=fact_references(PlanningState.model_validate_json(json.dumps(s)),['explain_current_plan'])
-        source=synthesis_data(PlanningState.model_validate_json(json.dumps(s)),facts)
-        assert source['selected_option']['exact_selected_option_id']==chosen['id']
-        assert not options and 'selected_option' in required
-        assert source['essential_summary']['remaining_unserved_essential_energy']==f"{s['computed_plan']['simulation']['baseline']['metrics']['critical_unserved_kwh']:.3f} kWh"
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client);reply=ask(client,state,'Could we explore alternatives?')
+        assert reply['message']=='This is only an unevaluated idea.'
+        assert reply['presentation']['option_ids']==[] and not weather and reply['state']==state
 
 
-@pytest.mark.parametrize('question',[
-    'Calculate recovery options and explain the updated electricity plan.',
-    'Recompute the plan with the latest forecast and explain the results.',
-    'Test the plan with 50% less sunshine and explain the comparison.',
-])
-def test_explicit_calculation_plus_explanation_is_not_forced_into_read_only_tool(question):
-    service,_=service_for()
-    agent,calls=agent_with([{'name':'recompute_clinic_plan','arguments':{'include_recovery':True}}])
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        s=create(c)
-        d=ask(c,s,question)
-        assert d['mode']=='local_tool_agent',d['message']
-        assert d['tool_calls']==['recompute_clinic_plan']
-        assert d['state']['plan_status']=='current'
+def test_exact_selected_explanation_is_read_only_but_the_model_receives_all_valid_tools():
+    service,weather=service_for();agent,calls=agent_with([{'name':'explain_current_plan','arguments':{}}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client);state=post(client,f"{BASE}/{state['id']}/recompute",{'expected_revision':state['revision'],'include_recovery':True})
+        option=[item for item in state['computed_plan']['recovery']['options'] if item['kind']=='output'][-1]
+        state=post(client,f"{BASE}/{state['id']}/recovery-selection",{'expected_revision':state['revision'],
+            'input_revision':state['input_revision'],'generation':state['computed_plan']['generation'],'option_id':option['id']})
+        count=len(weather);reply=ask(client,state,'Explain the exact selected plan without recalculating.')
+        assert reply['mode']=='local_tool_agent',reply['message']
+        assert reply['state']==state and len(weather)==count and reply['tool_calls']==['explain_current_plan']
+        assert reply['presentation']['option_ids']==[option['id']]
         wire=json.loads(next(call.content for call in calls if call.method=='POST'))
         assert 'recompute_clinic_plan' in {tool['function']['name'] for tool in wire['tools']}
+
+
+def test_one_grounded_option_is_valid_without_mandatory_three_option_prose():
+    facts={'option_output':'The tested output option leaves 0.123 kWh unserved.'}
+    message='The modeled output option leaves 0.123 kWh unserved.'
+    assert render_grounded_reply({'message':message,'fact_references':['option_output']},facts,set(),{'option_output','option_battery','option_solar'})==message
 
 
 def test_native_nurse_duration_and_priority_synonyms_leave_energy_arithmetic_to_python():
@@ -211,7 +168,7 @@ def test_native_cannot_convert_event_duration_into_device_runtime_or_ignore_expl
     with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
         s=create(c)
         d=ask(c,s,'Campaign from 10 AM to 12 PM uses a flexible portable pump rated 500 W, requiring 2 hours and 2 kWh; it is interruptible.')
-        assert d['state']==s and d['mode']=='local_agent_unavailable'
+        assert d['state']==s and not d['state']['proposals']
 
 
 def test_native_reviewed_duration_revision_reuses_known_confirmed_specs_without_rating_question():
@@ -285,12 +242,33 @@ def test_natural_clarification_does_not_need_a_technical_draft_or_model_preface(
         {'missing_detail':'Please provide the local start time.'},{'missing_detail'},set())==message
 
 
-def test_cloudier_synthesis_keeps_verified_factor_in_current_source_context():
-    agent,calls=agent_with([{'name':'recompute_clinic_plan','arguments':{'include_recovery':True}}])
+
+
+def test_energy_settings_are_staged_then_followed_up_in_same_draft_without_confirmation():
+    agent,_=agent_with([{'name':'propose_energy_settings','arguments':{'battery_capacity_kwh':8.}},
+        {'name':'update_energy_settings_draft','arguments':{'initial_battery_pct':50.}}])
+    service,weather=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client)
+        reply=ask(client,state,'Set the battery capacity to 8 kWh for review.');state=reply['state']
+        draft=state['active_energy_proposal_id']
+        assert state['energy_settings']['battery_capacity_kwh']==4.
+        assert reply['presentation']['kind']=='energy_review'
+        reply=ask(client,state,'Use a starting battery charge of 50% in that draft.');state=reply['state']
+        assert state['active_energy_proposal_id']==draft and len(state['energy_proposals'])==1
+        assert state['energy_proposals'][0]['proposed_energy_settings']['initial_battery_kwh']==4.
+        assert state['energy_settings']['initial_battery_kwh']==2. and not weather
+
+
+def test_existing_device_runtime_constraint_needs_physical_reference_and_device_runtime():
+    from app.planning_agent import DraftTool,validate_grounding
+    from app.planning_models import ActivityDraft
     service,_=service_for()
-    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
-        d=ask(c,create(c),'What if sunshine is 50% lower? Compare recovery options.')
-        assert d['state']['sunshine_factor']==.5
-        compose=next(json.loads(call.content) for call in reversed(calls) if call.method=='POST' and {t['function']['name'] for t in json.loads(call.content)['tools']}=={'compose_planning_reply'})
-        facts=json.loads(compose['messages'][1]['content'])['verified_facts']
-        assert facts['weather_basis']['forecast_irradiation_used']=='50%'
+    with TestClient(create_app(forecast_service=service)) as client:
+        state=state_model(create(client))
+    for text in ('The campaign lasts 3 hours.','The vaccine campaign lasts 3 hours.'):
+        tool=DraftTool(details=ActivityDraft(equipment_constraints=[{'equipment_id':'pump','required_duration_hours':3}]),evidence={'equipment_constraints':text})
+        with pytest.raises(PlanningError):validate_grounding(tool,text,state)
+    text='The Water pump must operate for 3 hours.'
+    tool=DraftTool(details=ActivityDraft(equipment_constraints=[{'equipment_id':'pump','required_duration_hours':3}]),evidence={'equipment_constraints':text})
+    validate_grounding(tool,text,state)

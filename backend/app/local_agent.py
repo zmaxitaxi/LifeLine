@@ -210,6 +210,40 @@ class LocalAgent:
             except (httpx.HTTPError, ValueError, KeyError, TypeError):
                 raise AgentUnavailable('LOCAL_AGENT_UNAVAILABLE') from None
 
+    async def session_turn(self, messages, *, toolset):
+        """Native session choice: ordinary authored content OR one actual tool.
+
+        Legacy decide() remains tool-only. Session callers must validate prose
+        against their current context before exposing computed claims.
+        """
+        if self.lock.locked():
+            raise AgentUnavailable('LOCAL_AGENT_BUSY')
+        async with self.lock:
+            try:
+                async with httpx.AsyncClient(transport=self.transport,timeout=httpx.Timeout(45.,connect=2.),trust_env=False) as client:
+                    response = await client.post(OLLAMA_URL+'/api/chat',json={
+                        'model':self.model,'messages':messages,'stream':False,'think':False,'keep_alive':'10m',
+                        'options':{'temperature':0,'num_ctx':8192,'num_predict':800},
+                        'tools':[{'type':'function','function':tool} for tool in toolset]})
+                    response.raise_for_status()
+                    message=response.json()['message']
+                if not isinstance(message,dict):
+                    raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                calls=message.get('tool_calls',[])
+                if not isinstance(calls,list) or len(calls)>1:
+                    raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                if calls:
+                    call=calls[0]['function']
+                    if not isinstance(call['name'],str) or not isinstance(call['arguments'],dict):
+                        raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                    return {'type':'tool_call','call':call,'content':message.get('content','')}
+                content=message.get('content')
+                if not isinstance(content,str) or not content.strip() or len(content)>6000:
+                    raise AgentUnavailable('INVALID_AGENT_RESPONSE')
+                return {'type':'message','content':content}
+            except (httpx.HTTPError, ValueError, KeyError, TypeError):
+                raise AgentUnavailable('LOCAL_AGENT_UNAVAILABLE') from None
+
 
 def answer(context, *, mode='local_tool_agent', model=None, **fields):
     return AgentResponse(mode=mode,model=model,input_basis=context.input_basis,**fields)
