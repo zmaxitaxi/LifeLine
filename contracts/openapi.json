@@ -2129,6 +2129,96 @@
         }
       }
     },
+    "/api/planning/sessions/{session_id}/agent/stream": {
+      "post": {
+        "tags": [
+          "Shared planning"
+        ],
+        "summary": "Stream Agent",
+        "operationId": "stream_agent_api_planning_sessions__session_id__agent_stream_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionAgentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        }
+      }
+    },
     "/api/weather/outlook": {
       "get": {
         "summary": "Weather Outlook",
@@ -2820,6 +2910,63 @@
           "input_basis"
         ],
         "title": "AgentResponse"
+      },
+      "AgentTimings": {
+        "properties": {
+          "total_seconds": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Seconds"
+          },
+          "first_progress_seconds": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Progress Seconds"
+          },
+          "stages_seconds": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Stages Seconds",
+            "default": {}
+          },
+          "model_calls": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Calls"
+          },
+          "model_metrics": {
+            "items": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Model Metrics",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "total_seconds"
+        ],
+        "title": "AgentTimings"
       },
       "ApiErrorResponse": {
         "properties": {
@@ -6153,6 +6300,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/AgentFailure"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timings": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentTimings"
               },
               {
                 "type": "null"

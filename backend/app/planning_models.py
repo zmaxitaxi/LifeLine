@@ -243,6 +243,14 @@ class AgentFailure(StrictModel):
     requested_date: str | None = None
 
 
+class AgentTimings(StrictModel):
+    total_seconds: Annotated[float, Field(ge=0)]
+    first_progress_seconds: Annotated[float, Field(ge=0)] | None = None
+    stages_seconds: dict[str, float] = {}
+    model_calls: int | None = None
+    model_metrics: list[dict[str, float]] = []
+
+
 class SessionAgentResponse(StrictModel):
     mode: Literal['local_tool_agent', 'local_agent_unavailable']
     model: str | None = None
@@ -255,3 +263,4 @@ class SessionAgentResponse(StrictModel):
     user_message_id: ID | None = None
     state: PlanningState
     failure: AgentFailure | None = None
+    timings: AgentTimings | None = None

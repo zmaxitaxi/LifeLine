@@ -8,9 +8,15 @@ from .planning_models import (PlanningState, ActivityProposal, CreatePlanningSes
     SessionAgentRequest, SessionAgentResponse)
 from .planning_agent import ask_session_agent
 from .models import ApiErrorResponse
-from .planning_models import PlanningConversation
+from .planning_models import PlanningConversation, AgentTimings
 from .energy_settings_models import (EnergySettingsProposal, CreateEnergySettingsProposal,
                                     UpdateEnergySettingsProposal)
+from .agent_telemetry import ACTIVE_TRACE, AgentTrace, measured
+from .planning_state import PlanningError
+from fastapi.responses import StreamingResponse
+import asyncio
+import json
+from contextlib import suppress
 
 router = APIRouter(prefix='/api/planning/sessions', tags=['Shared planning'],
     responses={status:{'model':ApiErrorResponse} for status in (404,409,422,500,503)})
@@ -115,7 +121,53 @@ async def select(session_id: str, body: SelectRecoveryIntervention, request: Req
 
 @router.post('/{session_id}/agent', response_model=SessionAgentResponse)
 async def agent(session_id: str, body: SessionAgentRequest, request: Request):
-    response = await ask_session_agent(session_id, body, request.app.state.planning,
-        request.app.state.catalog, request.app.state.forecasts, request.app.state.solve_lock,
-        request.app.state.agent)
-    return await request.app.state.planning.record_turn(session_id, body.question, response)
+    return await run_agent(session_id, body, request)
+
+
+async def run_agent(session_id, body, request, emit=None):
+    trace = AgentTrace(emit)
+    token = ACTIVE_TRACE.set(trace)
+    try:
+        trace.progress('request', 'running')
+        response = await ask_session_agent(session_id, body, request.app.state.planning,
+            request.app.state.catalog, request.app.state.forecasts, request.app.state.solve_lock,
+            request.app.state.agent)
+        request.app.state.planning.check(session_id, response.state.revision)
+        with measured('persistence'):
+            response = await request.app.state.planning.record_turn(session_id, body.question, response)
+        response.timings = AgentTimings(**trace.snapshot())
+        return response
+    finally:
+        ACTIVE_TRACE.reset(token)
+
+
+@router.post('/{session_id}/agent/stream')
+async def stream_agent(session_id: str, body: SessionAgentRequest, request: Request):
+    request.app.state.planning.check(session_id, body.expected_revision)
+    async def events():
+        queue = asyncio.Queue()
+        loop = asyncio.get_running_loop()
+        def emit(event):
+            loop.call_soon_threadsafe(queue.put_nowait, event)
+        async def work():
+            try:
+                response = await run_agent(session_id, body, request, emit)
+                await queue.put({'type': 'result', 'response': response.model_dump(mode='json')})
+            except PlanningError as exc:
+                await queue.put({'type': 'error', 'error': {'code': exc.code, 'message': exc.message}})
+            except Exception:
+                await queue.put({'type': 'error', 'error': {'code': 'INTERNAL_ERROR', 'message': 'The request could not be completed. Reload the current state before retrying.'}})
+        task = asyncio.create_task(work())
+        try:
+            while True:
+                event = await queue.get()
+                yield 'data: '+json.dumps(event, allow_nan=False)+'\n\n'
+                if event['type'] in ('result', 'error'):
+                    break
+        finally:
+            if not task.done():
+                task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+    return StreamingResponse(events(), media_type='text/event-stream',
+        headers={'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no'})
