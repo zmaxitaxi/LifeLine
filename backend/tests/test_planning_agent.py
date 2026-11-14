@@ -102,6 +102,8 @@ def test_relative_day_uses_forecast_timezone_with_no_nairobi_default():
         assert len(d['state']['proposals'])==1
         assert len(weather)==1
         assert d['state']['proposals'][0]['details']['planning_date']==date
+        assert d['state']['timezone']=='America/Los_Angeles'
+        assert c.get(f"{BASE}/{s['id']}").json()['timezone']=='America/Los_Angeles'
 
 
 def test_invalid_timezone_or_date_type_rejected():

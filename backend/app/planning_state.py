@@ -245,6 +245,21 @@ class PlanningStore:
             raise PlanningError('REVISION_CONFLICT', 'Planning state changed. Refresh and review the latest state.', 409)
         return state
 
+    async def resolve_timezone(self, session_id, expected_revision, timezone_name):
+        from .planning_models import CreatePlanningSession
+        try:
+            CreatePlanningSession.known_timezone(timezone_name)
+        except ValueError:
+            raise PlanningError('INVALID_REQUEST', 'The clinic timezone could not be validated.') from None
+        async with self.lock:
+            state = self.check(session_id, expected_revision)
+            if state.timezone != timezone_name:
+                state.timezone = timezone_name
+                state.revision += 1
+                self.states[session_id] = state
+                self._persist()
+            return state.model_copy(deep=True)
+
     def proposal(self, state, proposal_id):
         proposal = next((p for p in state.proposals if p.id == proposal_id), None)
         if proposal is None:

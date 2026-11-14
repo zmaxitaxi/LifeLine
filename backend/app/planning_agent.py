@@ -384,7 +384,7 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
             elif name in ('propose_activity', 'update_activity_draft', 'correct_last_activity_time', 'propose_activity_revision'):
                 if state.timezone is None and re.search(r'\b(today|tomorrow)\b',body.question,re.I):
                     forecast=await service.get(ForecastLocation(**state.location.model_dump()))
-                    state=state.model_copy(update={'timezone':forecast.timezone})
+                    state=await store.resolve_timezone(session_id,state.revision,forecast.timezone)
                 revision_target = None
                 if name == 'propose_activity_revision':
                     revision_target = arguments.get('target_activity_id')
