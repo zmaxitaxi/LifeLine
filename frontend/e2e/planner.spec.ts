@@ -5,6 +5,7 @@ import { open, seed, read, calculate, say, overview, assistant, weatherFailure }
 test.beforeEach(() => weatherFailure(false)); test.afterEach(() => weatherFailure(false));
 
 test("the overview fills the workspace with four equal desktop quadrants", async ({ page, request }) => {
+  const errors: string[] = [];page.on('pageerror', error => errors.push(error.message));
   await page.setViewportSize({ width:1280,height:900 });
   await open(page, await calculate(request, await seed(request))); await overview(page).click(); await expect(overview(page)).toHaveAttribute("aria-current","page");
   const panels = page.locator(".overview-grid > .overview-square"); await expect(panels).toHaveCount(4);
@@ -15,6 +16,7 @@ test("the overview fills the workspace with four equal desktop quadrants", async
   expect(Math.abs(boxes[0].y-boxes[1].y)).toBeLessThan(2); expect(boxes[2].y).toBeGreaterThan(boxes[0].y); expect(Math.abs(boxes[2].y-boxes[3].y)).toBeLessThan(2);
   for (const name of ["Activities & Equipment","Weather","Battery & Energy","Plans"]) await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
   await expect(page.getByRole("button",{name:"Add equipment",exact:true})).toBeVisible();
+  await expect(page).toHaveTitle('LifeLine — Clinic energy planner');await expect(page.locator('vite-error-overlay')).toHaveCount(0);expect(errors).toEqual([]);
   await page.screenshot({path:join(tmpdir(),"lifeline-four-square-overview.png")});
 });
 
@@ -65,6 +67,7 @@ test("the in-app preview width keeps all four panels in view",async({page,reques
   const boxes=await page.locator('.overview-square').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
   expect(boxes[1].x).toBeGreaterThan(boxes[0].x);expect(boxes[2].y).toBeGreaterThan(boxes[0].y);expect(boxes[3].y+boxes[3].height).toBeLessThan(955);
   const energy=page.getByRole('region',{name:'Battery & Energy',exact:true});const play=await energy.getByRole('button',{name:'Play battery playback',exact:true}).boundingBox();expect(play!.y+play!.height).toBeLessThan(boxes[2].y+boxes[2].height);
+  const ticks=await page.locator('.battery-time-labels span:visible').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right};}));for(let i=1;i<ticks.length;i++)expect(ticks[i].left).toBeGreaterThanOrEqual(ticks[i-1].right-1);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:join(tmpdir(),'lifeline-preview-four-panels.png')});
 });
 

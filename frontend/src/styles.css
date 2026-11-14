@@ -2144,3 +2144,7 @@ a {
 
 .overview-square .battery-playback { padding-top: 0; margin-top: 0; border-top: 0; }
 .overview-square .panel-lead { font-size: 17px; margin-block: 6px 10px; }
+@media (min-width: 600px) and (max-width: 767px) {
+  .overview-square .battery-time-labels span:nth-child(2),
+  .overview-square .battery-time-labels span:nth-child(4) { display: none; }
+}
