@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 import tempfile
 
+SUPPORTS_DIRECTORY_FSYNC = os.name == 'posix'
+
 
 class LocalPlanningPersistence:
     def __init__(self, path):
@@ -36,11 +38,12 @@ class LocalPlanningPersistence:
                 os.fsync(handle.fileno())
             os.replace(temporary, self.path)
             # Commit the rename as well as its contents where supported.
-            descriptor = os.open(self.path.parent, os.O_RDONLY)
-            try:
-                os.fsync(descriptor)
-            finally:
-                os.close(descriptor)
+            if SUPPORTS_DIRECTORY_FSYNC:
+                descriptor = os.open(self.path.parent, os.O_RDONLY)
+                try:
+                    os.fsync(descriptor)
+                finally:
+                    os.close(descriptor)
         finally:
             if temporary is not None:
                 temporary.unlink(missing_ok=True)
