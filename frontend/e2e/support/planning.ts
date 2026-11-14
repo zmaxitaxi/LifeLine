@@ -88,7 +88,7 @@ export async function calculate(
 }
 export async function open(page: Page, state: PlanningState) {
   await page.addInitScript(
-    (id) => localStorage.setItem("lifeline.planning-session.v1", id),
+    (id) => {localStorage.setItem("lifeline.planning-session.v1", id);localStorage.setItem("lifeline.reviewed-session.v1",id);},
     state.id,
   );
   await page.goto("/");

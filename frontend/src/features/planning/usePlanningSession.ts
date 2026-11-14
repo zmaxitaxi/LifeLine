@@ -3,11 +3,13 @@ import type {
   PlanningState,
   CreatePlanningSession,
 } from "../../../../contracts/planning";
-import type { ScenarioListResponse } from "../../../../contracts/api";
 import type { SolarForecast } from "../../../../contracts/forecast";
 import { api } from "@/lib/clinic";
 import { planningApi, PlanningApiError, currentPlan } from "./planning-api";
 const storageKey = "lifeline.planning-session.v1";
+const reviewedKey = "lifeline.reviewed-session.v1";
+function reviewedSession() {try{return localStorage.getItem(reviewedKey);}catch{return null;}}
+function markReviewed(id:string) {try{localStorage.setItem(reviewedKey,id);}catch{/* The server remains authoritative. */}}
 function storedSession() {
   try {
     return localStorage.getItem(storageKey);
@@ -22,19 +24,6 @@ function remember(id: string) {
     /* Server snapshot remains authoritative without storage. */
   }
 }
-function tomorrowInNairobi() {
-  const parts = new Intl.DateTimeFormat("en", {
-    timeZone: "Africa/Nairobi",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const part = (name: string) =>
-    Number(parts.find((p) => p.type === name)?.value);
-  return new Date(Date.UTC(part("year"), part("month") - 1, part("day") + 1))
-    .toISOString()
-    .slice(0, 10);
-}
 export function usePlanningSession() {
   const [state, setState] = useState<PlanningState | null>(null);
   const stateRef = useRef<PlanningState | null>(null);
@@ -42,6 +31,7 @@ export function usePlanningSession() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [missingSession, setMissingSession] = useState(false);
+  const [resumeCandidate,setResumeCandidate]=useState<PlanningState|null>(null);
   const [busy, setBusy] = useState("");
   const locked = useRef(false);
   const [invalidating, setInvalidating] = useState(false);
@@ -91,35 +81,11 @@ export function usePlanningSession() {
       setMissingSession(false);
       try {
         const id = startNew ? null : storedSession();
-        let snapshot: PlanningState;
-        if (id) snapshot = await planningApi.read(id, controller.signal);
-        else {
-          const catalog = await api<ScenarioListResponse>(
-            "scenarios",
-            undefined,
-            controller.signal,
-          );
-          const preset =
-            catalog.scenarios.find((s) => s.id === "scheduling") ??
-            catalog.scenarios[0];
-          if (!preset) throw new Error("No configured clinic is available.");
-          const body: CreatePlanningSession = {
-            selected_clinic_id: preset.id,
-            clinic_name: "Kisumu example clinic",
-            location: { latitude: -0.0917, longitude: 34.768 },
-            planning_date: tomorrowInNairobi(),
-            timezone: "Africa/Nairobi",
-            clinic: { scenario: preset.id },
-            midnight_battery_kwh: preset.defaults.initial_battery_kwh,
-          };
-          snapshot = await planningApi.create(body, controller.signal);
-          setNotice(
-            "This planning session uses the configured Kisumu example inputs. Review the equipment and starting energy in Clinic Overview before relying on a plan.",
-          );
-        }
+        if(!id)return;
+        const snapshot=await planningApi.read(id,controller.signal);
         if (controller.signal.aborted) return;
-        accept(snapshot);
-        void refreshWeather(snapshot);
+        if(reviewedSession()===id){accept(snapshot);void refreshWeather(snapshot);}
+        else setResumeCandidate(snapshot);
       } catch (e) {
         if (controller.signal.aborted) return;
         if (e instanceof PlanningApiError && e.code === "NOT_FOUND") {
@@ -143,6 +109,14 @@ export function usePlanningSession() {
     void initialize();
     return () => initialization.current?.abort();
   }, [initialize]);
+  function beginSetup(){if(stateRef.current)setResumeCandidate(stateRef.current);stateRef.current=null;setState(null);setWeather(null);setError("");setNotice("");}
+  async function resume(){if(!resumeCandidate || locked.current)return;markReviewed(resumeCandidate.id);accept(resumeCandidate);setResumeCandidate(null);setError("");void refreshWeather(resumeCandidate);}
+  async function create(body:CreatePlanningSession){
+    if(locked.current)return false;locked.current=true;setBusy("Saving your clinic setup…");setError("");
+    try{const snapshot=await planningApi.create(body);markReviewed(snapshot.id);accept(snapshot);setResumeCandidate(null);setNotice("");void refreshWeather(snapshot);return true;}
+    catch(e){setError(e instanceof Error ? e.message : "The clinic setup could not be saved. Please retry.");return false;}
+    finally{locked.current=false;setBusy("");}
+  }
   const reload = useCallback(async () => {
     const snapshot = stateRef.current;
     if (!snapshot) return;
@@ -235,6 +209,10 @@ export function usePlanningSession() {
     notice,
     busy,
     missingSession,
+    resumeCandidate,
+    resume,
+    create,
+    beginSetup,
     initialize,
     reload,
     run,

@@ -33,6 +33,7 @@ import { InlinePlan } from "@/features/planning/InlinePlan";
 
 import { restoreMessages, resultAttachment, type ChatMessage } from "@/features/planning/conversation-view";
 import { EnergySettingsReview } from "@/features/planning/EnergySettingsReview";
+import { ClinicSetup } from "@/features/planning/ClinicSetup";
 const toolLabels: Record<string, string> = {
   conversational_reply: "Answered your message",
   explain_current_plan: "Reviewed the selected plan",
@@ -96,7 +97,7 @@ export default function App() {
     } catch {if(!signal?.aborted)setHistoryError("The conversation could not be loaded. Your clinic information is still available.");}
     finally {if(!signal?.aborted)setHistoryLoading(false);}
   }
-  useEffect(()=>{const abort=new AbortController();if(state?.id)void loadHistory(state,abort.signal);return ()=>abort.abort();},[state?.id]);
+  useEffect(()=>{const abort=new AbortController();setMessages([]);if(state?.id)void loadHistory(state,abort.signal);return ()=>abort.abort();},[state?.id]);
   async function checkModel() {
     setModelError(false);
     try {
@@ -228,7 +229,7 @@ export default function App() {
             computed!.simulation.effective_config.reserve_kwh - 1e-6
           ? "Battery may run too low"
           : "The forecast plan covers essential equipment"
-    : "Ask LifeLine about the clinic’s electricity";
+    : state?.equipment_inventory.length ? "Ask LifeLine about the clinic’s electricity" : "Add essential equipment to assess power";
   const locationName = state
     ? (locations
         .find(
@@ -286,6 +287,7 @@ export default function App() {
             {locationName} · {state.planning_date}
           </span>
         </div>
+        <Button variant="ghost" disabled={Boolean(busy)} onClick={()=>session.beginSetup()}>Change clinic</Button>
       </div>
       {route.page === "assistant" ? (
         <div className="chat-weather" role="status">
@@ -324,28 +326,16 @@ export default function App() {
             Loading your clinic…
           </p>
         ) : null}
-        {!session.loading && !state ? (
-          <div className="chat-initial-error" role="alert">
-            <p>{session.error}</p>
-            <Button
-              onClick={() => void session.initialize(session.missingSession)}
-            >
-              {session.missingSession
-                ? "Start a new session"
-                : "Retry connection"}
-            </Button>
-          </div>
-        ) : null}
         {historyLoading ? <p role="status" className="chat-loading">Loading your conversation…</p> : null}
         {historyError ? <div className="chat-initial-error" role="alert"><p>{historyError}</p><Button variant="outline" onClick={()=>void loadHistory()}>Retry conversation</Button></div> : null}
         {state && !messages.length && !historyLoading ? (
           <div className="chat-welcome">
-            <h1>How can LifeLine help today?</h1>
+            <h1>{state.equipment_inventory.length ? "How can LifeLine help today?" : "Which equipment does your clinic use?"}</h1>
             <p>
-              Talk about your clinic’s activities, equipment times, or
-              electricity. LifeLine will check the details and explain your
-              options.
+              {state.equipment_inventory.length ? "Talk about your clinic’s activities, equipment times, or electricity. LifeLine will check the details and explain your options." : "Tell LifeLine about your fridges, lights, pumps or other devices, or add them using the button below. We need their requirements before assessing your electricity."}
             </p>
+            {!state.equipment_inventory.length ? <Button disabled={Boolean(busy)} onClick={()=>setEquipmentOpen(true)}>Add clinic equipment</Button> : null}
+            {state.equipment_inventory.length ? <>
             <div className="chat-suggestions" aria-label="Suggested questions">
               <Button
                 variant="outline"
@@ -368,6 +358,7 @@ export default function App() {
                 </Button>
               ))}
             </div>
+            </> : null}
           </div>
         ) : null}
         {state && session.notice ? (
@@ -494,7 +485,7 @@ export default function App() {
             ref={input}
             value={text}
             onChange={(event) => setText(event.target.value)}
-            placeholder="Message LifeLine…"
+            placeholder={state?.equipment_inventory.length ? "Message LifeLine…" : "Tell LifeLine about your clinic’s equipment…"}
             maxLength={2000}
             disabled={!state || Boolean(busy) || narrationPending || historyLoading}
             onKeyDown={(event) => {
@@ -587,7 +578,7 @@ export default function App() {
     <p role="status">
       {session.loading
         ? "Loading your clinic…"
-        : "Connect to LifeLine from AI Assistant to view the clinic."}
+        : <a href="#assistant">Set up your clinic in AI Assistant to view its equipment and electricity plan.</a>}
     </p>
   );
   return (<>
@@ -595,7 +586,7 @@ export default function App() {
       page={route.page}
       section={route.section}
       context={context}
-      assistant={assistant}
+      assistant={state ? assistant : session.loading ? <p className="chat-loading" role="status">Checking for a saved clinic…</p> : <ClinicSetup saved={session.resumeCandidate} busy={Boolean(busy)} error={session.error} demoWeather={weatherMode?.mode === "demo"} onResume={()=>void session.resume()} onCreate={session.create}/>}
       overview={overview}
       modelStatus={
         <>

@@ -1,0 +1,61 @@
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Disclosure } from "@/components/Disclosure";
+import { api } from "@/lib/clinic";
+import type { ScenarioListResponse, ScenarioSummary } from "../../../../contracts/api";
+import type { CreatePlanningSession, PlanningState } from "../../../../contracts/planning";
+
+type Place={id:string;name:string;latitude:number;longitude:number};
+function tomorrow(zone:string){try{const day=new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const n=(key:string)=>Number(day.find(p=>p.type===key)?.value);return new Date(Date.UTC(n('year'),n('month')-1,n('day')+1)).toISOString().slice(0,10);}catch{return '';}}
+const zones:Record<string,string>={kisumu:'Africa/Nairobi',kampala:'Africa/Kampala',berkeley:'America/Los_Angeles'};
+
+/** Unsaved form values only. The backend owns the clinic after explicit review. */
+export function ClinicSetup({saved,busy,error,demoWeather,onResume,onCreate}:{saved:PlanningState|null;busy:boolean;error:string;demoWeather:boolean;onResume:()=>void;onCreate:(body:CreatePlanningSession)=>Promise<boolean>}){
+ const [step,setStep]=useState(1),[name,setName]=useState(''),[place,setPlace]=useState(''),[latitude,setLatitude]=useState(''),[longitude,setLongitude]=useState(''),[zone,setZone]=useState(''),[date,setDate]=useState('');
+ const [capacity,setCapacity]=useState(''),[solar,setSolar]=useState(''),[charge,setCharge]=useState(''),[reserve,setReserve]=useState(''),[demo,setDemo]=useState(false),[agreed,setAgreed]=useState(false);
+ const [places,setPlaces]=useState<Place[]>([]),[profiles,setProfiles]=useState<ScenarioSummary[]>([]),[profileId,setProfileId]=useState('normal'),[loadError,setLoadError]=useState(''),[attempt,setAttempt]=useState(0),[formError,setFormError]=useState('');
+ const title=useRef<HTMLHeadingElement>(null);
+ useEffect(()=>{const abort=new AbortController();void Promise.all([api<{locations:Place[]}>('forecast/locations',undefined,abort.signal),api<ScenarioListResponse>('scenarios',undefined,abort.signal)]).then(([locations,catalog])=>{if(abort.signal.aborted)return;setPlaces(locations.locations);setProfiles(catalog.scenarios);setReserve(String(catalog.scenarios.find(p=>p.id==='normal')?.defaults.reserve_kwh??0));setLoadError('');}).catch(()=>{if(!abort.signal.aborted)setLoadError('Setup details could not be loaded. Check the local server and retry.');});return()=>abort.abort();},[attempt]);
+ useEffect(()=>{title.current?.focus();},[step]);
+ const selected=places.find(p=>p.id===place);
+ const preset=profiles.find(p=>p.id===profileId);
+ const defaults=preset?.defaults;
+ function sample(){const p=profiles.find(p=>p.id==='scheduling')??preset;if(!p)return;const d=p.defaults;setProfileId(p.id);setDemo(true);setCapacity(String(d.battery_capacity_kwh));setSolar(String(d.pv_capacity_kw*1000));setCharge(String(d.initial_battery_kwh/d.battery_capacity_kwh*100));setReserve(String(d.reserve_kwh));setAgreed(false);}
+ const body=():CreatePlanningSession=>({selected_clinic_id:demo?`demo-${preset!.id}`:`clinic-${crypto.randomUUID()}`,clinic_name:demo?`${name.slice(0,100)} — demo`:name.trim(),location:selected?{latitude:selected.latitude,longitude:selected.longitude}:{latitude:Number(latitude),longitude:Number(longitude)},timezone:zone,planning_date:date,midnight_battery_kwh:Number(capacity)*Number(charge)/100,clinic:{scenario:preset!.id,battery_capacity_kwh:Number(capacity),initial_battery_kwh:Number(capacity)*Number(charge)/100,pv_capacity_kw:Number(solar)/1000,reserve_kwh:Number(reserve),charge_efficiency:defaults!.charge_efficiency,discharge_efficiency:defaults!.discharge_efficiency,max_charge_kw:defaults!.max_charge_kw,max_discharge_kw:defaults!.max_discharge_kw,equipment:demo?preset!.equipment:[]}});
+ return <div className="clinic-setup">
+   <p className="setup-step">Clinic setup · {step} of 3</p>
+   <h1 ref={title} tabIndex={-1}>{step===1?'First, where is your clinic?':step===2?'What powers your clinic?':'Check your clinic setup'}</h1>
+   <p>{step===1?'LifeLine helps you plan electricity around clinic work. Let’s start with your clinic, then add its electrical equipment.':step===2?'Use the ratings on the solar and battery labels. These are planning inputs, not live measurements.':'Nothing has been calculated or changed yet. Check these inputs before continuing.'}</p>
+   {demoWeather && step>1?<p className="panel-footnote">This demo uses sample weather on Africa/Nairobi time, not a local weather prediction. Your chosen clinic location is recorded separately.</p>:null}
+   {error||loadError||formError?<p role="alert" className="editor-error">{error||loadError||formError}</p>:null}
+   {loadError?<Button variant="outline" onClick={()=>setAttempt(n=>n+1)}>Retry setup connection</Button>:null}
+   {step===2?<div className="setup-demo"><Button type="button" variant="outline" disabled={busy||!preset} onClick={sample}>Autofill demo setup</Button><p className="panel-footnote">Adds example battery, solar and equipment inputs for trying vaccination planning and recovery options. It does not calculate a plan.</p>{demo?<Button type="button" variant="ghost" disabled={busy} onClick={()=>{setDemo(false);setProfileId('normal');setCapacity('');setSolar('');setCharge('');setReserve(String(profiles.find(p=>p.id==='normal')?.defaults.reserve_kwh??0));}}>Use my own components instead</Button>:null}</div>:null}
+   <form onSubmit={async event=>{event.preventDefault();setFormError('');if(step===1){setStep(2);return;}if(step===2){setAgreed(false);setStep(3);return;}await onCreate(body());}}>
+    <fieldset disabled={busy}><FieldGroup>
+    {step===1?<>
+      <Field><FieldLabel htmlFor="setup-name">Clinic name</FieldLabel><Input id="setup-name" required maxLength={120} autoComplete="organization" value={name} onChange={e=>setName(e.target.value)}/></Field>
+      <Field><FieldLabel htmlFor="setup-place">Clinic location</FieldLabel><NativeSelect id="setup-place" required value={place} onChange={e=>{setPlace(e.target.value);const tz=zones[e.target.value]??'';setZone(tz);setDate(tz?tomorrow(tz):'');}}><NativeSelectOption value="">Choose your area</NativeSelectOption>{places.map(p=><NativeSelectOption key={p.id} value={p.id}>{p.name.replace(/\s*\([^)]*\)/,'')}</NativeSelectOption>)}<NativeSelectOption value="other">Another location</NativeSelectOption></NativeSelect><FieldDescription>{selected?'Uses a representative point in this area, not an exact clinic address.':'Select an area or enter your clinic coordinates.'}</FieldDescription></Field>
+      {place==='other'?<><div className="setup-columns"><Field><FieldLabel htmlFor="setup-latitude">Latitude</FieldLabel><Input id="setup-latitude" required type="number" min="-90" max="90" step="any" value={latitude} onChange={e=>setLatitude(e.target.value)}/></Field><Field><FieldLabel htmlFor="setup-longitude">Longitude</FieldLabel><Input id="setup-longitude" required type="number" min="-180" max="180" step="any" value={longitude} onChange={e=>setLongitude(e.target.value)}/></Field></div><Field><FieldLabel htmlFor="setup-timezone">Clinic time zone</FieldLabel><Input id="setup-timezone" required placeholder="For example, Africa/Nairobi" value={zone} onChange={e=>{setZone(e.target.value);setDate(tomorrow(e.target.value));}}/><FieldDescription>Location search is not connected. Copy coordinates from your clinic’s map information.</FieldDescription></Field></>:null}
+      <Field><FieldLabel htmlFor="setup-date">Which day are you planning?</FieldLabel><Input id="setup-date" required type="date" value={date} onChange={e=>setDate(e.target.value)}/>{zone?<FieldDescription>Clinic time: {zone}</FieldDescription>:null}</Field>
+    </>:step===2?<>
+      {demo?<p className="panel-attention" role="status">Demo setup autofilled. These example components are editable and are not your clinic’s measurements.</p>:null}
+      <Field><FieldLabel htmlFor="setup-capacity">Battery storage size (kWh)</FieldLabel><Input id="setup-capacity" required type="number" min="0.001" max="200" step="any" value={capacity} onChange={e=>{if(Number(capacity)>0 && Number(e.target.value)>0 && charge!=='')setCharge(String(Number(capacity)*Number(charge)/Number(e.target.value)));setCapacity(e.target.value);}}/><FieldDescription>Copy the storage capacity from the battery label. This is its size, not how full it is. Changing size preserves any stored-energy assumption already entered.</FieldDescription></Field>
+      <Field><FieldLabel htmlFor="setup-solar">Total solar panel rating (W)</FieldLabel><Input id="setup-solar" required type="number" min="0" max="100000" step="any" value={solar} onChange={e=>setSolar(e.target.value)}/><FieldDescription>Use the installed system’s rating. Enter 0 if there are no solar panels.</FieldDescription></Field>
+      <Field><FieldLabel htmlFor="setup-charge">Expected battery charge at the start of the day (%)</FieldLabel><Input id="setup-charge" required type="number" min="0" max="100" step="any" value={charge} onChange={e=>setCharge(e.target.value)}/><FieldDescription>Your assumption for midnight on {date}. It is separate from a battery reading taken now.</FieldDescription></Field>
+      <p className="panel-footnote">Not sure? Check the labels or ask the person responsible for the power system. LifeLine won’t guess your clinic’s ratings.</p>
+    </>:<>
+      <dl className="setup-review"><div><dt>Clinic</dt><dd>{name}{demo?' · sample electrical setup':''}</dd></div><div><dt>Location</dt><dd>{selected?.name.replace(/\s*\([^)]*\)/,'')??`${latitude}, ${longitude}`}</dd></div><div><dt>Planning day</dt><dd>{date} · {zone}</dd></div><div><dt>Battery size</dt><dd>{capacity} kWh</dd></div><div><dt>Solar rating</dt><dd>{solar} W</dd></div><div><dt>Assumed midnight charge</dt><dd>{charge}%</dd></div></dl>
+      {demo?<div><strong>Example equipment</strong><ul>{preset?.equipment.map(e=><li key={e.id}>{e.name} · {(e.category==='critical'?e.power_kw:e.max_power_kw)*1000} W</li>)}</ul><p className="panel-attention">Sample equipment and settings. These do not describe your clinic.</p></div>:<p>Next, add the equipment your clinic uses—such as fridges, lights or pumps. No example equipment will be added.</p>}
+      <Field><FieldLabel htmlFor="setup-reserve">Battery reserve target (kWh)</FieldLabel><Input id="setup-reserve" type="number" required min="0" max={capacity} step="any" value={reserve} onChange={e=>setReserve(e.target.value)}/><FieldDescription>The stored energy the model should try to keep in reserve. Starts from the standard profile; review this assumption.</FieldDescription></Field>
+      <Disclosure title="Model assumptions to review" keepMounted={false}><p>Charging efficiency: {(defaults?.charge_efficiency??0)*100}%. Discharging efficiency: {(defaults?.discharge_efficiency??0)*100}%. Maximum charging: {defaults?.max_charge_kw} kW. Maximum output: {defaults?.max_discharge_kw} kW.</p><p>These are model assumptions from the standard profile, not measured specifications. You can edit them in Power setup before calculating a plan.</p></Disclosure>
+      <label className="setup-agreement"><input type="checkbox" required checked={agreed} onChange={e=>setAgreed(e.target.checked)}/>I have reviewed the inputs and model assumptions.</label>
+    </>}
+    </FieldGroup></fieldset>
+    <div className="proposal-actions"><Button type="submit" disabled={busy||!preset}>{busy?'Saving clinic…':step===1?'Continue to electrical setup':step===2?'Review setup':demo?'Open the example clinic':'Save setup and add equipment'}</Button>{step>1?<Button type="button" variant="ghost" disabled={busy} onClick={()=>{setStep(step-1);setFormError('');}}>Back</Button>:null}</div>
+   </form>
+   {step===1 && saved?<div className="setup-resume"><p>Already have a saved clinic?</p><Button variant="outline" disabled={busy} onClick={onResume}>Resume {saved.clinic_name}</Button><p className="panel-footnote">Your saved activities and settings stay available. Starting a new clinic creates a separate record.</p></div>:null}
+ </div>;
+}

@@ -2173,3 +2173,20 @@ a {
 .focused-plan-facts dd { font-weight: 600; }
 .draft-shortcut { align-self: flex-start; margin-bottom: 5px; white-space: normal; height: auto; min-height: 44px; text-align: left; }
 .two-page-app .notice-message:has(.inline-plan) { color: var(--foreground); font-size: 15px; }
+.clinic-setup { width: min(100%, 560px); margin: 0 auto; padding: 28px 20px 40px; overflow-y: auto; min-height: 0; }
+.clinic-setup h1 { font-size: clamp(24px, 4vw, 30px); line-height: 1.2; font-weight: 600; letter-spacing: -.6px; margin-bottom: 12px; }
+.clinic-setup h1:focus { outline: none; }
+.clinic-setup > p { color: var(--muted); line-height: 1.6; margin-bottom: 22px; }
+.clinic-setup .setup-step { color: var(--primary); font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.clinic-setup form { margin-block: 24px; }
+.clinic-setup .proposal-actions { margin-top: 24px; }
+.setup-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.setup-review { display: grid; gap: 12px; }
+.setup-review > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 18px; }
+.setup-review dt { color: var(--muted); }.setup-review dd { font-weight: 500; }
+.setup-agreement { display: flex; align-items: flex-start; gap: 12px; line-height: 1.5; cursor: pointer; padding-block: 12px; }
+.setup-agreement input { margin-top: 5px; width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--primary); }
+.setup-resume, .setup-demo { padding-top: 20px; border-top: 1px solid var(--border); }
+.setup-resume > p, .setup-demo > p { margin-block: 10px; }
+.clinic-setup button { min-height: 44px; white-space: normal; height: auto; }
+@media (max-width: 599px) { .clinic-setup { padding: 20px 14px 30px; }.setup-columns { grid-template-columns: 1fr; } }
