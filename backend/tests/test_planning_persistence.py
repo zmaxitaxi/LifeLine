@@ -33,6 +33,26 @@ def test_structured_failure_survives_restart_without_inventing_retry_semantics(t
         assert client.get(f"{BASE}/{state['id']}").json()==state
 
 
+def test_reply_cannot_persist_after_state_changes_before_history_lock(tmp_path):
+    from app.planning_models import SessionAgentResponse
+    from app.planning_state import PlanningError
+    path=tmp_path/'planning.json'
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service,planning_state_path=path)) as client:
+        state=create(client)
+        store=client.app.state.planning
+        old_reply=SessionAgentResponse(mode='local_tool_agent',message='An earlier reply.',
+            needs_clarification=False,state=store.read(state['id']))
+        changed=energy(client,state,{'battery_capacity_kwh':8.})
+        saved=path.read_bytes()
+        with pytest.raises(PlanningError) as error:
+            asyncio.run(store.record_turn(state['id'],'An earlier question.',old_reply))
+        assert error.value.code=='REVISION_CONFLICT'
+        assert path.read_bytes()==saved
+        assert store.conversation(state['id']).messages==[]
+        assert client.get(f"{BASE}/{state['id']}").json()==changed
+
+
 def test_restart_preserves_settings_activity_plan_and_idempotency(tmp_path):
     path = tmp_path / 'state' / 'planning.json'
     service, _ = service_for()

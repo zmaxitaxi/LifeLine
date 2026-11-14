@@ -223,7 +223,9 @@ class PlanningStore:
 
     async def record_turn(self, session_id, question, response):
         async with self.lock:
-            self.read(session_id)
+            # Check while holding the persistence lock: another operator edit
+            # may have completed since the route's pre-persistence check.
+            self.check(session_id, response.state.revision)
             now = datetime.now(timezone.utc)
             user = PlanningMessage(id=str(uuid4()), role='user', content=question, created_at=now)
             assistant = PlanningMessage(id=str(uuid4()), role='assistant', content=response.message,
