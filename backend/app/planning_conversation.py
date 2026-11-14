@@ -527,7 +527,7 @@ def _qualified_coverage(state,sentence,message,calls):
     contexts=[]
     recovery=plan.recovery
     selected=state.selected_recovery_intervention_id
-    if re.search(r'\b(?:existing|baseline|before)\b',sentence,re.I):
+    if re.search(r'\bbaseline\b|\b(?:existing|current)\s+(?:schedule|settings|configuration|plan)\b|\bbefore\s+(?:any\s+)?intervention\b',sentence,re.I):
         contexts=[plan.simulation.baseline.metrics]
     elif recovery and selected and (re.search(r'\b(?:selected|chosen)\b',sentence,re.I) or calls and calls[-1]=='explain_current_plan'):
         contexts=[option.metrics for option in recovery.options+[recovery.existing] if option.id==selected]

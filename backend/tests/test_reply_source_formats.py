@@ -59,6 +59,8 @@ def test_output_and_storage_options_bind_their_own_tested_size_and_result():
         parsed=model_state(state)
         good='The tested battery output alternative at 1.4 kW meets the modeled essential demand and leaves 0.000 kWh of essential shortfall.'
         assert validate_reply_content(good,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==good
+        criteria='Test output: 1.4 kW meets modeled essential demand and is ranked first under the existing criteria.'
+        assert validate_reply_content(criteria,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==criteria
         negative='The tested battery capacity alternative at 10 kWh did not resolve the modeled essential shortfall of 1.200 kWh.'
         assert validate_reply_content(negative,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==negative
         for message in ('Under the current baseline and optimized schedules, 1.200 kWh of essential evening demand (19:00 and 20:00) goes unserved.',
