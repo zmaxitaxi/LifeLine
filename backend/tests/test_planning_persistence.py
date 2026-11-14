@@ -27,7 +27,8 @@ def test_restart_preserves_settings_activity_plan_and_idempotency(tmp_path):
         duplicate = post(client, f"{BASE}/{state['id']}/energy-proposals/{pid}/confirm",
             {'expected_revision': 0, 'idempotency_key': 'settings-click'})
         assert duplicate == state
-    assert os.stat(path).st_mode & 0o777 == 0o600
+    if os.name == 'posix':
+        assert os.stat(path).st_mode & 0o777 == 0o600
     assert not list(path.parent.glob('*.tmp'))
 
 
