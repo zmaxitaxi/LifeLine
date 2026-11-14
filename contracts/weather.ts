@@ -1,9 +1,11 @@
 import type { ForecastLocation } from "./forecast";
+export interface WeatherRuntimeMode { mode: 'live'|'demo'; label: string; description: string }
 
 export type WeatherCondition = "clear" | "mainly_clear" | "partly_cloudy" | "overcast" | "fog" | "drizzle" | "freezing_drizzle" | "rain" | "freezing_rain" | "snow" | "rain_showers" | "snow_showers" | "thunderstorm" | "unavailable";
 export interface WeatherOutlook {
-  source: "Open-Meteo Forecast API";
-  data_kind: "weather_model_current_and_daily_forecast";
+  source: "Open-Meteo Forecast API" | "LifeLine synthetic demo weather";
+  data_kind: "weather_model_current_and_daily_forecast" | "synthetic_demo_weather";
+  weather_mode: "live" | "demo";
   requested_location: ForecastLocation;
   model_grid_location: ForecastLocation;
   timezone: string;

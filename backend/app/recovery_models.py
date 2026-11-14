@@ -81,7 +81,7 @@ class RecoveryOption(StrictModel):
 
 
 class RecoveryResponse(StrictModel):
-    weather_mode: Literal['live_forecast', 'existing_scenario']
+    weather_mode: Literal['live_forecast', 'existing_scenario', 'demo_weather']
     forecast: SolarForecast | None = None
     planning_date: date | None = None
     timezone: str

@@ -37,15 +37,15 @@ def forecast_case(catalog, body, day, forecast, factor):
     equipment = catalog.equipment_for(request, config)
     warnings, recommendations = explain(results, inputs, equipment)
     return SimulationResponse(scenario=request.scenario, scenario_name=catalog.preset(request.scenario).name,
-        data_source='mixed', weather_dataset='open-meteo-forecast', timezone=forecast.timezone,
+        data_source='mixed', weather_dataset='synthetic-demo' if forecast.weather_mode=='demo' else 'open-meteo-forecast', timezone=forecast.timezone,
         cloud_factors=[factor]*24, effective_config=config, pv_performance_ratio=catalog.pv_model.performance_ratio,
         input_provenance={'equipment': 'user_entered_unverified' if request.equipment is not None else 'synthetic',
-                          'weather': 'Open_Meteo_weather_model_forecast',
+                          'weather': 'LifeLine_synthetic_demo_weather' if forecast.weather_mode=='demo' else 'Open_Meteo_weather_model_forecast',
                           'model': 'Horizontal irradiance approximation; reduced-sunshine factor applied once; preset cloud curve replaced.',
                           'initial_battery': 'Operator assumption at selected day’s local midnight; not a carried-forward prediction.'},
         equipment=equipment, assumptions=[f'24 hourly slots for {day.date.isoformat()} in {forecast.timezone}.',
-            f'Forecast retrieved at {forecast.retrieved_at.isoformat()}; cache status: {forecast.cache_status}.',
-            f'Radiation profile multiplied by {factor:g}; identical profile supplied to all three schedules.']+LIMITATIONS,
+            f'{forecast.source}: {forecast.data_kind}; generated/retrieved at {forecast.retrieved_at.isoformat()}; cache status: {forecast.cache_status}.',
+            f'Radiation profile multiplied by {factor:g}; identical profile supplied to all three schedules.']+forecast.warnings+LIMITATIONS,
         diagnosis=diagnose(inputs, results), status=results['optimized']['status'], baseline=results['baseline'],
         heuristic=results['heuristic'], optimized=results['optimized'], comparison=results['comparison'],
         warnings=warnings, recommendations=recommendations)

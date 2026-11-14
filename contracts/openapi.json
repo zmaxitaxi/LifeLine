@@ -6,6 +6,22 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/weather/mode": {
+      "get": {
+        "summary": "Configured Weather Mode",
+        "operationId": "configured_weather_mode_api_weather_mode_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Health",
@@ -3048,6 +3064,15 @@
       },
       "ComputedPlan": {
         "properties": {
+          "weather_mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "demo"
+            ],
+            "title": "Weather Mode",
+            "default": "live"
+          },
           "input_revision": {
             "type": "integer",
             "minimum": 0.0,
@@ -5557,7 +5582,8 @@
             "type": "string",
             "enum": [
               "live_forecast",
-              "existing_scenario"
+              "existing_scenario",
+              "demo_weather"
             ],
             "title": "Weather Mode"
           },
@@ -6343,15 +6369,30 @@
         "properties": {
           "source": {
             "type": "string",
-            "const": "Open-Meteo Forecast API",
+            "enum": [
+              "Open-Meteo Forecast API",
+              "LifeLine synthetic demo weather"
+            ],
             "title": "Source",
             "default": "Open-Meteo Forecast API"
           },
           "data_kind": {
             "type": "string",
-            "const": "weather_model_forecast",
+            "enum": [
+              "weather_model_forecast",
+              "synthetic_demo_weather"
+            ],
             "title": "Data Kind",
             "default": "weather_model_forecast"
+          },
+          "weather_mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "demo"
+            ],
+            "title": "Weather Mode",
+            "default": "live"
           },
           "requested_location": {
             "$ref": "#/components/schemas/ForecastLocation"
@@ -6560,15 +6601,30 @@
         "properties": {
           "source": {
             "type": "string",
-            "const": "Open-Meteo Forecast API",
+            "enum": [
+              "Open-Meteo Forecast API",
+              "LifeLine synthetic demo weather"
+            ],
             "title": "Source",
             "default": "Open-Meteo Forecast API"
           },
           "data_kind": {
             "type": "string",
-            "const": "weather_model_current_and_daily_forecast",
+            "enum": [
+              "weather_model_current_and_daily_forecast",
+              "synthetic_demo_weather"
+            ],
             "title": "Data Kind",
             "default": "weather_model_current_and_daily_forecast"
+          },
+          "weather_mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "demo"
+            ],
+            "title": "Weather Mode",
+            "default": "live"
           },
           "requested_location": {
             "$ref": "#/components/schemas/ForecastLocation"

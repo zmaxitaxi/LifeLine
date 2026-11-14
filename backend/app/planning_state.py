@@ -536,6 +536,7 @@ class PlanningStore:
             if body.include_recovery:
                 recovery = await generate_recovery_plan(context, catalog, SnapshotService(forecast), solve_lock)
             computed = ComputedPlan(input_revision=snapshot.input_revision, generation=generation,
+                weather_mode=forecast.weather_mode,
                 computed_at=datetime.now(timezone.utc), sunshine_factor=snapshot.sunshine_factor,
                 simulation=simulation, recovery=recovery)
         except Exception as exc:

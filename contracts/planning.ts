@@ -6,7 +6,7 @@ export interface ProposedEquipment { id: string; name: string; category?: 'criti
 export interface ActivityDraft { name?: string|null; planning_date?: string|null; start_hour?: number|null; end_hour?: number|null; deadline_hour?: number|null; duration_hours?: number|null; equipment_ids?: string[]|null; equipment_constraints?: EquipmentConstraint[]; additional_equipment?: ProposedEquipment[] }
 export interface Activity { id: string; version: number; status: 'confirmed'; details: ActivityDraft }
 export interface ActivityProposal { id: string; status: 'draft'|'confirmed'|'rejected'; target_activity_id: string|null; base_activity_version: number|null; details: ActivityDraft; missing_fields: string[]; confirmed_activity_id: string|null }
-export interface ComputedPlan { input_revision: number; generation: number; computed_at: string; sunshine_factor: number; simulation: SimulationResponse; recovery: RecoveryResponse|null }
+export interface ComputedPlan { weather_mode: 'live'|'demo'; input_revision: number; generation: number; computed_at: string; sunshine_factor: number; simulation: SimulationResponse; recovery: RecoveryResponse|null }
 export interface BatteryReading { energy_kwh: number; measured_at: string }
 export interface EnergySettingsPatch { battery_capacity_kwh?: number; initial_battery_kwh?: number; reserve_kwh?: number; pv_capacity_kw?: number; charge_efficiency?: number; discharge_efficiency?: number; max_charge_kw?: number; max_discharge_kw?: number }
 export interface EnergySettingsProposal { id: string; status: 'draft'|'confirmed'|'rejected'; base_input_revision: number; settings: EnergySettingsPatch; proposed_energy_settings: EffectiveConfig; current_battery_reading: BatteryReading|null; updates_current_battery_reading: boolean }

@@ -173,7 +173,7 @@ async def generate_recovery_plan(body, catalog, service, solve_lock, progress=No
     next_action = ('Review the proposed equipment times with staff. An energy technician must verify any hypothetical capacity or output change; '
         'this comparison does not authorize purchases or equipment control.')
     planning_date=day.date if day else (date.fromisoformat(load_weather()['local_date']) if clinic.weather_dataset!='synthetic' else None)
-    return RecoveryResponse(weather_mode=body.weather_mode,forecast=forecast,planning_date=planning_date,
+    return RecoveryResponse(weather_mode='demo_weather' if forecast and forecast.weather_mode=='demo' else body.weather_mode,forecast=forecast,planning_date=planning_date,
         timezone=forecast.timezone if forecast else catalog.timezone,sunshine_factor=body.sunshine_factor,reference=reference,
         existing=existing,options=options,problem_detected=bool(triggers),triggers=triggers,
         recommended_option_id=selected.id,smallest_tested_resolving_option_id=smallest.id if smallest else None,

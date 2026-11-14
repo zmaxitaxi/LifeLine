@@ -50,21 +50,31 @@ def validation_details(errors, prefix=()):
 
 
 def create_app(config_path: Path = CONFIG_PATH, forecast_service=None, agent_service=None, outlook_service=None,
-               planning_state_path=None):
+               planning_state_path=None, weather_mode='live'):
+    if weather_mode not in ('live', 'demo'):
+        raise ValueError('Weather mode must be live or demo')
     @asynccontextmanager
     async def lifespan(app):
         app.state.catalog = load_catalog(config_path)
         load_weather()
         importlib.import_module('scipy.optimize')  # preload before accepting requests
         app.state.solve_lock = asyncio.Lock()
-        app.state.forecasts = forecast_service or ForecastService()
+        from .demo_weather import DemoWeatherService, DemoOutlookService
+        app.state.forecasts = forecast_service or (DemoWeatherService() if weather_mode=='demo' else ForecastService())
         app.state.agent = agent_service or LocalAgent()
         app.state.planning = PlanningStore(planning_state_path)
-        app.state.outlooks = outlook_service or WeatherOutlookService()
+        app.state.outlooks = outlook_service or (DemoOutlookService() if weather_mode=='demo' else WeatherOutlookService())
+        app.state.weather_mode = weather_mode
         yield
 
     app = FastAPI(title='LifeLine API', version='1.0', lifespan=lifespan,
                   description='Synthetic energy planning; not for clinical or operational use.')
+
+    @app.get('/api/weather/mode')
+    async def configured_weather_mode(request: Request):
+        return {'mode': request.app.state.weather_mode,
+                'label': 'Demo weather · synthetic sample conditions' if request.app.state.weather_mode=='demo' else 'Live weather · Open-Meteo',
+                'description': 'Sample weather, actual local Llama and real physical calculations.' if request.app.state.weather_mode=='demo' else 'Actual forecasts require a reachable weather provider.'}
 
     @app.exception_handler(PlanningError)
     async def planning_error(request, exc):
@@ -223,4 +233,5 @@ def local_state_path():
     return Path(configured).expanduser() if configured else CONFIG_PATH.parent.parent / '.local' / 'planning-state.json'
 
 
-app = create_app(planning_state_path=local_state_path())
+import os
+app = create_app(planning_state_path=local_state_path(), weather_mode=os.environ.get('LIFELINE_WEATHER_MODE', 'live'))
