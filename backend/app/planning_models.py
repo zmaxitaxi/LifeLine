@@ -20,6 +20,9 @@ class EquipmentConstraint(StrictModel):
     # extend critical hours or narrow divisible flexible windows, never ratings.
     required_hours: list[Hour] | None = None
     allowed_hours: list[Hour] | None = None
+    # Explicit minimum TOTAL DAILY physical-device runtime, not extra work per
+    # activity. Shared references use max with baseline, never duplicate demand.
+    required_duration_hours: Annotated[int, Field(ge=1, le=24)] | None = None
     @model_validator(mode='after')
     def one_kind(self):
         if self.required_hours is not None and self.allowed_hours is not None:

@@ -35,6 +35,21 @@ For flexible equipment, the operator may provide `required_duration_hours` (whol
 
 ## Example sequence
 
+For existing divisible flexible devices, an explicit
+`equipment_constraints[].required_duration_hours` sets a minimum **total daily
+physical-device runtime**, not extra work per activity. Python multiplies the
+known rated power by that runtime. Shared activities use the maximum of the
+baseline work requirement and every confirmed daily-runtime requirement, with
+intersected allowed windows. Thus two references to one pump never create two
+pumps or overwrite another activity's larger requirement. Reducing one reviewed
+runtime leaves the baseline and other confirmed requirements protected. Distinct
+additive jobs on the same device are not separately modeled by this field;
+review the combined daily runtime explicitly. Event `duration_hours` never
+changes electrical demand. This runtime budget cannot shorten essential hours
+or represent a continuous medical-device cycle. The existing fixed baseline
+allocations remain explicit: new work without baseline allocations is reported
+unfinished in that schedule rather than silently scheduled for the operator.
+
 Create session with configured clinic, coordinates, selected ISO date and explicit midnight stored energy. POST proposals with `{expected_revision:0,details:{name:"Vaccination campaign",planning_date:"2026-11-14"}}`. It returns a draft and missing start/end/equipment fields. PATCH the returned proposal ID with `{expected_revision:1,details:{start_hour:9}}`, then `{expected_revision:2,details:{start_hour:10,end_hour:15,equipment_ids:["fridge"]}}`. Omitted keys preserve the draft; null clears a field. Inspect the returned proposal before POST confirm `{expected_revision:3,idempotency_key:"operator-click-001"}`. The returned confirmed activity references the existing fridge once. POST recompute `{expected_revision:<latest>,sunshine_factor:0.5,include_recovery:true}` retains every confirmed activity, fetches actual Open-Meteo weather, then tests 50% of forecast irradiation using the original simulator/MILP and Recovery Planner. Selecting a recovery option records a reviewed comparison selection; it does not install hypothetical hardware.
 
 Session agent uses canonical state on every turn; send only `{expected_revision,question}`. The local model receives current draft/confirmed activity/inventory and chooses native strict tools. It may create/update drafts or compute weather/recovery; it cannot call confirmation or mutate confirmed facts. A conversational “Confirm” returns review instructions with the active proposal; UI invokes the explicit confirm endpoint after review. No repeat questions for known clinic/energy/weather inputs. `timezone` is nullable before a forecast calculation; create optionally accepts a validated IANA `timezone`. Relative-day extraction resolves an absent timezone through actual weather, rather than assuming Nairobi for other coordinates. A network failure still permits manual drafting by exact selected date. Local unavailability is explicit and leaves drafts intact.

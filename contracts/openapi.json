@@ -3720,6 +3720,19 @@
               }
             ],
             "title": "Allowed Hours"
+          },
+          "required_duration_hours": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 24.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Required Duration Hours"
           }
         },
         "additionalProperties": false,

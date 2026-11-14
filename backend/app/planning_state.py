@@ -101,6 +101,8 @@ def validate_activity(details, state, *, complete=True, target=None):
             raise PlanningError('INVALID_ACTIVITY', 'Fixed operating constraints require critical equipment; continuous cycles are unsupported for divisible flexible tasks.')
         if constraint.allowed_hours is not None and equipment.category != 'flexible':
             raise PlanningError('INVALID_ACTIVITY', 'Essential equipment cannot be shortened, moved or made flexible.')
+        if constraint.required_duration_hours is not None and equipment.category != 'flexible':
+            raise PlanningError('INVALID_ACTIVITY', 'Daily runtime budgets apply only to explicitly divisible flexible equipment. Essential required hours remain protected.')
         hours = constraint.required_hours if constraint.required_hours is not None else constraint.allowed_hours
         if hours is not None:
             validate_hours(hours, details)
@@ -143,6 +145,11 @@ def compile_clinic(state, activities=None, inventory=None):
                         allocations.append(RequestedTaskAllocation(hour=hour, requested_kwh=energy))
                     remaining -= energy
                 item.baseline_allocations = allocations
+            if constraint.required_duration_hours is not None:
+                item.required_energy_kwh = max(item.required_energy_kwh,
+                    item.max_power_kw * constraint.required_duration_hours)
+                if item.required_energy_kwh > len(item.allowed_hours) * item.max_power_kw + 1e-7:
+                    raise PlanningError('INVALID_ACTIVITY', 'The shared device daily work requirement cannot fit its combined allowed hours.')
     try:
         return SimulationRequest.model_validate(state.clinic.model_dump(exclude_unset=True) |
             {'equipment': [e.model_dump() for e in equipment.values()]})

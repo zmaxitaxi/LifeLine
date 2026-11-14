@@ -1,7 +1,7 @@
 import type { Equipment, SimulationRequest, SimulationResponse, EffectiveConfig } from './api';
 import type { ForecastLocation, SolarForecast } from './forecast';
 import type { RecoveryResponse } from './recovery';
-export interface EquipmentConstraint { equipment_id: string; required_hours?: number[] | null; allowed_hours?: number[] | null }
+export interface EquipmentConstraint { equipment_id: string; required_hours?: number[] | null; allowed_hours?: number[] | null; /** Minimum TOTAL DAILY device runtime; shared requirements aggregate by max with baseline, not addition. */ required_duration_hours?: number|null }
 export interface ProposedEquipment { id: string; name: string; category?: 'critical'|'flexible'|null; power_kw?: number|null; required_hours?: number[]|null; max_power_kw?: number|null; required_energy_kwh?: number|null; required_duration_hours?: number|null; allowed_hours?: number[]|null; divisible?: true|null }
 export interface ActivityDraft { name?: string|null; planning_date?: string|null; start_hour?: number|null; end_hour?: number|null; deadline_hour?: number|null; duration_hours?: number|null; equipment_ids?: string[]|null; equipment_constraints?: EquipmentConstraint[]; additional_equipment?: ProposedEquipment[] }
 export interface Activity { id: string; version: number; status: 'confirmed'; details: ActivityDraft }
