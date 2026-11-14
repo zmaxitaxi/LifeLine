@@ -148,7 +148,14 @@ async def stream_agent(session_id: str, body: SessionAgentRequest, request: Requ
         queue = asyncio.Queue()
         loop = asyncio.get_running_loop()
         def emit(event):
-            loop.call_soon_threadsafe(queue.put_nowait, event)
+            try:
+                on_loop = asyncio.get_running_loop() is loop
+            except RuntimeError:
+                on_loop = False
+            if on_loop:
+                queue.put_nowait(event)
+            else:
+                loop.call_soon_threadsafe(queue.put_nowait, event)
         async def work():
             try:
                 response = await run_agent(session_id, body, request, emit)
