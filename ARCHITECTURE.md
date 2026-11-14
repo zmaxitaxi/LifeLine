@@ -1,6 +1,6 @@
 # LifeLine architecture
 
-The original architecture is retained: React/Vite + shadcn/Tailwind → FastAPI → validated model inputs → baseline/heuristic/MILP → independent physical checks → typed results and deterministic explanations.
+The original numerical architecture is retained: React/Vite + shadcn/Tailwind → FastAPI → validated model inputs → baseline/heuristic/MILP → independent physical checks → typed results. The primary session assistant uses local Llama for native tool selection and natural conversation; numerical facts always originate in Python. Legacy stateless endpoints retain their existing deterministic renderers.
 
 ## Data paths
 
@@ -26,11 +26,41 @@ All three methods within a comparison receive the exact same immutable `ModelInp
 | `backend/app/forecast_routes.py` | Additive HTTP endpoints |
 | `backend/app/solar_forecast.py` | Existing synthetic generator plus shared irradiation-to-PV conversion |
 | `backend/app/energy_simulator.py`, `optimizer.py`, `heuristic.py` | Existing dispatch, optimization and comparator; unchanged |
-| `frontend/src/components/LiveForecastPlanner.tsx` | Location, provenance, explicit midnight assumption, computed schedules, uncertainty and errors |
+| `backend/app/planning_models.py`, `planning_state.py`, `planning_routes.py` | Canonical revisioned sessions, staged activities/settings, confirmation, result freshness and recovery selection |
+| `backend/app/energy_settings_models.py`, `energy_settings_agent.py` | Reviewed energy settings, separate timestamped current reading, native source guards and Python percentage conversion |
+| `backend/app/planning_agent.py`, `planning_conversation.py` | Primary session-based natural local-model conversation and numerical grounding |
+| `backend/app/planning_persistence.py` | Atomic private local snapshots for single-process restart recovery |
+| `backend/app/weather_outlook.py` | Independent current and seven-day weather adapter, distinct from hourly energy forecasts |
+| `frontend/src/features/planning/` | Two-page assistant/Overview, activity and energy review forms, scoped results and restored chat |
 
 Forecast calls run asynchronously; the existing solve lock and worker thread serialize MILP work without blocking health/catalog requests. Forecast service clocks/transports are injected for offline unit/integration tests. The local cache is bounded and does not constitute durable storage or a distributed deployment cache.
 
 ## Assistant boundary
+
+The primary UI calls `/api/planning/sessions/{id}/agent`. Canonical inputs and
+recent user/assistant messages provide context; ordinary conversation may return
+genuine direct model prose. Llama chooses among state-valid native tools without
+keyword-forced social/explanation subsets. Planning tools provide actual weather,
+staged requirements and computed results. Relevant option IDs and schedule
+presentation are explicit metadata, bound to the actual input revision and
+calculation generation. There is no requirement to display every alternative or
+run a calculator for a greeting. Unevaluated ideas are labeled as such.
+
+Activity and energy-setting tools can stage proposals; only the operator's
+explicit confirmation API can adopt them. Confirmed edits invalidate/recalculate
+the plan. A current battery reading with a timestamp is separate from the
+selected-day midnight assumption. Increasing capacity preserves absolute initial
+stored energy. Shared flexible-device daily-runtime constraints take the maximum
+of baseline and confirmed daily work budgets using one device; event duration
+alone adds no electrical demand. Exact-selected-plan explanations are read-only.
+
+Production sessions, idempotency receipts, original dated computed results and
+recent conversation persist in atomic private local snapshots. Revision and
+generation checks prevent obsolete calculations from installing. Interrupted
+calculations restore as failed. The local snapshot is not a multi-process or
+distributed database. [Settings and persistence details](docs/ENERGY_SETTINGS_AND_LOCAL_STATE.md).
+
+## Preserved stateless APIs
 
 The selected provider is **local Ollama with Llama 3.1 8B**. `GET /api/agent/status` verifies an installed model with tool capability and rejects cloud/remote model records. `POST /api/agent/ask` receives the operator's reviewed clinic, location, explicit midnight charge, question and bounded user-question history. It reads the current configuration, asks the local model for a native tool call, validates its name/arguments, and executes existing Python planning functions. Model requests use a fixed loopback URL, no provider key, a bounded context/output, at most three selections and an overall request timeout. Generated prose is never rendered as an energy answer; assessments/actions/numbers are generated from actual tool results. This is genuine LLM tool selection with a deterministic result renderer, not free-form model reasoning presented as numerical evidence.
 
@@ -38,8 +68,8 @@ The operator context remains authoritative. New fixed-equipment proposals requir
 
 The recovery tool computes alternatives through those same numerical functions. It ranks essential coverage, reserve protection, completion of original flexible work and normalized change magnitude, with every candidate and remaining deficit exposed. A larger battery keeps the same initial stored kWh. Explicitly postponed work stays unfinished against the original denominator. Known configured inputs can be used without repeated review prompts via `use_configured_context`; confirmed starting percentages remain distinct from current readings. The selected sensitivity and pending fixed requirement can travel through `context_sunshine_factor` and `active_requirement`. See [recovery contracts and limitations](RECOVERY_PLANNER.md).
 
-Native local templates sometimes encode numeric/list arguments as JSON strings. A narrow provider adapter decodes only known numeric/list fields before strict validation. HTTP user inputs remain strict. Unknown tools, unsupported arguments and malformed responses cannot execute code or write configuration. Missing inputs produce focused backend-authored questions.
+Native local templates sometimes encode numeric/list arguments as JSON strings. A narrow provider adapter decodes only known numeric/list fields before strict validation. HTTP user inputs remain strict. Unknown tools, unsupported arguments and malformed responses cannot execute code or adopt configuration. The primary session chat uses model-authored missing-input questions; preserved stateless endpoints can return their existing structured clarifications.
 
-The original `/api/assistant` offline rule-based editor and `/api/planner/ask` guided forecast workflow remain unchanged. Local-model connection failures, invalid calls and busy/timeout cases disclose deterministic fallback. Weather errors propagate as unavailable rather than inventing a forecast. Historical/synthetic planning remains an explicit offline alternative.
+The original `/api/assistant` offline rule-based editor and `/api/planner/ask` guided forecast workflow remain unchanged. Their fallback behavior is separate from primary session chat, where local-model failure returns a retry with completed state preserved. Weather errors propagate as unavailable rather than inventing a forecast. Historical/synthetic numerical planning remains an explicit offline alternative.
 
 Wajo authenticated discovery and a harmless greeting were tested separately. The application neither loads its credential nor invokes Fo. No Claude integration or hosted-LLM validation is claimed. See [architecture decision and proof](WAJO_INVESTIGATION.md).
