@@ -25,3 +25,13 @@ Validation:
 ```
 
 Real-inference evidence is recorded separately from the implementation commit. Test transports deliberately synthesize model replies for regressions and are not evidence of genuine local inference.
+
+Genuine inference observations (unforced native protocol):
+
+- The energy-settings proposal and same-draft correction passed with the real local model: 22.50 seconds and 23.88 seconds, with zero weather calls. Python converted the proposed 12 kWh battery's 50% day-start assumption to 6 kWh and its separate 20% current reading to 2.4 kWh. Changing the starting assumption to 40% produced 4.8 kWh without changing the current reading or active configuration.
+- Initial exact clinic/weather question attempts printed a malformed function-call envelope as ordinary content (including Python `True`). Nothing was executed from this text. Explicit native-channel/JSON correction subsequently produced a genuine native calculator call. The live forecast attempt then returned `FORECAST_UNAVAILABLE`; no computed result was claimed. Those failed artifacts remain failure evidence.
+- Ordinary greeting, help and unevaluated-idea turns used genuine model-authored content with no weather or state changes. Some initial wording echoed the question; the output guard now rejects a full request echo. Authored text can still be awkward or require retry.
+
+Failed calculation status and its public code are supplied back to the model without private provider text or speculative diagnoses. An unavailable result requested by the model can be handled conversationally; actual state revision conflicts still propagate. Plain replies and computed explanations retain numerical/source and confirmation checks. Recorded timings measure complete local HTTP turns, not just token generation. They are observations, not latency guarantees.
+
+The user subsequently authorized filler weather for a demo. `scripts/check_conversation_agent.py --weather synthetic-demo` explicitly labels that evidence **SYNTHETIC DEMO WEATHER; actual local Llama, real existing physics**. Such a run is not proof of live weather access. Forecast source/data-kind labels are passed to the model; there is no hidden fallback in this agent.

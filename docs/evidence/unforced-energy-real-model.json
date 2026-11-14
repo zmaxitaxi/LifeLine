@@ -1,0 +1,330 @@
+{
+  "started_at": "2026-11-14T01:45:26.197722+00:00",
+  "implementation_commit": "1e553e95bbf1bd7fc1f7822213847ffe654a0999",
+  "backend_uncommitted_changes": false,
+  "scope": "Genuine local native content/tool choices. Weather is actual Open-Meteo; all numerical state comes from the existing model. Compact snapshots retain computed metrics, tested alternatives and forecast provenance.",
+  "turns": [
+    {
+      "question": "For review, set our battery capacity to 12 kWh. The current reading is 20%, and for tomorrow assume a 50% starting charge at midnight. Do not apply the draft yet.",
+      "seconds": 22.500392500311136,
+      "weather_calls": 0,
+      "http_status": 200,
+      "native_turns": [
+        {
+          "turn": {
+            "type": "tool_call",
+            "call": {
+              "index": 0,
+              "name": "propose_energy_settings",
+              "arguments": {
+                "battery_capacity_kwh": 12,
+                "current_battery_pct": 20,
+                "initial_battery_pct": 50
+              }
+            },
+            "content": ""
+          },
+          "seconds": 8.3259246670641,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "The proposed energy settings are:\n\n* Battery capacity: 12 kWh\n* Day-start stored energy: 6 kWh\n* Reserve: 1 kWh\n* PV rated power: 1.5 kW\n* Charging limit: 4 kW\n* Output limit: 0.4 kW\n* Charge efficiency: 95%\n* Discharge efficiency: 95%\n\nThese settings are not active until explicit operator confirmation. The current stored-energy reading is 2.4 kWh, which is separate from the proposed day-start stored energy."
+          },
+          "seconds": 14.130768166854978,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "update_energy_settings_draft",
+            "respond_to_user"
+          ]
+        }
+      ],
+      "passed": true,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "The proposed energy settings are:\n\n* Battery capacity: 12 kWh\n* Day-start stored energy: 6 kWh\n* Reserve: 1 kWh\n* PV rated power: 1.5 kW\n* Charging limit: 4 kW\n* Output limit: 0.4 kW\n* Charge efficiency: 95%\n* Discharge efficiency: 95%\n\nThese settings are not active until explicit operator confirmation. The current stored-energy reading is 2.4 kWh, which is separate from the proposed day-start stored energy.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "propose_energy_settings"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "fa140c04-9815-418a-94b3-b178e15c8258",
+        "user_message_id": "bf6d0d02-d58f-47c8-b5e0-a1385581a871"
+      },
+      "state": {
+        "id": "d64c26b7-4357-4128-87cf-848cc970c641",
+        "revision": 1,
+        "input_revision": 0,
+        "selected_clinic_id": "illustrative-energy",
+        "clinic_name": "Illustrative native verification",
+        "location": {
+          "latitude": -0.0917,
+          "longitude": 34.768
+        },
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "clinic": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "max_discharge_kw": 0.4,
+          "scenario": "normal",
+          "equipment": [
+            {
+              "id": "evening",
+              "name": "Illustrative essential evening equipment",
+              "category": "critical",
+              "power_kw": 1.0,
+              "required_hours": [
+                19,
+                20
+              ]
+            }
+          ],
+          "weather_dataset": "synthetic"
+        },
+        "equipment_inventory": [
+          {
+            "id": "evening",
+            "name": "Illustrative essential evening equipment",
+            "category": "critical",
+            "power_kw": 1.0,
+            "required_hours": [
+              19,
+              20
+            ]
+          }
+        ],
+        "energy_settings": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "charge_efficiency": 0.95,
+          "discharge_efficiency": 0.95,
+          "max_charge_kw": 4.0,
+          "max_discharge_kw": 0.4,
+          "additional_critical_kw": 0.0
+        },
+        "current_battery_reading": null,
+        "energy_proposals": [
+          {
+            "id": "5a4c6f86-f832-44a8-9815-1961d254a728",
+            "status": "draft",
+            "base_input_revision": 0,
+            "settings": {
+              "battery_capacity_kwh": 12.0,
+              "initial_battery_kwh": 6.0
+            },
+            "proposed_energy_settings": {
+              "battery_capacity_kwh": 12.0,
+              "initial_battery_kwh": 6.0,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "current_battery_reading": {
+              "energy_kwh": 2.4,
+              "measured_at": "2026-11-14T01:45:34.889226Z"
+            },
+            "updates_current_battery_reading": true
+          }
+        ],
+        "active_energy_proposal_id": "5a4c6f86-f832-44a8-9815-1961d254a728",
+        "confirmed_activities": [],
+        "proposals": [],
+        "active_proposal_id": null,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "selected_recovery_intervention_id": null,
+        "sunshine_factor": 1.0
+      }
+    },
+    {
+      "question": "Actually use a 40% starting battery charge in that same draft. Leave the current reading alone.",
+      "seconds": 23.876606207806617,
+      "weather_calls": 0,
+      "http_status": 200,
+      "native_turns": [
+        {
+          "turn": {
+            "type": "tool_call",
+            "call": {
+              "index": 0,
+              "name": "update_energy_settings_draft",
+              "arguments": {
+                "initial_battery_pct": 40
+              }
+            },
+            "content": ""
+          },
+          "seconds": 17.157992042135447,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "update_energy_settings_draft",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "The proposed energy settings have been updated to reflect a 40% starting battery charge. The proposed day-start stored energy is now 4.8 kWh. The current stored-energy reading remains unchanged at 2.4 kWh."
+          },
+          "seconds": 6.669402375351638,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "update_energy_settings_draft",
+            "respond_to_user"
+          ]
+        }
+      ],
+      "passed": true,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "The proposed energy settings have been updated to reflect a 40% starting battery charge. The proposed day-start stored energy is now 4.8 kWh. The current stored-energy reading remains unchanged at 2.4 kWh.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [
+          "update_energy_settings_draft"
+        ],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "2e7bb704-ede0-4f56-bbcb-87af158c98b4",
+        "user_message_id": "720a792f-6896-48a7-8789-1eeb6072d593"
+      },
+      "state": {
+        "id": "d64c26b7-4357-4128-87cf-848cc970c641",
+        "revision": 2,
+        "input_revision": 0,
+        "selected_clinic_id": "illustrative-energy",
+        "clinic_name": "Illustrative native verification",
+        "location": {
+          "latitude": -0.0917,
+          "longitude": 34.768
+        },
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "clinic": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "max_discharge_kw": 0.4,
+          "scenario": "normal",
+          "equipment": [
+            {
+              "id": "evening",
+              "name": "Illustrative essential evening equipment",
+              "category": "critical",
+              "power_kw": 1.0,
+              "required_hours": [
+                19,
+                20
+              ]
+            }
+          ],
+          "weather_dataset": "synthetic"
+        },
+        "equipment_inventory": [
+          {
+            "id": "evening",
+            "name": "Illustrative essential evening equipment",
+            "category": "critical",
+            "power_kw": 1.0,
+            "required_hours": [
+              19,
+              20
+            ]
+          }
+        ],
+        "energy_settings": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "charge_efficiency": 0.95,
+          "discharge_efficiency": 0.95,
+          "max_charge_kw": 4.0,
+          "max_discharge_kw": 0.4,
+          "additional_critical_kw": 0.0
+        },
+        "current_battery_reading": null,
+        "energy_proposals": [
+          {
+            "id": "5a4c6f86-f832-44a8-9815-1961d254a728",
+            "status": "draft",
+            "base_input_revision": 0,
+            "settings": {
+              "battery_capacity_kwh": 12.0,
+              "initial_battery_kwh": 4.8
+            },
+            "proposed_energy_settings": {
+              "battery_capacity_kwh": 12.0,
+              "initial_battery_kwh": 4.8,
+              "reserve_kwh": 1.0,
+              "pv_capacity_kw": 1.5,
+              "charge_efficiency": 0.95,
+              "discharge_efficiency": 0.95,
+              "max_charge_kw": 4.0,
+              "max_discharge_kw": 0.4,
+              "additional_critical_kw": 0.0
+            },
+            "current_battery_reading": {
+              "energy_kwh": 2.4,
+              "measured_at": "2026-11-14T01:45:34.889226Z"
+            },
+            "updates_current_battery_reading": true
+          }
+        ],
+        "active_energy_proposal_id": "5a4c6f86-f832-44a8-9815-1961d254a728",
+        "confirmed_activities": [],
+        "proposals": [],
+        "active_proposal_id": null,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "selected_recovery_intervention_id": null,
+        "sunshine_factor": 1.0
+      }
+    }
+  ],
+  "passed": true
+}
