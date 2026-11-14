@@ -61,6 +61,9 @@ export function activityView(
         : e.max_power_kw != null
           ? `Up to ${num(e.max_power_kw * 1000, 0)} W`
           : "Power rating needed",
+      ...(e.required_duration_hours != null ? [`${e.required_duration_hours} whole hours at the rated power`] : []),
+      ...(e.required_energy_kwh != null ? [`${num(e.required_energy_kwh)} kWh requested`] : []),
+      ...(e.divisible === true ? ["Work can pause and resume"] : []),
       e.required_hours
         ? timeRanges(e.required_hours)
         : e.allowed_hours
@@ -81,7 +84,8 @@ export function activityView(
     category: "review whether essential or flexible",
     required_hours: "hours when it must run",
     allowed_hours: "hours when it may run",
-    required_energy_kwh: "operator-reviewed electricity requirement (kWh)",
+    required_energy_kwh: "how many hours this device must run at its rated power, or its known energy requirement",
+    required_duration_hours: "how many whole hours this device must run at its rated power",
     divisible: "confirmation that the work can be split and interrupted",
   };
   const missingLabel = (field: string) => {

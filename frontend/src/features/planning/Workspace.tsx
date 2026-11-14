@@ -47,7 +47,7 @@ export function Workspace({
     }
   }, [page, section]);
   return (
-    <div className="chat-app two-page-app">
+    <div className="chat-app two-page-app" data-page={page}>
       <a
         className="skip-link"
         href={page === "assistant" ? "#chat-input" : "#overview-title"}

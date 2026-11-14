@@ -1,266 +1,79 @@
 import { test, expect } from "@playwright/test";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  assistant,
-  overview,
-  open,
-  seed,
-  weatherFailure,
-  proposal,
-  apiBase,
-  read,
-  readyDraft,
-  confirm,
-} from "./support/planning";
-test.beforeEach(() => weatherFailure(false));
-test.afterEach(() => weatherFailure(false));
+import { tmpdir } from "node:os";
+import { open, seed, read, calculate, say, overview, assistant, weatherFailure } from "./support/planning";
+test.beforeEach(() => weatherFailure(false)); test.afterEach(() => weatherFailure(false));
 
-test("exactly two primary destinations preserve the conversation and unsent input", async ({
-  page,
-  request,
-}) => {
-  const errors: string[] = [];
-  page.on("pageerror", (e) => errors.push(e.message));
-  page.on("console", (m) => {
-    if (m.type() === "error") errors.push(m.text());
-  });
-  await open(page, await seed(request));
-  await expect(page).toHaveTitle(/LifeLine/);
-  const navigation = page.getByRole("navigation", {
-    name: "Primary navigation",
-    exact: true,
-  });
-  await expect(navigation.getByRole("link")).toHaveCount(2);
-  await expect(assistant(page)).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("battery-playback")).toHaveCount(0);
-  await expect(page.locator(".chat-weather")).not.toContainText(
-    /Open-Meteo|cached forecast|updated/,
-  );
-  await expect(
-    page.getByText("No current verified energy plan.", { exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page
-      .locator('.chat-suggestions[aria-label="Suggested questions"]')
-      .getByRole("button", { name: "Calculate plan", exact: true }),
-  ).toBeVisible();
-  await page
-    .getByRole("textbox", { name: "Message LifeLine", exact: true })
-    .fill("We need to plan tomorrow’s clinic work");
-  await overview(page).click();
-  await expect(overview(page)).toHaveAttribute("aria-current", "page");
-  await expect(
-    page.getByRole("heading", { name: "Clinic Overview", exact: true }),
-  ).toBeVisible();
-  for (const name of [
-    "Activities & Equipment",
-    "Weather",
-    "Battery & Energy",
-    "Solutions",
-  ])
-    await expect(
-      page.getByRole("heading", { name, exact: true }),
-    ).toBeVisible();
-  await assistant(page).click();
-  await expect(assistant(page)).toHaveAttribute("aria-current", "page");
-  await expect(
-    page.getByRole("textbox", { name: "Message LifeLine", exact: true }),
-  ).toHaveValue("We need to plan tomorrow’s clinic work");
-  await expect(page.locator("vite-error-overlay")).toHaveCount(0);
-  expect(errors).toEqual([]);
-  await page.screenshot({
-    path: join(tmpdir(), "lifeline-two-page-assistant.png"),
-  });
+test("the overview fills the workspace with four equal desktop quadrants", async ({ page, request }) => {
+  await page.setViewportSize({ width:1280,height:900 });
+  await open(page, await calculate(request, await seed(request))); await overview(page).click(); await expect(overview(page)).toHaveAttribute("aria-current","page");
+  const panels = page.locator(".overview-grid > .overview-square"); await expect(panels).toHaveCount(4);
+  const boxes = await panels.evaluateAll(elements => elements.map(e => { const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}; }));
+  for (const box of boxes) {expect(Math.abs(box.width-boxes[0].width)).toBeLessThan(2);expect(Math.abs(box.height-boxes[0].height)).toBeLessThan(2);}
+  const grid=await page.locator('.overview-grid').boundingBox();expect(grid!.width).toBeGreaterThan(1180);expect(boxes[3].y+boxes[3].height).toBeGreaterThan(860);expect(boxes[3].y+boxes[3].height).toBeLessThan(900);
+  await expect(page.getByRole('slider',{name:'Simulation time',exact:true})).toBeVisible();await expect(page.getByRole('radio',{name:'Current plan',exact:true})).toBeVisible();
+  expect(Math.abs(boxes[0].y-boxes[1].y)).toBeLessThan(2); expect(boxes[2].y).toBeGreaterThan(boxes[0].y); expect(Math.abs(boxes[2].y-boxes[3].y)).toBeLessThan(2);
+  for (const name of ["Activities & Equipment","Weather","Battery & Energy","Plans"]) await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Add equipment",exact:true})).toBeVisible();
+  await page.screenshot({path:join(tmpdir(),"lifeline-four-square-overview.png")});
 });
 
-test("manual creation and editing use the same revisioned activity state as chat", async ({
-  page,
-  request,
-}) => {
-  const initial = await seed(request);
-  await open(page, initial);
-  await overview(page).click();
-  await expect(overview(page)).toHaveAttribute("aria-current", "page");
-  await page
-    .getByRole("button", { name: "Add activity manually", exact: true })
-    .click();
-  const card = proposal(page);
-  await card
-    .getByLabel("Activity name", { exact: true })
-    .fill("Morning vaccination clinic");
-  await card.getByLabel("Start hour (0–23)", { exact: true }).fill("9");
-  await card.getByLabel("Finish hour (1–24)", { exact: true }).fill("15");
-  await card
-    .getByRole("checkbox", { name: "Vaccine refrigerator", exact: true })
-    .check();
-  await card.getByRole("checkbox", { name: /I reviewed this list/ }).check();
-  await card
-    .getByRole("button", { name: "Save draft for review", exact: true })
-    .click();
-  await expect(
-    card.getByRole("button", { name: "Confirm", exact: true }),
-  ).toBeEnabled();
-  expect((await read(request, initial.id)).confirmed_activities).toHaveLength(
-    0,
-  );
-  await confirm(page);
-  await expect(page.getByTestId("confirmed-activity")).toContainText(
-    "Morning vaccination clinic",
-  );
-  await page
-    .getByRole("button", { name: "Edit activity", exact: true })
-    .click();
-  await proposal(page)
-    .getByLabel("Start hour (0–23)", { exact: true })
-    .fill("10");
-  await proposal(page)
-    .getByRole("button", { name: "Save draft for review", exact: true })
-    .click();
-  const before = await read(request, initial.id);
-  expect(before.confirmed_activities[0].details.start_hour).toBe(9);
-  await confirm(page);
-  const after = await read(request, initial.id);
-  expect(after.confirmed_activities).toHaveLength(1);
-  expect(after.confirmed_activities[0].details.start_hour).toBe(10);
-  expect(after.confirmed_activities[0].version).toBe(2);
-  await assistant(page).click();
-  await expect(assistant(page)).toHaveAttribute("aria-current", "page");
-  await expect(
-    page.getByTestId("current-plan-summary").filter({ visible: true }),
-  ).toBeVisible();
-  await page
-    .getByRole("textbox", { name: "Message LifeLine", exact: true })
-    .fill("Calculate the energy plan.");
-  const sent = page.waitForRequest((r) => /\/agent$/.test(r.url()));
-  await page.getByRole("button", { name: "Send message", exact: true }).click();
-  expect((await sent).postDataJSON()).toEqual({
-    expected_revision: after.revision,
-    question: "Calculate the energy plan.",
-  });
+test("page navigation preserves the conversation and unsent message", async ({ page, request }) => {
+  await open(page, await seed(request)); await say(page,"Hello");
+  const textbox=page.getByRole("textbox",{name:"Message LifeLine",exact:true}); await textbox.fill("I want to change the clinic work");
+  await overview(page).click(); await expect(overview(page)).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("navigation",{name:"Primary navigation"}).getByRole("link")).toHaveCount(2);
+  await assistant(page).click(); await expect(assistant(page)).toHaveAttribute("aria-current","page");
+  await expect(textbox).toHaveValue("I want to change the clinic work"); await expect(page.locator(".assistant-message")).toContainText("Hello!");
 });
 
-test("a revision conflict refreshes for review and never silently replays confirmation", async ({
-  page,
-  request,
-}) => {
-  const state = await seed(request);
-  await open(page, state);
-  await readyDraft(page);
-  const current = await read(request, state.id);
-  const external = await request.patch(
-    `${apiBase}/${state.id}/proposals/${current.active_proposal_id}`,
-    {
-      data: {
-        expected_revision: current.revision,
-        details: { start_hour: 10 },
-      },
-    },
-  );
-  expect(external.ok()).toBe(true);
-  await confirm(page);
-  await expect(page.getByRole("alert")).toContainText(
-    "shared plan changed elsewhere",
-  );
-  expect((await read(request, state.id)).confirmed_activities).toHaveLength(0);
-  await expect(proposal(page)).toContainText("10:00–15:00");
-  await confirm(page);
-  expect((await read(request, state.id)).confirmed_activities).toHaveLength(1);
+test("equipment can be entered from Overview but is proposed by the LLM and confirmed separately", async ({ page, request }) => {
+  const state=await seed(request); await open(page,state); await overview(page).click(); await expect(overview(page)).toHaveAttribute("aria-current","page");
+  await page.getByRole("button",{name:"Add equipment",exact:true}).click(); const dialog=page.getByRole("dialog",{name:"Add clinic equipment",exact:true});
+  await dialog.getByRole("textbox",{name:"Equipment name",exact:true}).fill("Campaign light"); await dialog.getByRole("spinbutton",{name:"Power rating on the label (W)",exact:true}).fill("200");
+  await dialog.getByRole("combobox",{name:"Does it need protected power?",exact:true}).selectOption("critical"); await dialog.getByRole("combobox",{name:"Start time",exact:true}).selectOption("10"); await dialog.getByRole("combobox",{name:"Finish time",exact:true}).selectOption("12");
+  expect((await read(request,state.id)).equipment_inventory).toHaveLength(2);
+  const sent=page.waitForRequest(r=>r.url().endsWith("/agent")); await dialog.getByRole("button",{name:"Review with LifeLine",exact:true}).click();
+  expect((await sent).postDataJSON().question).toContain("200 W"); await expect(dialog).not.toBeVisible();
+  const draft=page.locator('[data-testid="activity-proposal"]:visible'); await expect(draft).toContainText("Campaign light"); await expect(draft).toContainText("200 W");
+  expect((await read(request,state.id)).equipment_inventory).toHaveLength(2);
+  await draft.getByRole("button",{name:"Confirm",exact:true}).click(); await expect(page.locator("#chat-input")).toBeEditable();
+  const confirmed=await read(request,state.id); expect(confirmed.equipment_inventory).toHaveLength(3); expect(confirmed.computed_plan!.simulation.optimized.metrics.critical_requested_kwh).toBeCloseTo(2.8,8);
 });
 
-test("mobile and keyboard navigation keep controls readable and usable", async ({
-  page,
-  request,
-}) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  await open(page, await seed(request));
-  await overview(page).focus();
-  await page.keyboard.press("Enter");
-  await expect(
-    page.getByRole("heading", { name: "Clinic Overview", exact: true }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Add activity manually", exact: true })
-    .focus();
-  await page.keyboard.press("Enter");
-  await expect(
-    proposal(page).getByLabel("Activity name", { exact: true }),
-  ).toBeVisible();
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
-  const button = await proposal(page)
-    .getByRole("button", { name: "Save draft for review", exact: true })
-    .boundingBox();
-  expect(button!.height).toBeGreaterThanOrEqual(44);
-  await assistant(page).focus();
-  await page.keyboard.press("Enter");
-  await expect(
-    page.getByRole("textbox", { name: "Message LifeLine", exact: true }),
-  ).toBeVisible();
+test("mobile panels stack and equipment form supports keyboard and unknown ratings", async ({ page, request }) => {
+  await page.setViewportSize({width:375,height:812}); await open(page,await seed(request)); await overview(page).focus(); await page.keyboard.press("Enter"); await expect(overview(page)).toHaveAttribute("aria-current","page");
+  const boxes=await page.locator(".overview-square").evaluateAll(elements=>elements.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
+  for (let index=0;index<boxes.length;index++){expect(boxes[index].height).toBe(520);if(index)expect(boxes[index].y).toBeGreaterThan(boxes[index-1].y);}
+  await page.getByRole("button",{name:"Add equipment",exact:true}).focus(); await page.keyboard.press("Enter"); const dialog=page.getByRole("dialog",{name:"Add clinic equipment",exact:true});
+  await expect(dialog.getByRole("textbox",{name:"Equipment name",exact:true})).toBeFocused(); await page.keyboard.press("Escape"); await expect(dialog).toBeHidden(); await expect(page.getByRole("button",{name:"Add equipment",exact:true})).toBeFocused();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
-test("an expired server session requires an explicit new-session action", async ({
-  page,
-}) => {
-  let creations = 0;
-  page.on("request", (req) => {
-    if (req.url().endsWith("/api/planning/sessions") && req.method() === "POST")
-      creations++;
-  });
-  await page.addInitScript(() =>
-    localStorage.setItem("lifeline.planning-session.v1", "expired-session"),
-  );
-  await page.goto("/");
-  await expect(page.getByRole("alert")).toContainText(
-    "previous local planning session is no longer available",
-  );
-  expect(creations).toBe(0);
-  await page
-    .getByRole("button", { name: "Start a new session", exact: true })
-    .click();
-  await expect(
-    page.getByRole("heading", { name: "Plan your clinic’s day.", exact: true }),
-  ).toBeVisible();
-  expect(creations).toBe(1);
+test("equipment is visible, scrollable and opens details without changing the plan",async({page,request})=>{
+  const base=(await import('./support/planning')).initial();
+  const state=await seed(request,{clinic:{...base.clinic,equipment:[...base.clinic.equipment!,...Array.from({length:18},(_,i)=>({id:`light-${i}`,name:`Clinic light ${i}`,category:'critical' as const,power_kw:.01,required_hours:[9,10]}))]}});
+  await open(page,state);await overview(page).click();await expect(overview(page)).toHaveAttribute('aria-current','page');
+  const panel=page.getByRole('region',{name:'Activities & Equipment',exact:true});await expect(panel.locator('.equipment-item')).toHaveCount(20);
+  const scroll=panel.locator('.overview-square-body');expect(await scroll.evaluate(el=>el.scrollHeight>el.clientHeight)).toBe(true);
+  const equipment=panel.locator('.equipment-item').last();await equipment.locator('summary').focus();await page.keyboard.press('Enter');await expect(equipment).toHaveAttribute('open','');await expect(equipment).toContainText('09:00–11:00');await expect(equipment.getByRole('button',{name:'Edit in chat',exact:true})).toBeVisible();
+  expect((await read(request,state.id)).revision).toBe(state.revision);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
-test("manual operating hours reject half hours without truncating or submitting them", async ({
-  page,
-  request,
-}) => {
-  const state = await seed(request);
-  await open(page, state);
-  await overview(page).click();
-  await expect(overview(page)).toHaveAttribute("aria-current", "page");
-  await page
-    .getByRole("button", { name: "Add activity manually", exact: true })
-    .click();
-  const card = proposal(page);
-  await card
-    .getByLabel("Activity name", { exact: true })
-    .fill("Morning activity");
-  const start = card.getByLabel("Start hour (0–23)", { exact: true });
-  await start.fill("9.5");
-  await card.getByLabel("Finish hour (1–24)", { exact: true }).fill("15");
-  await card
-    .getByRole("checkbox", { name: "Vaccine refrigerator", exact: true })
-    .check();
-  await card.getByRole("checkbox", { name: /I reviewed this list/ }).check();
-  let patches = 0;
-  page.on("request", (req) => {
-    if (req.method() === "PATCH") patches++;
-  });
-  await card
-    .getByRole("button", { name: "Save draft for review", exact: true })
-    .click();
-  expect(
-    await start.evaluate((el: HTMLInputElement) => el.validity.stepMismatch),
-  ).toBe(true);
-  expect(patches).toBe(0);
-  expect(
-    (await read(request, state.id)).proposals[0].details.start_hour,
-  ).toBeNull();
+test("the in-app preview width keeps all four panels in view",async({page,request})=>{
+  await page.setViewportSize({width:631,height:955});await open(page,await calculate(request,await seed(request)));await overview(page).click();await expect(overview(page)).toHaveAttribute('aria-current','page');
+  const boxes=await page.locator('.overview-square').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}));
+  expect(boxes[1].x).toBeGreaterThan(boxes[0].x);expect(boxes[2].y).toBeGreaterThan(boxes[0].y);expect(boxes[3].y+boxes[3].height).toBeLessThan(955);
+  const energy=page.getByRole('region',{name:'Battery & Energy',exact:true});const play=await energy.getByRole('button',{name:'Play battery playback',exact:true}).boundingBox();expect(play!.y+play!.height).toBeLessThan(boxes[2].y+boxes[2].height);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:join(tmpdir(),'lifeline-preview-four-panels.png')});
+});
+
+test("flexible equipment asks for device hours and the backend derives its energy after review",async({page,request})=>{
+  const state=await seed(request);await open(page,state);await overview(page).click();await page.getByRole('button',{name:'Add equipment',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Add clinic equipment',exact:true});
+  await dialog.getByRole('textbox',{name:'Equipment name',exact:true}).fill('Portable pump');await dialog.getByRole('spinbutton',{name:'Power rating on the label (W)',exact:true}).fill('500');
+  await dialog.getByRole('combobox',{name:'Does it need protected power?',exact:true}).selectOption('flexible');await dialog.getByRole('combobox',{name:'Start time',exact:true}).selectOption('10');await dialog.getByRole('combobox',{name:'Finish time',exact:true}).selectOption('14');
+  await dialog.getByRole('spinbutton',{name:'How many hours must this device run?',exact:true}).fill('2');await dialog.getByRole('combobox',{name:'Can the work pause and resume?',exact:true}).selectOption('yes');
+  await dialog.getByRole('button',{name:'Review with LifeLine',exact:true}).click();const draft=page.locator('[data-testid="activity-proposal"]:visible');await expect(draft.getByRole('button',{name:'Confirm',exact:true})).toBeEnabled();
+  expect((await read(request,state.id)).equipment_inventory).toHaveLength(2);await draft.getByRole('button',{name:'Confirm',exact:true}).click();await expect(page.locator('#chat-input')).toBeEditable();
+  const next=await read(request,state.id);const equipment=next.equipment_inventory.find(e=>e.name==='Portable pump')!;expect(equipment.category).toBe('flexible');if(equipment.category==='flexible'){expect(equipment.required_energy_kwh).toBe(1);expect(equipment.allowed_hours).toEqual([10,11,12,13]);}
 });

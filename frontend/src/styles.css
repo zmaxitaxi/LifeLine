@@ -1758,3 +1758,389 @@ a {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Chat messages own a complete row; author labels never share a text column. */
+.two-page-app .chat-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.two-page-app .chat-transcript > * {
+  flex-shrink: 0;
+}
+.two-page-app .chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.two-page-app .chat-message.assistant-message {
+  display: flex;
+  grid-template-columns: none;
+  align-self: stretch;
+}
+.two-page-app .message-author {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.two-page-app .chat-message p {
+  margin: 0;
+}
+.two-page-app .user-message {
+  align-self: flex-end;
+}
+.two-page-app .notice-message {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.overview-square:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+.overview-square-body {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.panel-lead {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 8px 0 14px;
+  line-height: 1.4;
+}
+.panel-footnote {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 12px 0;
+}
+.panel-attention {
+  color: #8b5224;
+  margin: 12px 0;
+}
+.panel-change {
+  margin-block: 10px;
+}
+.activity-quick-list {
+  list-style: none;
+  padding: 0;
+}
+.activity-quick-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.activity-quick-list li > strong,
+.activity-quick-list li > span {
+  display: block;
+}
+.activity-quick-list li > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.overview-square .battery-method-note,
+.overview-square .battery-flow {
+  font-size: 11px;
+}
+
+.proposal-missing {
+  padding-block: 10px;
+  color: #8b5224;
+}
+.proposal-missing ul {
+  list-style: disc;
+  padding-left: 20px;
+}
+@media (max-width: 767px) {
+
+  .overview-square .battery-pair.with-comparison .battery-graphic {
+    flex-direction: column;
+  }
+}
+/* Keep all four summaries in view on a typical desktop screen. */
+.overview-heading p {
+  display: none;
+}
+.overview-heading h1 {
+  font-size: 23px;
+}
+.overview-page {
+  padding: 16px 20px;
+}
+
+.activity-chat-line {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 3px;
+  white-space: normal;
+  padding: 3px 0;
+  height: auto;
+  min-height: 44px;
+  text-align: left;
+}
+.activity-chat-line span {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.inline-plan {
+  margin-top: 10px;
+}
+.plan-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+.inline-options h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-block: 15px 6px;
+}
+.inline-options > ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.inline-alternative {
+  border-left: 3px solid var(--border);
+  padding: 8px 0 8px 12px;
+  font-size: 14px;
+}
+.inline-alternative > strong,
+.inline-alternative > span {
+  display: block;
+}
+.inline-alternative > span {
+  color: var(--muted);
+  margin-top: 4px;
+}
+.alternative-details {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.alternative-details ul {
+  list-style: disc;
+  padding-left: 18px;
+}
+@media (max-width: 767px) {
+
+  .overview-page {
+    padding-inline: 14px;
+  }
+}
+
+.current-weather {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-block: 6px 12px;
+}
+.current-weather > svg {
+  width: 42px;
+  height: 42px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.current-weather > div {
+  display: flex;
+  flex-direction: column;
+}
+.current-weather strong {
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 550;
+}
+.current-weather strong small {
+  font-size: 16px;
+}
+.current-weather span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.weekly-weather {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+  padding-block: 8px;
+}
+.weather-day {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  min-width: 0;
+  font-size: 12px;
+}
+.weather-day strong {
+  font-weight: 500;
+  font-size: 11px;
+}
+.weather-day svg {
+  width: 19px;
+  height: 19px;
+  color: var(--primary);
+}
+.weather-day small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.equipment-entry { width: min(540px, calc(100% - 28px)); }
+.equipment-entry [data-slot="input"], .equipment-entry select { min-height: 44px; font-size: 16px; }
+.equipment-entry [data-slot="native-select-wrapper"] { width: 100%; }
+.equipment-entry-times { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 480px) { .equipment-entry-times { grid-template-columns: minmax(0, 1fr); } }
+
+/* The overview uses the full workspace, with four equally sized regions. */
+.two-page-app[data-page="overview"] .chat-workspace,
+.two-page-app[data-page="overview"] .workspace-navigation {
+  width: calc(100% - 32px);
+  max-width: none;
+}
+.two-page-app[data-page="overview"] .chat-workspace { margin-bottom: 16px; }
+.two-page-app[data-page="overview"] .chat-context { padding: 12px 20px 0; }
+.two-page-app[data-page="overview"] .clinic-context-row { padding-bottom: 8px; }
+.two-page-app .overview-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 16px 16px;
+  overflow: hidden;
+}
+.overview-heading { flex-shrink: 0; }
+.overview-grid {
+  display: grid;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 14px;
+  margin: 0;
+}
+.overview-grid > .overview-square {
+  min-height: 0;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  scroll-margin: 16px;
+  aspect-ratio: auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.overview-square > h2 { position: static; flex-shrink: 0; font-size: 19px; padding: 14px 0 10px; margin-bottom: 0; }
+.overview-square-body { min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; padding: 12px 4px 18px 0; font-size: 15px; }
+.overview-square h3 { font-size: 16px; }
+.panel-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.equipment-count { font-size: 13px; color: var(--muted); }
+.equipment-list { list-style: none; padding: 0; }
+.equipment-item { border-bottom: 1px solid var(--border); }
+.equipment-item summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 62px; padding: 8px 4px; cursor: pointer; }
+.equipment-item summary::after { content: "+"; font-size: 20px; color: var(--primary); }
+.equipment-item[open] summary::after { content: "−"; }
+.equipment-item summary > span:first-child { flex: 1; }
+.equipment-item summary strong, .equipment-item summary small { display: block; }
+.equipment-item summary small { font-size: 13px; color: var(--muted); }
+.equipment-item summary:focus-visible, .weather-day:focus-visible, .weather-hours button:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; border-radius: 5px; }
+.equipment-detail { padding: 4px 6px 16px; }
+.equipment-detail dl { display: grid; gap: 10px; margin-bottom: 12px; }
+.equipment-detail dt { color: var(--muted); font-size: 13px; }
+.plan-choices { border: 0; padding: 0; margin: 14px 0 18px; display: grid; gap: 6px; }
+.plan-choices legend { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.plan-choice { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 7px; min-height: 48px; cursor: pointer; }
+.plan-choice[data-selected="true"] { border-color: var(--primary); background: var(--accent); }
+.plan-choice input { accent-color: var(--primary); width: 18px; height: 18px; flex-shrink: 0; }
+.plan-choice strong { display: block; font-size: 14px; font-weight: 550; }
+.plan-choice small { display: block; font-size: 12px; color: var(--primary); }
+.plan-equipment-times { font-size: 14px; }
+.plan-equipment-times ul { padding-left: 18px; list-style: disc; }
+
+.overview-square .battery-graphic > svg { width: 90px; height: 125px; }
+.overview-square .battery-value strong { font-size: 32px; }
+.overview-square .battery-value > span { font-size: 13px; }
+.overview-square .battery-playback-heading h3 { font-size: 16px; }
+.overview-square .battery-pair { margin-block: 12px; }
+.overview-square .battery-flow, .battery-minimum { text-align: center; font-size: 13px; }
+.battery-playback-heading { flex-wrap: wrap; }
+.weekly-weather { gap: 4px; }
+.weather-day { border: 1px solid transparent; border-radius: 7px; padding: 8px 2px; min-height: 90px; cursor: pointer; background: transparent; color: inherit; }
+.weather-day[aria-pressed="true"] { border-color: var(--primary); background: var(--accent); }
+.weather-day strong { font-size: 13px; }
+.weather-day svg { width: 24px; height: 24px; }
+.weather-day span { font-size: 14px; }
+.weather-energy { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
+.weather-hours { display: flex; gap: 5px; overflow-x: auto; margin: 8px 0 12px; padding-bottom: 6px; }
+.weather-hours button { min-height: 44px; min-width: 59px; border-radius: 5px; border: 1px solid var(--border); background: transparent; font-size: 13px; cursor: pointer; }
+.weather-hours button[aria-pressed="true"] { background: var(--primary); color: var(--primary-foreground); }
+.weather-energy-values { display: grid; gap: 8px; margin-top: 8px; }
+.weather-energy-values > div { display: flex; justify-content: space-between; gap: 16px; }
+.weather-energy-values dt { color: var(--muted); }
+.weather-energy-values dd { text-align: right; }
+@media (max-width: 767px) {
+  .two-page-app[data-page="overview"] .chat-workspace, .two-page-app[data-page="overview"] .workspace-navigation { width: calc(100% - 16px); }
+  .two-page-app .overview-page { overflow-y: auto; padding: 10px; }
+  .overview-grid { flex: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(4, minmax(480px, auto)); gap: 12px; }
+  .overview-grid > .overview-square { height: 520px; padding: 0 14px; }
+
+  .overview-square .battery-pair.with-comparison .battery-graphic { flex-direction: column; }
+  .overview-square .battery-graphic > svg { width: 70px; height: 100px; }
+  .weather-energy-values > div { flex-direction: column; gap: 0; }
+  .weather-energy-values dd { text-align: left; }
+}
+.plan-outcomes { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0 12px; }
+.plan-outcomes th, .plan-outcomes td { text-align: left; padding: 7px 8px 7px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.plan-outcomes thead th { font-size: 12px; font-weight: 500; color: var(--muted); }
+.plan-outcomes tbody th { font-weight: 500; }
+.selected-plan-name { margin-top: 12px; font-size: 14px; }
+.two-page-app[data-page="overview"] .overview-heading { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.overview-square .battery-playback-heading h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.overview-square .battery-playback-heading p { font-size: 12px; }
+.overview-square .battery-method-note { margin: 4px 0; }
+.overview-square .battery-graphic { margin: 6px auto; }
+.overview-square .battery-graphic > svg { width: 65px; height: 90px; }
+.overview-square .battery-state h4 { margin-top: 4px; }
+.overview-square .battery-flow { display: none; }
+.overview-square .battery-minimum { font-size: 12px; }
+.overview-square .battery-pair { margin: 5px 0 8px; }
+.overview-square .battery-timeline { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 0 14px; }
+.overview-square .battery-controls { margin: 0; flex-wrap: nowrap; gap: 4px; }
+.overview-square .battery-controls > span { display: none; }
+.overview-square .battery-controls button[aria-label="Restart battery playback"] { width: 44px; overflow: hidden; font-size: 0; gap: 0; padding: 0; }
+.overview-square .battery-time-labels { grid-column: 2; }
+.overview-square .battery-playback [data-slot="slider"] { margin-top: 0; }
+.overview-square .battery-reserve-caption, .overview-square .battery-warning { font-size: 12px; }
+@media (max-width: 767px) { .overview-square .battery-timeline { grid-template-columns: minmax(0, 1fr); }.overview-square .battery-time-labels { grid-column: 1; } }
+.overview-square .battery-state-meta { display: flex; justify-content: center; flex-wrap: wrap; column-gap: 12px; }
+.overview-square .battery-state-meta p { margin-top: 3px; }
+.overview-square .battery-pair:not(.with-comparison) .battery-state h4 { display: none; }
+.overview-square .battery-playback-heading p { margin-top: 0; }
+.overview-square .battery-modes { margin-top: 5px; }
+/* The desktop app's narrow preview still has room for four regions. */
+@media (min-width: 600px) and (max-width: 767px) {
+  .two-page-app .overview-page { overflow: hidden; }
+  .overview-grid { flex: 1; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .overview-grid > .overview-square { height: auto; padding-inline: 12px; }
+  .overview-square > h2 { font-size: 17px; }
+  .overview-square .battery-timeline { grid-template-columns: auto minmax(0, 1fr); gap: 0 6px; }
+  .overview-square .battery-time-labels { grid-column: 2; }
+  .overview-square .battery-pair.with-comparison .battery-graphic { flex-direction: column; }
+  .overview-square .battery-value strong { font-size: 26px; }
+  .overview-square .battery-graphic > svg { width: 54px; height: 75px; }
+  .overview-square .battery-playback-heading p { font-size: 11px; }
+  .plan-outcomes { font-size: 12px; }
+  .plan-outcomes th, .plan-outcomes td { padding-right: 4px; }
+  .weather-day strong { font-size: 11px; }
+  .weather-day svg { width: 20px; height: 20px; }
+}
+.draft-chat-link { padding-inline: 0; color: var(--primary); font-size: 13px; }
+
+.overview-square .battery-playback { padding-top: 0; margin-top: 0; border-top: 0; }
+.overview-square .panel-lead { font-size: 17px; margin-block: 6px 10px; }

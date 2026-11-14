@@ -2,11 +2,13 @@
  * The backend adapter projects its published contract into these components.
  * Pending form text is never treated as a confirmed clinic requirement.
  */
-import type { SimulationResponse } from "../../../../contracts/api";
+import type { PlanResult, SimulationResponse } from "../../../../contracts/api";
 export type OverviewSection = "activities" | "weather" | "energy" | "solutions";
 export interface EvidenceOption {
   label: string;
   simulation: SimulationResponse;
+  plan?: PlanResult;
+  kind?: string;
 }
 export interface ActivityView {
   id: string;

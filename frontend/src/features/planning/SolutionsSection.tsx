@@ -1,189 +1,111 @@
+import type { RecoveryOption } from "../../../../contracts/recovery";
 import type { ComputedPlan } from "../../../../contracts/planning";
 import { Button } from "@/components/ui/button";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
-import { Disclosure } from "@/components/Disclosure";
-import { OutcomeIndicators } from "./BatteryEvidence";
-import { PlanOutcome } from "./PlanOutcome";
-import { num, shortName, timeRanges } from "@/lib/clinic";
+import { shortName, timeRanges, num } from "@/lib/clinic";
+import { recoveryTitle } from "./plan-language";
 
 export function SolutionsSection({
   computed,
-  selectedId,
   busy,
+  onChat,
+  selected,
   onSelect,
-  onRecompute,
 }: {
   computed: ComputedPlan | null;
-  selectedId: string | null;
   busy: boolean;
+  onChat: (question: string) => void;
+  selected?: RecoveryOption;
   onSelect: (id: string) => void;
-  onRecompute: () => void;
 }) {
   const recovery = computed?.recovery;
-  const selected = recovery?.options.find(
-    (o) => o.id === (selectedId ?? recovery.recommended_option_id),
-  );
+  const proposed = selected ?? recovery?.existing;
+  const existing = computed?.simulation.baseline.metrics;
+  const next = proposed?.plan ?? computed?.simulation.baseline;
   return (
     <section
       data-overview-section="solutions"
-      className="overview-section"
+      className="overview-section overview-square"
       aria-labelledby="solutions-title"
+      tabIndex={0}
     >
-      <h2 id="solutions-title">Solutions</h2>
-      {computed ? (
-        <>
-          <PlanOutcome computed={computed} />
-          {recovery && selected ? (
-            <>
-              <label className="recovery-select">
-                Explore calculated recovery options
-                <NativeSelect
-                  aria-label="Calculated recovery option"
-                  value={selected.id}
-                  disabled={busy}
-                  onChange={(e) => onSelect(e.target.value)}
-                >
-                  {recovery.options.map((o) => (
-                    <NativeSelectOption key={o.id} value={o.id}>
-                      {o.label}
-                      {o.id === recovery.recommended_option_id
-                        ? " · recommended"
-                        : ""}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-              </label>
-              <OutcomeIndicators
-                current={{
-                  label: "Current",
-                  simulation: recovery.reference,
-                  plan: recovery.existing.plan,
-                }}
-                proposed={{
-                  label: "Selected proposal",
-                  simulation: selected.simulation,
-                  plan: selected.plan,
-                }}
-              />
-              <div className="recovery-changes">
-                <h4>What changes in this comparison</h4>
-                <p>
-                  {selected.kind === "existing"
-                    ? "Existing requested equipment timing. No intervention is proposed."
-                    : "Flexible equipment timing is recalculated within its allowed hours. Essential requirements stay fixed."}
-                </p>
-                <ul>
-                  {selected.infrastructure_changes.map((c) => (
-                    <li key={c.field}>
-                      {
-                        {
-                          pv_capacity_kw: "Solar capacity",
-                          battery_capacity_kwh: "Battery capacity",
-                          max_discharge_kw: "Battery output limit",
-                        }[c.field]
-                      }
-                      : {num(c.before)} → {num(c.after)} {c.unit}
-                    </li>
-                  ))}
-                  {selected.work_changes.map((c) => (
-                    <li key={c.equipment_id}>
-                      {shortName(c.name)}: {num(c.tested_required_kwh)} kWh
-                      requested instead of {num(c.original_required_kwh)} kWh.{" "}
-                      {num(c.explicitly_postponed_kwh)} kWh explicitly
-                      postponed.
-                    </li>
-                  ))}
-                </ul>
-                <p>
-                  Starting stored energy stays{" "}
-                  {num(selected.config.initial_battery_kwh)} kWh. Selecting a
-                  proposal records a comparison; it does not install hardware.
-                </p>
-              </div>
-              <div className="recovery-limits">
-                <h4>Remaining shortages and limits</h4>
-                {selected.remaining_constraints.length ? (
-                  <ul>
-                    {selected.remaining_constraints.map((c) => (
-                      <li key={c}>{c}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>
-                    No modeled shortfall remains against the original energy
-                    requirements and reserve. Forecast and model limitations
-                    still apply.
-                  </p>
-                )}
-              </div>
-              <Disclosure
-                title="Exact before-and-after comparison"
-                keepMounted={false}
-              >
-                <p>
-                  Essential shortage reduction:{" "}
-                  {selected.essential_shortage_reduction_kwh.toFixed(6)} kWh.
-                  Minimum stored-energy improvement:{" "}
-                  {selected.minimum_battery_improvement_kwh.toFixed(6)} kWh.
-                  Flexible energy completion improvement:{" "}
-                  {selected.flexible_completion_improvement_kwh.toFixed(6)} kWh.
-                </p>
-                <ul>
-                  {recovery.assumptions.map((a) => (
-                    <li key={a}>{a}</li>
-                  ))}
-                </ul>
-              </Disclosure>
-            </>
-          ) : (
-            <Button variant="outline" disabled={busy} onClick={onRecompute}>
-              Evaluate recovery options
-            </Button>
-          )}
-          <Disclosure
-            title="Existing and recommended equipment times"
-            keepMounted={false}
-          >
-            {(
-              [
-                ["Existing schedule", computed.simulation.baseline],
-                ["Recommended operating plan", computed.simulation.optimized],
-              ] as const
-            ).map(([name, plan]) => (
-              <div key={name}>
-                <h3>{name}</h3>
-                <ul>
-                  {plan.flexible_tasks.map((t) => (
-                    <li key={t.task_id}>
-                      {shortName(
-                        computed.simulation.equipment.find(
-                          (e) => e.id === t.task_id,
-                        )?.name ?? t.task_id,
-                      )}
-                      :{" "}
-                      {timeRanges(
-                        t.allocations
-                          .filter((a) => a.served_kwh > 1e-6)
-                          .map((a) => a.hour),
-                      ) || "Not scheduled"}
-                      ; {num(t.served_kwh)} kWh supplied, {num(t.deferred_kwh)}{" "}
-                      kWh unfinished.
-                    </li>
-                  ))}
-                </ul>
-              </div>
+      <h2 id="solutions-title">Plans</h2>
+      <div className="overview-square-body">
+
+        {computed && existing && next ? (
+          <>
+            <p className="panel-lead">{existing.critical_unserved_kwh > 1e-6 ? "Essential equipment may lose power" : existing.min_soc_kwh < computed.simulation.effective_config.reserve_kwh - 1e-6 ? "Battery may run too low" : existing.flexible_deferred_kwh > 1e-6 ? "Some work is unfinished" : existing.critical_requested_kwh <= 1e-6 ? "Essential needs need review" : "Current modeled needs are met"}</p>
+            <table className="plan-outcomes"><caption className="sr-only">Current and selected plan outcomes</caption>
+              <thead><tr><th scope="col">Daily outcome</th><th scope="col">Current</th><th scope="col">Selected</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Essential power</th>{[existing, next.metrics].map((m, i) => <td key={i}>{m.critical_requested_kwh <= 1e-6 ? "Not configured" : m.critical_unserved_kwh > 1e-6 ? `${num(m.critical_unserved_kwh)} kWh short` : "Needs covered"}</td>)}</tr>
+                <tr><th scope="row">Battery reserve</th><td>{existing.min_soc_kwh < computed.simulation.effective_config.reserve_kwh - 1e-6 ? "Below target" : "Target met"}</td><td>{next.metrics.min_soc_kwh < (proposed?.config.reserve_kwh ?? computed.simulation.effective_config.reserve_kwh) - 1e-6 ? "Below target" : "Target met"}</td></tr>
+                <tr><th scope="row">Unfinished work</th><td>{num(existing.flexible_deferred_kwh)} kWh</td><td>{num(proposed?.metrics.flexible_unfinished_kwh ?? next.metrics.flexible_deferred_kwh)} kWh</td></tr>
+              </tbody>
+            </table>
+            {proposed && proposed.kind !== "existing" ? <p className="selected-plan-name"><strong>Selected:</strong> {recoveryTitle(proposed.kind)}</p> : null}
+            {proposed?.infrastructure_changes.map((change) => (
+              <p className="panel-change" key={change.field}>
+                {
+                  {
+                    pv_capacity_kw: "Solar panels",
+                    battery_capacity_kwh: "Battery size",
+                    max_discharge_kw: "Battery output",
+                  }[change.field]
+                }
+                : {num(change.before)} → {num(change.after)} {change.unit}
+              </p>
             ))}
-          </Disclosure>
-        </>
-      ) : (
-        <p>
-          No current verified solution is available. Calculate a plan after
-          reviewing the confirmed activities.
-        </p>
-      )}
+            {proposed?.work_changes.map(change => <p className="panel-change" key={change.equipment_id}>{shortName(change.name)}: {num(change.original_required_kwh)} → {num(change.tested_required_kwh)} kWh of work today. {num(change.explicitly_postponed_kwh)} kWh postponed, still unfinished.</p>)}
+            <p className="panel-footnote">Comparison only · nothing physically changed.</p>
+            <div className="plan-equipment-times"><h3>When to run equipment</h3>
+              <ul>
+                {next.flexible_tasks.map((t) => (
+                  <li key={t.task_id}>
+                    {shortName(
+                      computed.simulation.equipment.find(
+                        (e) => e.id === t.task_id,
+                      )?.name ?? t.task_id,
+                    )}
+                    :{" "}
+                    {timeRanges(
+                      t.allocations
+                        .filter((a) => a.served_kwh > 1e-6)
+                        .map((a) => a.hour),
+                    ) || "Not scheduled"}
+                    ; {num(t.served_kwh)} kWh supplied.
+                  </li>
+                ))}
+              </ul>
+              <p>
+                Essential energy missing:{" "}
+                {num(next.metrics.critical_unserved_kwh)} kWh. Lowest stored
+                energy: {num(next.metrics.min_soc_kwh)} kWh.
+              </p>
+            </div>
+            {recovery && proposed ? <fieldset className="plan-choices"><legend>Choose a calculated plan</legend>
+              {[recovery.existing, ...recovery.options].map(option => <label key={option.id} className="plan-choice" data-selected={proposed.id === option.id}>
+                <input type="radio" name="clinic-plan" value={option.id} checked={proposed.id === option.id} disabled={busy} onChange={() => onSelect(option.id)} />
+                <span><strong>{option.kind === "existing" ? "Current plan" : recoveryTitle(option.kind)}{option.infrastructure_changes.length ? ` · ${option.infrastructure_changes.map(change => `${change.after} ${change.unit}`).join(", ")}` : ""}</strong>
+                {option.id === recovery.recommended_option_id ? <small>Recommended</small> : null}</span>
+              </label>)}
+            </fieldset> : null}
+
+          </>
+        ) : (
+          <p className="panel-lead">Ask LifeLine to find a better plan.</p>
+        )}
+        <Button
+          variant="outline"
+          disabled={busy}
+          onClick={() =>
+            onChat(
+              computed ? "Explain the exact selected plan compared with the existing baseline. Explain what changes and which shortages remain in plain English. Keep this selected comparison; do not recalculate." : "Calculate recovery options for the clinic and describe what staff should review in plain English.",
+            )
+          }
+        >
+          Ask about this plan
+        </Button>
+      </div>
     </section>
   );
 }

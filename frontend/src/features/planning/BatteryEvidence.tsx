@@ -172,6 +172,7 @@ function Battery({
         </div>
       </div>
       <p className="battery-flow">{flow}</p>
+      <div className="battery-state-meta"><p className="battery-minimum">Daily minimum: {num(plan.metrics.min_soc_kwh)} kWh</p>
       <p className={low ? "battery-warning" : "battery-reserve-caption"}>
         {low ? (
           <>
@@ -182,7 +183,7 @@ function Battery({
           "Reserve target: "
         )}
         {num(reserve)} kWh
-      </p>
+      </p></div>
       {hour < 24 && row.critical_unserved_kwh > 1e-6 ? (
         <p className="battery-warning">
           <AlertTriangle aria-hidden="true" />
@@ -208,7 +209,7 @@ export function BatteryEvidence({
   const [hour, setHour] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [mode, setMode] = useState<"current" | "recovery" | "compare">(
-    intervention ? "compare" : "recovery",
+    !intervention || intervention.kind === "existing" ? "current" : "compare",
   );
   const [reducedMotion, setReducedMotion] = useState(false);
   const sliderId = useId();
@@ -222,6 +223,7 @@ export function BatteryEvidence({
   useEffect(() => {
     setHour(0);
     setPlaying(false);
+    setMode(!intervention || intervention.kind === "existing" ? "current" : "compare");
   }, [result, intervention]);
   useEffect(() => {
     if (!playing) return;
@@ -241,9 +243,9 @@ export function BatteryEvidence({
   };
   const recovered = intervention?.simulation ?? result;
   const proposed: Scenario = {
-    label: "Recovery plan",
+    label: "Selected plan",
     simulation: recovered,
-    plan: recovered.optimized,
+    plan: intervention?.plan ?? recovered.optimized,
   };
   const visible =
     mode === "compare"
@@ -273,7 +275,7 @@ export function BatteryEvidence({
           proposed={mode === "compare" ? proposed : undefined}
         />
       ) : null}
-      <div
+      {intervention && intervention.kind !== "existing" ? <div
         className="battery-modes"
         role="group"
         aria-label="Battery visualization mode"
@@ -281,7 +283,7 @@ export function BatteryEvidence({
         {(
           [
             ["current", "Current plan"],
-            ["recovery", "Recovery plan"],
+            ["recovery", "Selected plan"],
             ["compare", "Compare"],
           ] as const
         ).map(([value, label]) => (
@@ -294,12 +296,7 @@ export function BatteryEvidence({
             {label}
           </Button>
         ))}
-      </div>
-      <p className="battery-method-note">
-        {intervention
-          ? intervention.label
-          : "Recovery plan: equipment rescheduling only. Weather, equipment requirements, capacity, and starting energy are unchanged."}
-      </p>
+      </div> : null}
       <div
         className={`battery-pair ${mode === "compare" ? "with-comparison" : ""}`}
       >
@@ -312,7 +309,7 @@ export function BatteryEvidence({
           />
         ))}
       </div>
-      <div className="battery-controls">
+      <div className="battery-timeline"><div className="battery-controls">
         <Button
           variant="outline"
           aria-label={
@@ -362,6 +359,7 @@ export function BatteryEvidence({
         {[0, 6, 12, 18, 24].map((t) => (
           <span key={t}>{timeLabel(t)}</span>
         ))}
+      </div>
       </div>
       <p className="battery-method-note">
         Hourly values only; fill movement is visual. Not a live battery reading.

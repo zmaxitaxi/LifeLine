@@ -12,11 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Disclosure } from "@/components/Disclosure";
 import { api, num } from "@/lib/clinic";
 import type { AgentStatus } from "../../contracts/agent";
-import type {
-  Activity,
-  ActivityDraft,
-  ActivityProposal,
-} from "../../contracts/planning";
+import type { ActivityProposal, ComputedPlan } from "../../contracts/planning";
 import {
   Workspace,
   useWorkspaceNavigation,
@@ -27,8 +23,9 @@ import { ActivityConfirmation } from "@/features/planning/ActivityConfirmation";
 import { ActivitiesSection } from "@/features/planning/ActivitiesSection";
 import { WeatherSection } from "@/features/planning/WeatherSection";
 import { SolutionsSection } from "@/features/planning/SolutionsSection";
-import { BatteryEvidence } from "@/features/planning/BatteryEvidence";
-import { PlanOutcome } from "@/features/planning/PlanOutcome";
+import { BatterySummary } from "@/features/planning/BatterySummary";
+import { AddEquipment } from "@/features/planning/AddEquipment";
+import { InlinePlan } from "@/features/planning/InlinePlan";
 
 interface Message {
   id: string;
@@ -36,32 +33,52 @@ interface Message {
   text: string;
   tools?: string[];
   inputRevision?: number;
+  plan?: ComputedPlan;
+  date?: string;
+  sessionId?: string;
+  retryQuestion?: string;
+  selectionId?: string;
 }
 const toolLabels: Record<string, string> = {
-  inspect_planning_state: "Inspect clinic planning state",
-  review_activity_proposal: "Review the activity draft",
-  propose_activity: "Propose a clinic activity",
-  update_activity_draft: "Update the activity draft",
-  propose_activity_revision: "Prepare a reviewed activity change",
-  correct_last_activity_time: "Correct the draft’s operating time",
-  recompute_clinic_plan: "Calculate the clinic energy plan",
+  conversational_reply: "Answered your message",
+  explain_current_plan: "Reviewed the selected plan",
+  inspect_planning_state: "Reviewed the clinic details",
+  review_activity_proposal: "Prepared the activity for review",
+  propose_activity: "Prepared an activity draft",
+  update_activity_draft: "Updated the activity draft",
+  propose_activity_revision: "Prepared an activity change",
+  correct_last_activity_time: "Corrected the operating time",
+  recompute_clinic_plan: "Calculated the plan and checked the weather",
 };
+const planQuestion =
+  "Calculate the clinic’s electricity plan and compare recovery options. Describe the proposed actions and remaining limitations for clinic staff in plain English.";
 export default function App() {
   const session = usePlanningSession();
-  const { state, computed, busy } = session;
+  const { state, busy } = session;
   const route = useWorkspaceNavigation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
+  const [equipmentOpen, setEquipmentOpen] = useState(false);
   const [agent, setAgent] = useState<AgentStatus | null>(null);
   const [modelError, setModelError] = useState(false);
+  const [narrationPending, setNarrationPending] = useState(false);
+  const [replyReady, setReplyReady] = useState(true);
   const [locations, setLocations] = useState<
     { name: string; latitude: number; longitude: number }[]
   >([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const transcript = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const following = useRef(true);
   const confirmationKeys = useRef(new Map<string, string>());
+  const computed = narrationPending ? null : session.computed;
+  const activeProposal = state?.proposals.find(
+    (p) => p.id === state.active_proposal_id && p.status === "draft",
+  );
+  const recovery = computed?.recovery;
+  const selected = recovery ? [recovery.existing, ...recovery.options].find(option => option.id === (state?.selected_recovery_intervention_id ?? recovery.existing.id)) ?? recovery.existing : undefined;
+  const latestPlanMessageId = messages.filter(item => item.plan).at(-1)?.id;
+  const addMessage = (message: Omit<Message, "id">) =>
+    setMessages((items) => [...items, { id: crypto.randomUUID(), ...message }]);
   async function checkModel() {
     setModelError(false);
     try {
@@ -82,170 +99,130 @@ export default function App() {
     if (following.current && transcript.current)
       transcript.current.scrollTop = transcript.current.scrollHeight;
   }, [messages, busy, computed, state?.revision]);
-  const activeProposal = state?.proposals.find(
-    (p) => p.id === state.active_proposal_id && p.status === "draft",
-  );
-  const recovery = computed?.recovery;
-  const selected = recovery?.options.find(
-    (o) =>
-      o.id ===
-      (state?.selected_recovery_intervention_id ??
-        recovery.recommended_option_id),
-  );
-  async function say(question: string) {
-    if (!question.trim() || busy || !state) return;
+  function focusChat(prefill = "") {
+    location.hash = "assistant";
+    setText(prefill);
+    requestAnimationFrame(() => input.current?.focus());
+  }
+  async function say(question: string, showUser = true) {
+    if (!question.trim() || busy || !session.stateRef.current) return;
     following.current = true;
     setText("");
-    setMessages((items) => [
-      ...items,
-      { id: crypto.randomUUID(), role: "user", text: question },
-    ]);
+    setReplyReady(false);
+    if (showUser) addMessage({ role: "user", text: question });
+    const before = session.stateRef.current.computed_plan;
     const response = await session.run(
-      "Sending your message to the local assistant…",
+      "LifeLine is preparing your response…",
       (s) => planningApi.ask(s, question),
       (r) => r.state,
       true,
     );
-    if (response) {
-      setMessages((items) => [
-        ...items,
-        {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          text: response.message,
-          tools: response.tool_calls,
-          inputRevision: response.state.input_revision,
-        },
-      ]);
-      setEditingId(null);
-      requestAnimationFrame(() => input.current?.focus());
+    if (response?.mode === "local_tool_agent") {
+      const result = response.state.computed_plan;
+      const newPlan =
+        response.state.plan_status === "current" &&
+        result?.input_revision === response.state.input_revision &&
+        (response.tool_calls.includes("explain_current_plan") || !before ||
+          before.generation !== result.generation ||
+          before.input_revision !== result.input_revision ||
+          before.computed_at !== result.computed_at);
+      addMessage({
+        role: "assistant",
+        text: response.message,
+        tools: response.tool_calls,
+        inputRevision: response.state.input_revision,
+        ...(newPlan
+          ? {
+              plan: result!,
+              date: response.state.planning_date,
+              sessionId: response.state.id,
+              selectionId: response.tool_calls.includes("explain_current_plan") ? response.state.selected_recovery_intervention_id ?? response.state.computed_plan?.recovery?.existing.id : undefined,
+            }
+          : {}),
+      });
+      setReplyReady(true);
+    } else if (response) {
+      addMessage({
+        role: "notice",
+        text: "The local assistant couldn’t finish this reply. Please retry.",
+        retryQuestion: question,
+      });
+    } else {
+      addMessage({
+        role: "notice",
+        text: "The reply could not be completed.",
+        retryQuestion: question,
+      });
     }
+    requestAnimationFrame(() => input.current?.focus());
   }
-  async function save(proposal: ActivityProposal, details: ActivityDraft) {
-    const response = await session.run(
-      "Saving the draft for review…",
-      (s) => planningApi.edit(s, proposal.id, details),
-      (s) => s,
-    );
-    if (response) {
-      setEditingId(null);
-      setMessages((items) => [
-        ...items,
-        {
-          id: crypto.randomUUID(),
-          role: "notice",
-          text: "Draft saved for review. It has not changed the active energy plan.",
-        },
-      ]);
-    }
+  function requestPlan(question = planQuestion) {
+    location.hash = "assistant";
+    void say(question);
   }
   async function confirm(proposal: ActivityProposal) {
-    let idempotencyKey = confirmationKeys.current.get(proposal.id);
-    if (!idempotencyKey) {
-      idempotencyKey = crypto.randomUUID();
-      confirmationKeys.current.set(proposal.id, idempotencyKey);
+    setNarrationPending(true);
+    setReplyReady(false);
+    let key = confirmationKeys.current.get(proposal.id);
+    if (!key) {
+      key = crypto.randomUUID();
+      confirmationKeys.current.set(proposal.id, key);
     }
     const response = await session.run(
-      "Confirming the activity and calculating the updated plan…",
-      (s) => planningApi.confirm(s, proposal.id, idempotencyKey!),
+      "Confirming your activity…",
+      (s) => planningApi.confirm(s, proposal.id, key!),
       (s) => s,
       true,
     );
     if (response) {
-      setEditingId(null);
-      setMessages((items) => [
-        ...items,
-        {
-          id: crypto.randomUUID(),
-          role: "notice",
-          text:
-            response.plan_status === "failed"
-              ? "The activity is confirmed. The updated energy calculation failed; no earlier plan is shown as current."
-              : "Activity confirmed. Both pages now use the updated clinic requirements.",
-        },
-      ]);
+      addMessage({
+        role: "notice",
+        text:
+          response.plan_status === "failed"
+            ? "Activity confirmed. The energy calculation needs to be retried."
+            : "Activity confirmed.",
+      });
+      await say(
+        "Calculate recovery options for the activity just confirmed. Describe the updated electricity plan and next actions to clinic staff in plain English.",
+        false,
+      );
     }
+    setNarrationPending(false);
   }
   async function cancel(proposal: ActivityProposal) {
     const response = await session.run(
-      "Cancelling the activity draft…",
+      "Cancelling the draft…",
       (s) => planningApi.reject(s, proposal.id),
       (s) => s,
     );
-    if (response) {
-      setEditingId(null);
-      setMessages((items) => [
-        ...items,
-        {
-          id: crypto.randomUUID(),
-          role: "notice",
-          text: "Draft cancelled. Confirmed activities and their electrical requirements are unchanged.",
-        },
-      ]);
-    }
-  }
-  async function recompute(factor?: number) {
-    await session.run(
-      "Calculating the plan from confirmed requirements and the weather forecast…",
-      (s) => planningApi.recompute(s, factor ?? s.sunshine_factor),
-      (s) => s,
-      true,
-    );
-  }
-  function calculateFromChat() {
-    if (!state || busy) return;
-    following.current = true;
-    setMessages((items) => [
-      ...items,
-      {
-        id: crypto.randomUUID(),
-        role: "user",
-        text: "Calculate the energy plan.",
-      },
-      ...(state.proposals.some((proposal) => proposal.status === "draft")
-        ? [
-            {
-              id: crypto.randomUUID(),
-              role: "notice" as const,
-              text: "This calculation uses confirmed activities only. Draft activities are excluded until you confirm them.",
-            },
-          ]
-        : []),
-    ]);
-    void recompute();
-  }
-  async function add() {
-    const response = await session.run(
-      "Creating an activity draft…",
-      (s) => planningApi.propose(s, { planning_date: s.planning_date }),
-      (s) => s,
-    );
-    if (response) setEditingId(response.active_proposal_id);
-  }
-  async function edit(activity: Activity) {
-    const response = await session.run(
-      "Preparing a draft of the activity changes…",
-      (s) => planningApi.propose(s, activity.details, activity.id),
-      (s) => s,
-    );
-    if (response) setEditingId(response.active_proposal_id);
+    if (response) addMessage({ role: "notice", text: "Draft cancelled." });
   }
   const currentWeather = state?.forecast_reference ?? session.weather;
-  const essential = computed?.simulation.baseline.metrics;
-  const outlook = essential
-    ? essential.critical_requested_kwh <= 1e-6
+  const existing = computed?.simulation.baseline.metrics;
+  const outlook = existing
+    ? existing.critical_requested_kwh <= 1e-6
       ? "Essential equipment needs review"
-      : essential.critical_unserved_kwh > 1e-6
-        ? "Energy shortage in the current schedule"
-        : essential.min_soc_kwh <
+      : existing.critical_unserved_kwh > 1e-6
+        ? "Essential equipment may lose power"
+        : existing.min_soc_kwh <
             computed!.simulation.effective_config.reserve_kwh - 1e-6
-          ? "Current schedule may use the battery reserve"
-          : "Current schedule supplies essential equipment in the model"
-    : "Ask LifeLine to check the energy outlook";
+          ? "Battery may run too low"
+          : "The forecast plan covers essential equipment"
+    : "Ask LifeLine about the clinic’s electricity";
+  const locationName = state
+    ? (locations
+        .find(
+          (l) =>
+            l.latitude === state.location.latitude &&
+            l.longitude === state.location.longitude,
+        )
+        ?.name.replace(/\s*\([^)]*\)/, "") ??
+      `${state.location.latitude.toFixed(4)}, ${state.location.longitude.toFixed(4)}`)
+    : "";
   const errorUI = session.error ? (
-    <Alert variant="destructive" role="alert" className="shared-error">
+    <Alert variant="destructive" role="alert">
       <AlertTriangle />
-      <AlertTitle>Planning update needs attention</AlertTitle>
+      <AlertTitle>The update needs attention</AlertTitle>
       <AlertDescription>
         {session.error}
         <Button
@@ -264,28 +241,21 @@ export default function App() {
         <AlertTriangle />
         <AlertTitle>No current energy plan</AlertTitle>
         <AlertDescription>
-          {state.plan_error ?? "The calculation failed."} Confirmed activities
-          are saved. No old battery or solution is shown.
+          Confirmed activities are saved. Ask LifeLine to retry the calculation.
           <Button
             variant="outline"
             disabled={Boolean(busy)}
-            onClick={() => void recompute()}
+            onClick={() =>
+              requestPlan(
+                "Retry the energy calculation for our confirmed activities and describe the result.",
+              )
+            }
           >
-            Retry energy calculation
+            Retry with LifeLine
           </Button>
         </AlertDescription>
       </Alert>
     ) : null;
-  const locationName = state
-    ? (locations
-        .find(
-          (location) =>
-            location.latitude === state.location.latitude &&
-            location.longitude === state.location.longitude,
-        )
-        ?.name.replace(/\s*\([^)]*\)/, "") ??
-      `${state.location.latitude.toFixed(4)}, ${state.location.longitude.toFixed(4)}`)
-    : "";
   const context = state ? (
     <div className="chat-context">
       <div className="clinic-context-row">
@@ -294,26 +264,25 @@ export default function App() {
           <span>
             <MapPin aria-hidden="true" />
             {locationName} · {state.planning_date}
-            {state.timezone
-              ? ` · ${state.timezone}`
-              : " · timezone awaiting forecast"}
           </span>
         </div>
       </div>
-      <div className="chat-weather" role="status">
-        <CloudSun aria-hidden="true" />
-        <div>
-          <strong>
-            {session.weatherLoading && !currentWeather
-              ? "Checking live weather…"
-              : currentWeather
-                ? currentWeather.cache_status === "stale"
-                  ? `Older forecast · ${outlook}`
-                  : outlook
-                : "Live weather is unavailable"}
-          </strong>
+      {route.page === "assistant" ? (
+        <div className="chat-weather" role="status">
+          <CloudSun aria-hidden="true" />
+          <div>
+            <strong>
+              {busy || narrationPending
+                ? busy || "LifeLine is preparing your response…"
+                : session.weatherLoading && !currentWeather
+                  ? "Checking weather…"
+                  : currentWeather
+                    ? outlook
+                    : "Weather is unavailable"}
+            </strong>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   ) : null;
   const assistant = (
@@ -331,8 +300,7 @@ export default function App() {
       >
         {session.loading ? (
           <p className="chat-loading" role="status">
-            <LoaderCircle className="loading-spin" />
-            Loading the shared clinic plan…
+            Loading your clinic…
           </p>
         ) : null}
         {!session.loading && !state ? (
@@ -349,18 +317,19 @@ export default function App() {
         ) : null}
         {state && !messages.length ? (
           <div className="chat-welcome">
-            <h1>Plan your clinic’s day.</h1>
+            <h1>How can LifeLine help today?</h1>
             <p>
-              Describe an activity. Review its equipment needs before it changes
-              the energy plan.
+              Talk about your clinic’s activities, equipment times, or
+              electricity. LifeLine will check the details and explain your
+              options.
             </p>
             <div className="chat-suggestions" aria-label="Suggested questions">
               <Button
                 variant="outline"
                 disabled={Boolean(busy)}
-                onClick={calculateFromChat}
+                onClick={() => requestPlan()}
               >
-                Calculate plan
+                Plan our electricity
               </Button>
               {[
                 "We have a vaccination campaign tomorrow from 9 AM to 3 PM.",
@@ -379,80 +348,108 @@ export default function App() {
           </div>
         ) : null}
         {state && session.notice ? (
-          <p className="chat-notice" role="status">
-            {session.notice}
-          </p>
+          <Disclosure title="About this clinic setup" keepMounted={false}>
+            <p>{session.notice}</p>
+          </Disclosure>
         ) : null}
-        {messages.map((message) => (
-          <article
-            key={message.id}
-            className={`chat-message ${message.role === "user" ? "user-message" : message.role === "notice" ? "notice-message" : "assistant-message"}`}
-          >
-            {message.role !== "notice" ? (
-              <strong className="message-author">
-                {message.role === "user" ? "You" : "LifeLine"}
-              </strong>
-            ) : null}
-            <p className="assistant-text">{message.text}</p>
-            {message.inputRevision !== undefined &&
-            state &&
-            message.inputRevision !== state.input_revision ? (
-              <p className="chat-result-note">
-                Earlier response · clinic requirements have since changed.
-              </p>
-            ) : null}
-            {message.tools?.length ? (
-              <Disclosure title="Reported tool activity" keepMounted={false}>
-                <ul>
-                  {message.tools.map((tool, i) => (
-                    <li key={`${tool}-${i}`}>
-                      Requested: {toolLabels[tool] ?? tool}
-                    </li>
-                  ))}
-                </ul>
-                <p>
-                  These are tool requests reported by the backend. Reviewed
-                  drafts and verified calculation results are shown separately;
-                  a request alone does not confirm a change.
-                </p>
-              </Disclosure>
-            ) : null}
-          </article>
-        ))}
-        {busy ? (
+        {messages.map((message) => {
+          const current = Boolean(
+            computed &&
+              message.id === latestPlanMessageId &&
+              message.sessionId === state?.id &&
+              message.plan?.input_revision === computed.input_revision &&
+              message.plan?.generation === computed.generation,
+          );
+          return (
+            <article
+              key={message.id}
+              className={`chat-message ${message.role === "user" ? "user-message" : message.role === "notice" ? "notice-message" : "assistant-message"}`}
+            >
+              {message.role !== "notice" ? (
+                <strong className="message-author">
+                  {message.role === "user" ? "You" : "LifeLine"}
+                </strong>
+              ) : null}
+              {message.plan && !current ? <p className="chat-result-note">Earlier calculated response · not the active plan</p> : null}
+              <p className="assistant-text">{message.text}</p>
+              {message.retryQuestion ? (
+                <Button
+                  variant="outline"
+                  disabled={Boolean(busy)}
+                  onClick={() => void say(message.retryQuestion!, false)}
+                >
+                  Retry reply
+                </Button>
+              ) : null}
+              {message.plan &&
+              computed &&
+              replyReady &&
+              !busy &&
+              !narrationPending ? (
+                current ? (
+                  <InlinePlan computed={message.plan} date={message.date!} selectionId={message.selectionId} />
+                ) : (
+                  <Disclosure
+                    title={`Earlier plan · ${message.date}${message.plan.sunshine_factor < 1 ? ` · ${Math.round((1 - message.plan.sunshine_factor) * 100)}% less sunshine` : ""}`}
+                    keepMounted={false}
+                  >
+                    <p className="chat-result-note">
+                      Earlier calculation, not the active plan.
+                    </p>
+                    <InlinePlan
+                      computed={message.plan}
+                      date={message.date!}
+                      selectionId={message.selectionId}
+                      historical
+                    />
+                  </Disclosure>
+                )
+              ) : null}
+              {message.tools?.length ? (
+                <Disclosure title="What LifeLine checked" keepMounted={false}>
+                  <ul>
+                    {message.tools.map((tool, i) => (
+                      <li key={`${tool}-${i}`}>{toolLabels[tool] ?? tool}</li>
+                    ))}
+                  </ul>
+                </Disclosure>
+              ) : null}
+            </article>
+          );
+        })}
+        {busy || narrationPending ? (
           <p className="live-activity" role="status">
             <LoaderCircle className="loading-spin" aria-hidden="true" />
-            {busy}
+            {busy || "LifeLine is preparing your response…"}
           </p>
         ) : null}
         {state ? errorUI : null}
         {planFailure}
-        {activeProposal && state ? (
+        {activeProposal && state && !busy && !narrationPending ? (
           <ActivityConfirmation
-            key={`assistant-${activeProposal.id}-${state.revision}`}
+            key={`${activeProposal.id}-${state.revision}`}
             proposal={activeProposal}
             state={state}
-            busy={Boolean(busy)}
-            editInitially={activeProposal.id === editingId}
-            onSave={(details) => void save(activeProposal, details)}
+            busy={false}
             onConfirm={() => void confirm(activeProposal)}
             onCancel={() => void cancel(activeProposal)}
-          />
-        ) : null}
-        {computed ? (
-          <PlanOutcome
-            computed={computed}
-            onExplore={() => route.explore("solutions")}
+            onEdit={() =>
+              focusChat(
+                `Change ${activeProposal.details.name ?? "this activity"}: `,
+              )
+            }
           />
         ) : null}
         {state &&
         messages.length > 0 &&
         !computed &&
         !busy &&
+        !narrationPending &&
+        !activeProposal &&
         state.plan_status !== "failed" ? (
           <div className="chat-suggestions" aria-label="Chat options">
-            <Button variant="outline" onClick={calculateFromChat}>
-              Calculate plan
+            <Button variant="outline" onClick={() => requestPlan()}>
+              Plan our electricity
             </Button>
           </div>
         ) : null}
@@ -472,10 +469,10 @@ export default function App() {
             id="chat-input"
             ref={input}
             value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Describe a clinic activity or ask about electricity…"
+            onChange={(event) => setText(event.target.value)}
+            placeholder="Message LifeLine…"
             maxLength={2000}
-            disabled={!state || Boolean(busy)}
+            disabled={!state || Boolean(busy) || narrationPending}
             onKeyDown={(event) => {
               if (
                 event.key === "Enter" &&
@@ -490,14 +487,19 @@ export default function App() {
           <Button
             type="submit"
             aria-label="Send message"
-            disabled={!state || Boolean(busy) || !text.trim()}
+            disabled={
+              !state || Boolean(busy) || narrationPending || !text.trim()
+            }
           >
-            {busy ? <LoaderCircle className="loading-spin" /> : <ArrowUp />}
+            {busy || narrationPending ? (
+              <LoaderCircle className="loading-spin" />
+            ) : (
+              <ArrowUp />
+            )}
           </Button>
         </form>
         <p className="chat-composer-note">
-          Runs locally. Live weather needs internet. Don’t enter patient
-          information.
+          Local AI · Don’t enter patient information.
         </p>
       </div>
     </>
@@ -506,93 +508,62 @@ export default function App() {
     <>
       {errorUI}
       {planFailure}
-      {busy ? <p role="status">{busy}</p> : null}
-      <ActivitiesSection
-        state={state}
-        busy={Boolean(busy)}
-        editingId={editingId}
-        error=""
-        onAdd={() => void add()}
-        onEdit={(activity) => void edit(activity)}
-        onSave={(proposal, details) => void save(proposal, details)}
-        onConfirm={(proposal) => void confirm(proposal)}
-        onCancel={(proposal) => void cancel(proposal)}
-      />
-      <WeatherSection
-        forecast={currentWeather}
-        simulation={computed?.simulation ?? null}
-        date={state.planning_date}
-        loading={session.weatherLoading}
-        error={session.weatherError}
-        onRetry={() => void session.refreshWeather()}
-      />
-      <section
-        data-overview-section="energy"
-        className="overview-section"
-        aria-labelledby="energy-title"
-      >
-        <h2 id="energy-title">Battery &amp; Energy</h2>
-        {computed ? (
-          <BatteryEvidence
-            key={`${state.id}-${computed.input_revision}-${computed.generation}`}
-            result={computed.simulation}
-            date={state.planning_date}
-            intervention={selected}
-            showIndicators={false}
-          />
-        ) : (
-          <p>
-            No current verified battery forecast. Confirmed activities remain
-            saved; calculate the plan to inspect the battery.
-          </p>
-        )}
-        <Disclosure
-          title="Starting energy and battery assumptions"
-          keepMounted={false}
+      <div className="overview-grid">
+        <ActivitiesSection
+          state={state}
+          busy={Boolean(busy)}
+          onChat={focusChat}
+        onAddEquipment={() => setEquipmentOpen(true)}
+        />
+        <WeatherSection location={state.location} date={state.planning_date} computed={computed} selected={selected} />
+        <section
+          data-overview-section="energy"
+          className="overview-section overview-square"
+          aria-labelledby="energy-title"
+          tabIndex={0}
         >
-          <p>
-            Starting stored energy:{" "}
-            {state.clinic.initial_battery_kwh != null
-              ? num(state.clinic.initial_battery_kwh)
-              : "Not provided"}{" "}
-            kWh at 00:00 {state.planning_date}. This comes from the configured
-            clinic assumption, not a current battery measurement. The session is
-            based on {state.selected_clinic_id} inputs.
-          </p>
-        </Disclosure>
-        <Button
-          variant="outline"
-          disabled={Boolean(busy)}
-          onClick={() => void recompute()}
-        >
-          Calculate plan
-        </Button>
-      </section>
-      <SolutionsSection
-        computed={computed}
-        selectedId={state.selected_recovery_intervention_id}
-        busy={Boolean(busy)}
-        onSelect={(id) =>
-          void session.run(
-            "Saving the selected recovery comparison…",
-            (s) => planningApi.selectRecovery(s, id),
-            (s) => s,
-          )
-        }
-        onRecompute={() => void recompute()}
-      />
-      <a className="return-to-chat" href="#assistant">
-        Return to AI Assistant
-      </a>
+          <h2 id="energy-title">Battery &amp; Energy</h2>
+          <div className="overview-square-body">
+            {computed ? (
+              <BatterySummary computed={computed} date={state.planning_date} selected={selected} />
+            ) : (
+              <p className="panel-lead">Ask LifeLine to check the battery.</p>
+            )}
+            <Disclosure title="Battery assumptions" keepMounted={false}>
+              <p>
+                Assumed stored energy at midnight:{" "}
+                {state.clinic.initial_battery_kwh != null
+                  ? `${num(state.clinic.initial_battery_kwh)} kWh`
+                  : "not provided"}
+                . This is a planning assumption, not a current measurement.
+              </p>
+            </Disclosure>
+            <Button
+              variant="outline"
+              disabled={Boolean(busy)}
+              onClick={() => requestPlan(computed ? "Explain the battery results for the exact selected plan compared with the existing baseline, in plain English. Do not recalculate." : "Calculate the clinic battery forecast and describe its limitations in plain English.")}
+            >
+              Ask about the battery
+            </Button>
+          </div>
+        </section>
+        <SolutionsSection
+          computed={computed}
+          busy={Boolean(busy)}
+          selected={selected}
+          onSelect={id => void session.run("Updating the selected comparison…", s => planningApi.selectRecovery(s, id), s => s)}
+          onChat={requestPlan}
+        />
+      </div>
     </>
   ) : (
     <p role="status">
       {session.loading
-        ? "Loading the shared clinic state…"
-        : "Connect to the planning service from AI Assistant to view clinic details."}
+        ? "Loading your clinic…"
+        : "Connect to LifeLine from AI Assistant to view the clinic."}
     </p>
   );
-  return (
+  return (<>
     <Workspace
       page={route.page}
       section={route.section}
@@ -606,12 +577,12 @@ export default function App() {
           />
           <span>
             {modelError
-              ? "Local model connection unavailable"
+              ? "Local AI connection unavailable"
               : agent?.available
                 ? `Local model · ${agent.model}`
                 : agent
-                  ? "Local model unavailable · manual planning ready"
-                  : "Checking the local model…"}
+                  ? "Local AI unavailable"
+                  : "Connecting to local AI…"}
           </span>
           {modelError || (agent && !agent.available) ? (
             <Button
@@ -626,5 +597,6 @@ export default function App() {
         </>
       }
     />
-  );
+    {state ? <AddEquipment open={equipmentOpen} date={state.planning_date} onClose={() => setEquipmentOpen(false)} onSubmit={requestPlan} /> : null}
+  </>);
 }

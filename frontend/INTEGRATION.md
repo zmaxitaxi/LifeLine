@@ -1,12 +1,10 @@
 # Two-page frontend integration
 
-This frontend branch was started from fetched `origin/main` at `ac3a45e` and then fast-forwarded onto Main Chat’s published backend dependency `d47b2b9`. The frontend commit changes only `frontend/`; it does not implement or modify the agent, simulator, optimizer, backend routes, or shared API definitions. The original checkout and its uncommitted work remain untouched.
+Work is isolated on `codex/frontend-two-page` in `/private/tmp/lifeline-frontend-two-page`; the original dirty checkout is untouched. The branch began from fetched `origin/main` (`ac3a45e`) and integrates Main Chat's published backend dependencies through `da52d5f` (including `cf8f693` and `aa3fb39`). Frontend changes are exclusively under `frontend/`; agent, simulation, optimization and API contracts remain owned by Main Chat.
 
-## Integrating
+## Run and integrate
 
-Apply the frontend commit supplied in the handoff after Main Chat’s backend dependency `d47b2b9` (or a descendant containing it). The required authoritative interfaces are `contracts/planning.ts`, `contracts/recovery.ts`, and `docs/ACTIVITY_PLANNING.md`. Do not replace these with the earlier uncommitted recovery prototype’s contract.
-
-Run from the combined repository:
+Apply the supplied frontend commit after its backend dependencies, including native conversation/synthesis commit `d37efc6` supplied by Main Chat. Required contracts are `contracts/planning.ts`, `contracts/recovery.ts`, `contracts/weather.ts`, and `docs/ACTIVITY_PLANNING.md`.
 
 ```sh
 npm --prefix frontend ci
@@ -14,24 +12,24 @@ npm --prefix frontend run build
 .venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8020
 ```
 
-Open `http://127.0.0.1:8020/`. For development, run the backend and `LIFELINE_API_PORT=8020 npm --prefix frontend run dev` separately. An installed Ollama `llama3.1:8b` model supplies local conversation. The UI can create/review activities manually and request deterministic numerical calculations when the local model is unavailable; it does not invent an activity extraction.
+Open `http://127.0.0.1:8020/`. For development use the backend plus `LIFELINE_API_PORT=8020 npm --prefix frontend run dev`. Ollama with `llama3.1:8b` is required for conversation. The existing deterministic numerical tools remain available to Llama; this UI never substitutes a deterministic reply when Llama is unavailable. It shows an explicit retry instead. Older standalone deterministic backend endpoints are preserved but not used by production frontend planning actions.
 
-## State and review boundary
+## Experience and state
 
-- Exactly two primary destinations: **AI Assistant** (default) and **Clinic Overview**. The overview’s four sections are local destinations, not additional primary pages. Calculate plan is a chat suggestion, with no extra empty-plan status/action row. Forecast source/update details live in the overview’s Weather section; the shared header keeps only the concise outlook. Hash navigation preserves the mounted conversation and unsent composer text; Explore plan opens the Solutions section.
-- `usePlanningSession` caches only server responses. Local storage keeps one opaque session ID, never a competing activity, equipment, configuration, or plan record. The server owns conversational context and receives only `expected_revision` and the current question.
-- Activity edits are transient form buffers. **Save draft for review** PATCHes an unconfirmed server proposal. **Confirm** uses the explicit endpoint and a stable idempotency key; only that response can establish a confirmed activity and a new plan. Cancel calls the rejection endpoint.
-- Editing a confirmed activity first creates a proposal with `target_activity_id`; it preserves the original until confirmation. Associations alone do not add energy demand. Extra electrical-hour requirements and new device specifications must be explicitly supplied; existing device ratings and protected requirements are not silently replaced.
-- Both pages use the same `PlanningState`. HTTP 409 reloads the server snapshot and asks for another review instead of replaying a mutation. Failed/ambiguous recalculations hide the previous result until verification. A result renders only when `plan_status=current` and `computed_plan.input_revision` matches `input_revision`.
-- Selecting a recovery comparison uses the server’s revision/input revision/generation check. It does not apply hardware. All task recommendations, battery states and capacities come from the actual selected/recommended scenario; the original workload remains the comparison denominator.
-- Battery playback is only in Clinic Overview. Values are actual integer hourly boundaries, with separate per-scenario capacity, stored kWh, reserve, and unmet-demand notices. CSS eases fill transitions only; no sub-hour values are manufactured. Reduced-motion users receive no fill transitions.
-- Session APIs report successful tool names after completion. The UI shows generic request activity while waiting and the actual reported names afterwards. It does not manufacture incremental backend stages or private model reasoning.
+- Exactly two destinations: **AI Assistant** (default) and **Clinic Overview**. Navigation preserves the mounted conversation and unsent message. Plans and multiple computed alternatives appear inside the chat; there is no Explore plan link. Earlier calculations remain labeled, read-only transcript evidence.
+- Overview fills the available workspace with four equal regions at widths of 600 px and above, including Codex's narrow desktop preview. Smaller phones stack the same four panels. Each panel scrolls independently. Equipment is visible immediately, opens details on selection, and can be added from Overview or chat. Battery playback and calculated plan choices are expanded by default.
+- Overview equipment entry collects only operator-provided information and sends it to Llama through the session agent. Flexible equipment accepts printed watts and whole device-hours; Python derives its energy requirement. Event duration alone never becomes electrical demand. Unknown priority, ratings, operating hours and interruptibility remain questions, not defaults.
+- Every planning action uses the session `/agent` API. Replies render the model's returned validated message unchanged. While a request is running, results and reported tool activity wait for the final response; the UI shows only a generic preparing status, never private model reasoning. Read-only explanations use the exact selected comparison without changing its generation or selection.
+- `usePlanningSession` caches server responses only. Local storage contains one opaque session ID, never a competing configuration. Confirm and Cancel use the explicit canonical review endpoints; equipment is not adopted before Confirm. HTTP 409 refreshes and requires review instead of silently replaying changes.
+- Results require `plan_status=current` and a matching input revision. Pending, failed or ambiguous recalculations suppress stale evidence. Recovery selection uses server revision/input revision/generation checks and changes only the inspected comparison, not physical equipment.
+- Every battery value is an actual hourly boundary from the selected scenario's `.plan`, including the existing baseline. Percentages use that scenario's capacity; stored kWh, capacity, reserve and essential shortages stay distinct. Playback steps whole hours only and resets on new results or selection. CSS fill easing does not create intermediate simulated values; reduced motion removes it.
+- Weather uses `/api/weather/outlook` for actual current model conditions and seven daily forecasts, separately from the energy model's solar forecast. Selecting the calculated planning date/hour displays actual baseline and selected `pv_kwh` and energy flows. Other dates explicitly have no clinic energy calculation; weather codes never generate fictional seven-day energy values. Retrieval errors have a short retry path; missing readings show unavailable rather than zero. Source/timestamp/uncertainty stay in details.
 
-## Limits to retain
+## Limits
 
-Sessions are process-memory state. A server restart invalidates the stored ID; the UI requires an explicit new-session action and explains that previous activities were not copied. Base clinic/location/date/energy inputs are immutable within a session in this backend scope. Initial bootstrap clearly uses the configured Kisumu example and its starting-energy assumption, not a measured battery reading. Inventory ratings are read-only; new-device proposal specifications can be edited manually. Clinic base edits or another planning date require a deliberately created new session through the existing API. No persistent accounts, hardware deployment, medical-cycle validation, or clinical availability guarantee is implied.
+Sessions are in process memory. A server restart invalidates the stored ID; the UI explains this and requires an explicit new-session action. Earlier activities are never silently copied. Bootstrap uses labeled Kisumu example inputs and an assumed midnight battery state, not a measured current charge. Base clinic/date/configuration inputs are immutable within a session in the current contract. There is no physical equipment control, infrastructure adoption, clinical-cycle validation or clinical availability guarantee.
 
-## Verification
+## Validation
 
 ```sh
 npm --prefix frontend run typecheck
@@ -40,8 +38,8 @@ npm --prefix frontend run test:e2e
 .venv/bin/python -m pytest backend/tests -q
 ```
 
-Playwright starts isolated ports **8012** (backend test harness) and **5182** (Vite); override with `LIFELINE_API_PORT` and `LIFELINE_UI_PORT`. It does not reuse a production server. Browser artifacts and weather-outage flag files are written to the OS temporary directory. The harness is under `frontend/e2e/support`; it injects test weather, a matching clock, and Ollama transport only. Every planning-state mutation, confirmation boundary, compiler, simulator, optimizer and recovery comparison runs through the unmodified real backend. Fixture values never enter the production app.
+Playwright uses isolated ports 8012/5182, configurable with `LIFELINE_API_PORT`/`LIFELINE_UI_PORT`. Browser artifacts live in the OS temporary directory. The Browser plugin was not available, so tests use the existing Playwright setup. The test harness injects model-wire and provider-weather fixtures; the authoritative session API, validation, compiler, simulator, optimizer and recovery evaluation execute unchanged. Fixtures never enter the production app. Real installed-model/live-weather validation remains a separate integration check.
 
-The suite covers navigation/chat persistence; structured proposals, follow-ups, missing specifications and explicit confirmation/rejection; manual creation/revision; conflict refresh; deterministic calculation without a local-model answer; pending/failed/stale-result suppression; actual hourly battery values/percentages/capacity preservation/reserve/essential shortages; playback reset; forecast failure/retry; expired sessions; mobile layout and keyboard operation. Main Chat separately owns real installed-model/live-weather evaluation evidence.
+Coverage includes chat/navigation persistence, model replies and follow-ups, actual tool calls, explicit proposal confirmation/rejection, equipment entry and backend-derived energy, final-answer gating, reply retry without deterministic substitution, read-only selected-plan explanations, stale-result clearing, full-width/narrow/mobile layouts, keyboard operation, scrollable equipment details, current/week weather and errors, weather-hour energy grounding, canonical plan selection, all 25 battery boundaries, capacity preservation, reserve and essential-shortage notices, playback reset and reduced motion.
 
-Latest verified frontend handoff: **17 Chromium journeys**, **362 backend checks**, TypeScript, and production build pass against the Main Chat dependency. Desktop checks cover page identity, meaningful content, no framework overlay, console health, and the real confirm/edit/recalculate interaction. Mobile checks use 375×812, keyboard navigation, no horizontal overflow, and exact hourly battery readouts. Browser plugin was unavailable, so validation used the existing Playwright runtime. Visual evidence is saved outside the repository in the OS temporary directory (`lifeline-two-page-assistant.png`, `lifeline-two-page-proposal.png`, `lifeline-two-page-overview-mobile.png`).
+Verified against `d37efc6`: **25 Playwright journeys**, **424 backend tests**, TypeScript and the production build pass. Browser checks cover 1280×900 desktop, 631×955 in-app preview and 375×812 phone layouts. The full-width desktop and preview screenshots are saved to the OS temporary directory as `lifeline-four-square-overview.png` and `lifeline-preview-four-panels.png`.

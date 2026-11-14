@@ -93,7 +93,7 @@ export async function open(page: Page, state: PlanningState) {
   );
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Plan your clinic’s day.", exact: true }),
+    page.getByRole("heading", { name: "How can LifeLine help today?", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByRole("textbox", { name: "Message LifeLine", exact: true }),
@@ -117,7 +117,7 @@ export const proposal = (page: Page) =>
   page.locator('[data-testid="activity-proposal"]:visible');
 export async function readyDraft(page: Page) {
   await say(page, "We have a vaccination campaign tomorrow from 9 AM to 3 PM.");
-  await expect(proposal(page)).toContainText("Information still needed");
+  await expect(proposal(page)).toContainText("Still needed");
   await say(page, "Use the Vaccine refrigerator.");
   await expect(
     proposal(page).getByRole("button", { name: "Confirm", exact: true }),
