@@ -145,6 +145,24 @@ def test_explain_exact_selected_size_reads_existing_baseline_without_weather_or_
         assert source['essential_summary']['remaining_unserved_essential_energy']==f"{s['computed_plan']['simulation']['baseline']['metrics']['critical_unserved_kwh']:.3f} kWh"
 
 
+@pytest.mark.parametrize('question',[
+    'Calculate recovery options and explain the updated electricity plan.',
+    'Recompute the plan with the latest forecast and explain the results.',
+    'Test the plan with 50% less sunshine and explain the comparison.',
+])
+def test_explicit_calculation_plus_explanation_is_not_forced_into_read_only_tool(question):
+    service,_=service_for()
+    agent,calls=agent_with([{'name':'recompute_clinic_plan','arguments':{'include_recovery':True}}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        s=create(c)
+        d=ask(c,s,question)
+        assert d['mode']=='local_tool_agent',d['message']
+        assert d['tool_calls']==['recompute_clinic_plan']
+        assert d['state']['plan_status']=='current'
+        wire=json.loads(next(call.content for call in calls if call.method=='POST'))
+        assert 'recompute_clinic_plan' in {tool['function']['name'] for tool in wire['tools']}
+
+
 def test_native_nurse_duration_and_priority_synonyms_leave_energy_arithmetic_to_python():
     args={'name':'Campaign','start_hour':10,'end_hour':12,'equipment_ids':['portable-pump'],
         'additional_equipment':[{'id':'portable-pump','name':'portable pump','category':'optional',

@@ -340,7 +340,11 @@ async def _ask_session_agent(session_id, body, store, catalog, service, lock, ag
     messages.append({'role':'user', 'content':'Current operator request: ' + body.question})
     calls = []
     social_intent = conversational_intent(body.question)
-    explanation_only = bool(re.search(r'\b(?:explain|understand|meaning)\b',body.question,re.I) and re.search(r'\b(?:plan|option|selected|comparison|result)\b',body.question,re.I))
+    # Read-only explanation must not swallow an explicit calculation request.
+    # Negated requests such as "explain without recalculating" stay read-only.
+    calculation_text=re.sub(r"\b(?:do not|don't|without|avoid|skip|no need to)\s+(?:a\s+)?(?:recalculat\w*|calculat\w*|recomput\w*|rerun\w*|refresh\w*)\b",'',body.question,flags=re.I)
+    new_calculation=bool(re.search(r'\b(?:recalculat\w*|calculat\w*|recomput\w*|rerun\w*|refresh\w*|new forecast|latest forecast|what if|test\w*)\b',calculation_text,re.I))
+    explanation_only = bool(not new_calculation and re.search(r'\b(?:explain|understand|meaning)\b',body.question,re.I) and re.search(r'\b(?:plan|option|selected|comparison|result)\b',body.question,re.I))
     offered_tools = [conversation_definition()] if social_intent else definitions(state, latest_fields)
     if explanation_only:
         offered_tools = [tool for tool in offered_tools if tool['name'] == 'explain_current_plan']
