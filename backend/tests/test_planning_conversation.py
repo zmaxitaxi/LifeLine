@@ -335,3 +335,37 @@ def test_effective_confirmed_runtime_replaces_baseline_in_read_only_fact_context
         assert reply['state']==state and len(weather)==count
         wire=json.loads(next(call.content for call in calls if call.method=='POST'))
         assert 'explicit confirmed minimum total daily device runtime 3 hours' in wire['messages'][1]['content']
+
+
+def test_truthful_pending_settings_update_is_not_mistaken_for_adoption():
+    service,weather=service_for()
+    authored='The proposed energy settings have been updated to reflect a 40% starting battery charge. The proposed day-start stored energy is now 4.8 kWh. The current stored-energy reading remains unchanged at 2.4 kWh.'
+    agent,_=agent_with([{'name':'update_energy_settings_draft','arguments':{'initial_battery_pct':40.}}],syntheses=[{'content':authored}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client)
+        state=post(client,f"{BASE}/{state['id']}/energy-proposals",{'expected_revision':state['revision'],
+            'settings':{'battery_capacity_kwh':12.},'current_battery_reading':{'energy_kwh':2.4,'measured_at':'2026-11-13T22:00:00Z'}})
+        active=state['active_energy_proposal_id'];reading=state['energy_proposals'][0]['current_battery_reading']
+        reply=ask(client,state,'Use a 40% starting battery charge in the same draft; leave the reading alone.')
+        assert reply['mode']=='local_tool_agent' and reply['message']==authored
+        assert reply['state']['active_energy_proposal_id']==active
+        assert reply['state']['energy_settings']==state['energy_settings']
+        assert reply['state']['current_battery_reading'] is None
+        assert reply['state']['energy_proposals'][0]['current_battery_reading']==reading and not weather
+
+
+@pytest.mark.parametrize('message',[
+    'The proposed energy settings are now active.',
+    'The pending energy settings have been applied.',
+    'The draft settings have been updated and are now confirmed.',
+])
+def test_actual_draft_update_still_cannot_be_described_as_adopted(message):
+    service,weather=service_for()
+    agent,_=agent_with([{'name':'update_energy_settings_draft','arguments':{'initial_battery_pct':40.}}],
+        syntheses=[{'content':message},{'content':'The settings draft remains unconfirmed and available for review.'}])
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as client:
+        state=create(client)
+        state=post(client,f"{BASE}/{state['id']}/energy-proposals",{'expected_revision':state['revision'],'settings':{'battery_capacity_kwh':12.}})
+        reply=ask(client,state,'Use a 40% starting battery charge in that draft.')
+        assert reply['message']=='The settings draft remains unconfirmed and available for review.'
+        assert reply['state']['energy_settings']==state['energy_settings'] and not weather

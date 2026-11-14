@@ -513,7 +513,10 @@ def _non_operational_guards(message,state,calls):
     pending_activity=next((p for p in state.proposals if p.id==state.active_proposal_id),None)
     pending_energy=state.active_energy_proposal_id is not None
     passive_settings=re.search(r'\b(?:power |energy |battery |solar |proposed |new )?settings\s+(?:are|is|have been|has been)\s+(?:(?:now|already|just)\s+)?(?:active|applied|adopted|confirmed|updated)\b',message,re.I)
-    if pending_energy and passive_settings and not (re.search(r'\b(?:existing|original|previous|confirmed)\b',message,re.I) and re.search(r'\b(?:draft|proposal|new settings)\b.*\b(?:not|pending|unconfirmed)\b',message,re.I)):
+    draft_updated=any(name in calls for name in ('propose_energy_settings','update_energy_settings_draft')) and bool(re.search(r'\b(?:proposed|draft|pending)\b.{0,40}\bsettings\b|\bsettings draft\b',message,re.I))
+    adopted_claim=bool(re.search(r'\b(?:are|is|have been|has been)\s+(?:(?:now|already|just)\s+)?(?:active|applied|adopted|confirmed)\b',message,re.I))
+    truthful_draft_update=draft_updated and not adopted_claim
+    if pending_energy and passive_settings and not truthful_draft_update and not (re.search(r'\b(?:existing|original|previous|confirmed)\b',message,re.I) and re.search(r'\b(?:draft|proposal|new settings)\b.*\b(?:not|pending|unconfirmed)\b',message,re.I)):
         raise PlanningError('INVALID_ACTIVITY','The pending energy settings are not active; only explicit operator confirmation can adopt them.')
     passive_activity=re.search(r'\b(?:activity|campaign|draft|proposal|changes?)\s+(?:is|are|has been|have been)\s+(?:(?:now|already|just)\s+)?(?:confirmed|adopted|applied|active)\b',message,re.I)
     if passive_activity:
