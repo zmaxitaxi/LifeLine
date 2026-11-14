@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import create_app
 from app.planning_models import PlanningState
-from app.planning_conversation import validate_reply_content, reply_context
+from app.planning_conversation import validate_reply_content, reply_context, collect_reply_facts
 from app.planning_state import PlanningError
 from test_planning_state import create, post, BASE
 from test_weather_forecast import service_for
@@ -19,15 +19,23 @@ def test_essential_coverage_is_distinct_from_unfinished_flexible_work_and_reserv
             'planning_date':forecast['days'][1]['date'],'midnight_battery_kwh':6.,'clinic':{'scenario':'scheduling'}})
         state=post(client,f"{BASE}/{state['id']}/recompute",{'expected_revision':state['revision'],'sunshine_factor':.5,'include_recovery':True})
         parsed=model_state(state)
+        facts=collect_reply_facts(parsed,('recompute_clinic_plan',))
+        task=next(t for t in parsed.computed_plan.simulation.optimized.flexible_tasks if t.task_id=='auxiliary_laundry')
+        for allocation in task.allocations:
+            if allocation.served_kwh>1e-6:
+                assert f'{allocation.hour:02d}:00–{allocation.hour+1:02d}:00 ({allocation.served_kwh:.3f} kWh supplied)' in facts['optimized_schedule']
+        assert 'hourly model slots' in facts['optimized_schedule']
         messages=(
             'A test battery capacity of 10 kWh meets modeled essential demand but leaves 2.100 kWh of flexible work unfinished.',
             'A test battery storage capacity of 10 kWh (up from 8 kWh) models essential demand as met but leaves 2.100 kWh of flexible work unfinished, with lowest stored energy at 4.172 kWh.',
             'A test solar capacity of 3.5 kW has a lowest stored battery level of 4.975 kWh above its 4.800 kWh reserve target.',
+            'The optimized schedule raises the battery minimum to 4.172 kWh.',
         )
         for message in messages:
             assert validate_reply_content(message,parsed,'Compare recovery options.',('recompute_clinic_plan',))==message
         for bad in ('A test battery capacity of 10 kWh meets modeled essential demand and all flexible requirements.',
                     'A test battery capacity of 10 kWh meets modeled essential demand but all flexible work is completed.',
+                    'The optimized schedule lowers the battery minimum to 4.172 kWh.',
                     'A test solar capacity of 3.5 kW has a lowest stored battery level of 4.800 kWh above its 4.800 kWh reserve target.'):
             with pytest.raises(PlanningError):
                 validate_reply_content(bad,parsed,'Compare recovery options.',('recompute_clinic_plan',))

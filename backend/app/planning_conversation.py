@@ -426,6 +426,18 @@ def synthesis_data(state, facts):
     return data
 
 
+def schedule_fact(plan,equipment,label):
+    """Expose existing dispatch slots to the assistant without new calculations."""
+    names={item.id:item.name for item in equipment}
+    rows=[]
+    for task in plan.flexible_tasks:
+        slots=', '.join(f'{a.hour:02d}:00–{a.hour+1:02d}:00 ({a.served_kwh:.3f} kWh supplied)'
+            for a in task.allocations if a.served_kwh>1e-6)
+        rows.append(f'{names.get(task.task_id,task.task_id)}: '+(slots or 'no supplied slots')+
+            f'; total supplied {task.served_kwh:.3f} kWh; unfinished work {task.deferred_kwh:.3f} kWh.')
+    return label+': '+' '.join(rows)+' These are hourly model slots; use within a slot may be partial. They do not establish a complete medical equipment cycle.'
+
+
 
 
 def collect_reply_facts(state, calls=(), question=''):
@@ -497,6 +509,9 @@ def collect_reply_facts(state, calls=(), question=''):
     if fresh:
         baseline=state.computed_plan.simulation.baseline.metrics
         optimized=state.computed_plan.simulation.optimized.metrics
+        simulation=state.computed_plan.simulation
+        facts['baseline_schedule']=schedule_fact(simulation.baseline,simulation.equipment,'Existing fixed schedule')
+        facts['optimized_schedule']=schedule_fact(simulation.optimized,simulation.equipment,'Optimized flexible-equipment schedule')
         facts['optimized_summary']=(f'For the optimized schedule, essential requested energy is {optimized.critical_requested_kwh:.3f} kWh; '
             f'essential shortfall is {optimized.critical_unserved_kwh:.3f} kWh; flexible work unfinished is {optimized.flexible_deferred_kwh:.3f} kWh.')
         facts['optimized_battery']=f'The optimized schedule lowest battery level is {optimized.min_soc_kwh:.3f} kWh.'
@@ -512,6 +527,10 @@ def collect_reply_facts(state, calls=(), question=''):
         computed,_,_=fact_references(state,['explain_current_plan'] if calls and calls[-1]=='explain_current_plan' else ['recompute_clinic_plan'])
         facts.update(computed)
         recovery=state.computed_plan.recovery
+        if recovery and state.selected_recovery_intervention_id:
+            chosen=next((o for o in recovery.options+[recovery.existing] if o.id==state.selected_recovery_intervention_id),None)
+            if chosen:
+                facts['selected_schedule']=schedule_fact(chosen.plan,chosen.simulation.equipment,'Exact selected hypothetical comparison schedule')
         if recovery and not (calls and calls[-1]=='explain_current_plan' and state.selected_recovery_intervention_id):
             for index,option in enumerate(recovery.options):
                 key=f'option_{option.kind}_case_{index}'
@@ -677,6 +696,20 @@ def validate_reply_content(message,state,question,calls=(),references=None):
                 continue
             raise PlanningError('INVALID_ACTIVITY','Numerical claims need verified quantities with units, dates or local times.')
     fresh=state.plan_status=='current' and state.computed_plan is not None and state.computed_plan.input_revision==state.input_revision
+    if fresh:
+        for sentence in re.split(r'(?<=[.!?])\s+|\n+',message):
+            if not re.search(r'\b(?:optimized|optimised|rescheduled)\s+schedule\b',sentence,re.I):
+                continue
+            direction=re.search(r'\b(raises?|increases?|lowers?|decreases?|reduces?)\s+(?:the\s+)?(?:battery minimum|minimum (?:stored )?battery (?:level|energy)|lowest (?:stored )?battery (?:level|energy))\s+to\b',sentence,re.I)
+            if not direction:
+                continue
+            levels=[value for value,unit,start,end in quantities(sentence)[0]
+                if unit=='kwh' and start>=direction.end() and quantity_role(sentence,start,end)=='battery_minimum']
+            if levels:
+                baseline=state.computed_plan.simulation.baseline.metrics.min_soc_kwh
+                increases=bool(re.match(r'raise|increase',direction[1],re.I))
+                if increases and levels[0]<baseline-1e-3 or not increases and levels[0]>baseline+1e-3:
+                    raise PlanningError('INVALID_ACTIVITY','The stated battery-minimum direction contradicts the current baseline comparison. Report the verified level and use the correct direction, or omit the directional verb.')
     numeric_result=False
     for sentence in re.split(r'(?<=[.!?])\s+|\n+',message):
         proposed_question=bool(re.search(r'\b(?:shall i|would you like|we can|we could|i can)\b.*\b(?:test|compare|evaluate|check)\b',sentence,re.I))

@@ -17,7 +17,8 @@ const browser=await chromium.launch({headless:true});
 let report={passed:false,base,implementation_commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),started_at:new Date().toISOString(),browser_path:'Browser plugin not available; repository Playwright',viewport:{width:1280,height:1000},provider:'Actual Anthropic Claude Haiku',weather:'Explicit synthetic demo weather',steps:[],errors:[]};
 const save=()=>writeFile(reportPath,JSON.stringify(report,null,2)+'\n',{mode:0o600});
 try{
- const restore=process.argv.includes('--restore');
+ const slots=process.argv.includes('--slots');
+ const restore=process.argv.includes('--restore')||slots;
  if(restore)report=JSON.parse(await readFile(reportPath,'utf8'));
  const context=await browser.newContext({viewport:{width:1280,height:1000},...(restore?{storageState:join(dir,'browser-state.json')}: {})});
  const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
@@ -49,10 +50,18 @@ try{
  if(restore){
   await expect(page.getByLabel('Message LifeLine',{exact:true})).toBeEditable();
   expect(await getState()).toEqual(report.final_state);
+  if(slots){
+   const current=await say('explain_laundry_slots','Using the current optimized schedule, what are the auxiliary laundry\'s hourly slots? Use the existing calculation; do not recalculate or change equipment.');
+   expect(current).toEqual(report.final_state);
+   report.expected_laundry_allocations=current.computed_plan.simulation.optimized.flexible_tasks.find(t=>t.task_id==='auxiliary_laundry').allocations;
+   report.final_conversation=await(await page.request.get(`${base}/api/planning/sessions/${current.id}/conversation`)).json();
+   await save();console.log(JSON.stringify({passed:true,allocations:report.expected_laundry_allocations,report:reportPath}));
+  }else{
   const conversation=await(await page.request.get(`${base}/api/planning/sessions/${report.final_state.id}/conversation`)).json();
   expect(conversation).toEqual(report.final_conversation);
   report.restart_verified=true;report.steps.push({name:'backend_restart_restores_exact_state_and_conversation',passed:true});await save();
   await screenshot('restored-after-backend-restart');console.log(JSON.stringify({passed:true,restart_verified:true,report:reportPath}));
+  }
  }else{
   const started=performance.now();
   await page.getByLabel('Clinic name',{exact:true}).fill('Hackathon rehearsal clinic');
