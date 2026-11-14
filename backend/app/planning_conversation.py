@@ -180,23 +180,23 @@ def quantities(text):
 
 def quantity_role(text, start, end):
     entries, _ = quantities(text)
-    previous = max((b for _,_,a,b in entries if b <= start), default=0)
-    following = min((a for _,_,a,b in entries if a >= end), default=len(text))
-    left = re.split(r'(?<=[.!?])\s+|;|,|\band\b|\bwhile\b', text[previous:start], flags=re.I)[-1][-70:]
-    right = re.split(r'(?<=[.!?])\s+|;|,|\band\b|\bwhile\b', text[end:following], flags=re.I)[0][:70]
+    previous = max((b for _,unit,a,b in entries if b <= start and unit not in ('date','local_hour')), default=0)
+    following = min((a for _,unit,a,b in entries if a >= end and unit not in ('date','local_hour')), default=len(text))
+    left = re.split(r'(?<=[.!?])\s+|;|,|\band\b|\bwhile\b', re.sub(r'\([^)]*\)','',text[previous:start]), flags=re.I)[-1][-70:]
+    right = re.split(r'(?<=[.!?])\s+|;|,|\band\b|\bwhile\b', re.sub(r'\([^)]*\)','',text[end:following]), flags=re.I)[0][:70]
     clause = (left + ' ' + right).lower()
+    if 'reserve' in clause:
+        return 'reserve'
+    if re.search(r'\b(?:unserved|unmet|shortfall|shortage|deficit|gap)\b',clause):
+        return 'essential_unserved'
     if re.match(r'\s*(?:battery|storage)\b',right,re.I) and not re.search(r'lowest|minimum',left,re.I):
         return 'battery_capacity'
     if 'battery' in clause and 'capacity' in clause:
         return 'battery_capacity'
-    if 'reserve' in clause:
-        return 'reserve'
     if 'battery' in clause and re.search(r'lowest|minimum', clause):
         return 'battery_minimum'
     if re.search(r'flexible|work', clause) and re.search(r'unfinished|deferred', clause):
         return 'flexible_unfinished'
-    if re.search(r'unserved|shortfall|shortage|deficit', clause):
-        return 'essential_unserved'
     if re.search(r'requests?|needs?|requires?|demand', clause):
         return 'requested'
     if re.fullmatch(r'\s*to\s*',left):

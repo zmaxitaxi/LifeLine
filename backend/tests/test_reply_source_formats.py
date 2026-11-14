@@ -61,6 +61,9 @@ def test_output_and_storage_options_bind_their_own_tested_size_and_result():
         assert validate_reply_content(good,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==good
         negative='The tested battery capacity alternative at 10 kWh did not resolve the modeled essential shortfall of 1.200 kWh.'
         assert validate_reply_content(negative,parsed,'Compare the tested alternatives.',('recompute_clinic_plan',))==negative
+        for message in ('Under the current baseline and optimized schedules, 1.200 kWh of essential evening demand (19:00 and 20:00) goes unserved.',
+                        'I can compare a larger battery output limit or a larger battery capacity to see whether either closes the 1.200 kWh gap.'):
+            assert validate_reply_content(message,parsed,'Explain the result.',('recompute_clinic_plan',))==message
         for bad in ('The tested battery output alternative at 0.9 kW meets the modeled essential demand.',
                     'The tested battery output alternative at 1.4 kW leaves 0.200 kWh of essential shortfall.'):
             with pytest.raises(PlanningError):

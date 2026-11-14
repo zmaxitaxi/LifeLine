@@ -140,7 +140,11 @@ def main():
         stack.enter_context(patch.object(planning_state.PlanningStore,'record_turn',metrics.asynchronous('conversation_persistence',planning_state.PlanningStore.record_turn)))
         with TestClient(create_app(forecast_service=weather,agent_service=agent)) as client:
             for name in args.cases.split(','):
-                response=client.post('/api/planning/sessions',json=clinic_body());response.raise_for_status();state=response.json()
+                body=clinic_body()
+                if name=='proposal':
+                    body.update(clinic={'scenario':'scheduling'},midnight_battery_kwh=6.)
+                response=client.post('/api/planning/sessions',json=body);response.raise_for_status();state=response.json()
+                refrigerator=next((e for e in state['equipment_inventory'] if 'refrigerator' in e['name'].lower()),None)
                 if name=='followup':
                     state=client.post(f"/api/planning/sessions/{state['id']}/recompute",json={'expected_revision':state['revision'],'include_recovery':True}).json()
                     plan=state['computed_plan'];option=max((o for o in plan['recovery']['options'] if o['kind']=='output'),key=lambda o:o['config']['max_discharge_kw'])
@@ -156,6 +160,7 @@ def main():
                 question={'conversation':'Hello',
                     'assessment':'Can our clinic safely operate tomorrow given the weather forecast?',
                     'vaccination':'What if I wanted to plan a vaccination clinic today at 10 AM?',
+                    'proposal':f"Please stage a vaccination campaign tomorrow from 10 AM to 3 PM using the existing {refrigerator['name'] if refrigerator else 'refrigerator'}. Do not change any device operating hours.",
                     'recovery':'What changes could resolve our modeled essential electricity shortfall? Please compare tested recovery alternatives.',
                     'followup':'Please explain my exact selected plan against the existing baseline without recalculating or refreshing weather.',
                     'history':'Actually, I mean tomorrow at 10 AM. What else do you need to plan that vaccination campaign?'}[name]
@@ -166,6 +171,7 @@ def main():
                 if name=='conversation':correct=success and current==before and not data.get('tool_calls')
                 elif name=='assessment':correct=success and current['plan_status']=='current' and 'recompute_clinic_plan' in data.get('tool_calls',[])
                 elif name=='vaccination':correct=success and current==before and (('today' in text.lower() and 'tomorrow' in text.lower()) or (datetime.now(ZoneInfo('Africa/Nairobi')).date().isoformat() in text and before['planning_date'] in text)) and 'power rating' not in text.lower()
+                elif name=='proposal':correct=success and current['input_revision']==before['input_revision'] and current['confirmed_activities']==before['confirmed_activities'] and len(current['proposals'])==1 and current['proposals'][0]['details']['start_hour']==10 and current['proposals'][0]['details']['end_hour']==15 and current['proposals'][0]['details']['equipment_ids']==[refrigerator['id']] and not any(e['phase']=='weather' for e in metrics.events)
                 elif name=='recovery':correct=success and current.get('computed_plan') is not None and current['computed_plan'].get('recovery') is not None
                 elif name=='followup':correct=success and current==before and 'recompute_clinic_plan' not in data.get('tool_calls',[])
                 else:
