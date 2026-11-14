@@ -29,14 +29,13 @@ test("page navigation preserves the conversation and unsent message", async ({ p
   await expect(textbox).toHaveValue("I want to change the clinic work"); await expect(page.locator(".assistant-message")).toContainText("Hello!");
 });
 
-test("equipment can be entered from Overview but is proposed by the LLM and confirmed separately", async ({ page, request }) => {
+test("equipment can be entered and reviewed in Overview without requiring the LLM", async ({ page, request }) => {
   const state=await seed(request); await open(page,state); await overview(page).click(); await expect(overview(page)).toHaveAttribute("aria-current","page");
   await page.getByRole("button",{name:"Add equipment",exact:true}).click(); const dialog=page.getByRole("dialog",{name:"Add clinic equipment",exact:true});
   await dialog.getByRole("textbox",{name:"Equipment name",exact:true}).fill("Campaign light"); await dialog.getByRole("spinbutton",{name:"Power rating on the label (W)",exact:true}).fill("200");
   await dialog.getByRole("combobox",{name:"Does it need protected power?",exact:true}).selectOption("critical"); await dialog.getByRole("combobox",{name:"Start time",exact:true}).selectOption("10"); await dialog.getByRole("combobox",{name:"Finish time",exact:true}).selectOption("12");
   expect((await read(request,state.id)).equipment_inventory).toHaveLength(2);
-  const sent=page.waitForRequest(r=>r.url().endsWith("/agent")); await dialog.getByRole("button",{name:"Review with LifeLine",exact:true}).click();
-  expect((await sent).postDataJSON().question).toContain("200 W"); await expect(dialog).not.toBeVisible();
+  let agentCalls=0;page.on('request',r=>{if(r.url().endsWith('/agent'))agentCalls++;});await dialog.getByRole("button",{name:"Review equipment",exact:true}).click();await expect(dialog).not.toBeVisible();expect(agentCalls).toBe(0);
   const draft=page.locator('[data-testid="activity-proposal"]:visible'); await expect(draft).toContainText("Campaign light"); await expect(draft).toContainText("200 W");
   expect((await read(request,state.id)).equipment_inventory).toHaveLength(2);
   await draft.getByRole("button",{name:"Confirm",exact:true}).click(); await expect(page.locator("#chat-input")).toBeEditable();
@@ -76,7 +75,7 @@ test("flexible equipment asks for device hours and the backend derives its energ
   await dialog.getByRole('textbox',{name:'Equipment name',exact:true}).fill('Portable pump');await dialog.getByRole('spinbutton',{name:'Power rating on the label (W)',exact:true}).fill('500');
   await dialog.getByRole('combobox',{name:'Does it need protected power?',exact:true}).selectOption('flexible');await dialog.getByRole('combobox',{name:'Start time',exact:true}).selectOption('10');await dialog.getByRole('combobox',{name:'Finish time',exact:true}).selectOption('14');
   await dialog.getByRole('spinbutton',{name:'How many hours must this device run?',exact:true}).fill('2');await dialog.getByRole('combobox',{name:'Can the work pause and resume?',exact:true}).selectOption('yes');
-  await dialog.getByRole('button',{name:'Review with LifeLine',exact:true}).click();const draft=page.locator('[data-testid="activity-proposal"]:visible');await expect(draft.getByRole('button',{name:'Confirm',exact:true})).toBeEnabled();
+  await dialog.getByRole('button',{name:'Review equipment',exact:true}).click();const draft=page.locator('[data-testid="activity-proposal"]:visible');await expect(draft.getByRole('button',{name:'Confirm',exact:true})).toBeEnabled();
   expect((await read(request,state.id)).equipment_inventory).toHaveLength(2);await draft.getByRole('button',{name:'Confirm',exact:true}).click();await expect(page.locator('#chat-input')).toBeEditable();
   const next=await read(request,state.id);const equipment=next.equipment_inventory.find(e=>e.name==='Portable pump')!;expect(equipment.category).toBe('flexible');if(equipment.category==='flexible'){expect(equipment.required_energy_kwh).toBe(1);expect(equipment.allowed_hours).toEqual([10,11,12,13]);}
 });

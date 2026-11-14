@@ -200,11 +200,13 @@ export function BatteryEvidence({
   date,
   intervention,
   showIndicators = true,
+  resetKey,
 }: {
   result: SimulationResponse;
   date: string;
   intervention?: EvidenceOption;
   showIndicators?: boolean;
+  resetKey:string;
 }) {
   const [hour, setHour] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -224,7 +226,7 @@ export function BatteryEvidence({
     setHour(0);
     setPlaying(false);
     setMode(!intervention || intervention.kind === "existing" ? "current" : "compare");
-  }, [result, intervention]);
+  }, [resetKey]);
   useEffect(() => {
     if (!playing) return;
     const timer = window.setInterval(

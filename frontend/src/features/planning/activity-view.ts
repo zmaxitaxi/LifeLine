@@ -109,6 +109,7 @@ export function activityView(
         state.equipment_inventory.find((e) => e.id === c.equipment_id)?.name ??
           c.equipment_id,
       );
+      if(c.required_duration_hours != null)return `${name}: at least ${c.required_duration_hours} total daily operating hours. Existing larger work requirements remain protected.${c.allowed_hours ? ` Allowed during ${timeRanges(c.allowed_hours)}.` : ""}`;
       return c.required_hours
         ? `${name}: additional required hours ${timeRanges(c.required_hours)}. Existing essential hours stay protected.`
         : `${name}: flexible operation restricted to ${timeRanges(c.allowed_hours ?? [])}.`;

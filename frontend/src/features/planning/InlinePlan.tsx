@@ -96,20 +96,20 @@ export function InlinePlan({
   date,
   historical = false,
   selectionId,
+  optionIds = [],
+  showSchedule = true,
 }: {
   computed: ComputedPlan;
   date: string;
   historical?: boolean;
   selectionId?: string;
+  optionIds?: string[];
+  showSchedule?: boolean;
 }) {
   const recovery = computed.recovery;
-  const seen = new Set<string>();
-  const alternatives = (recovery?.options ?? []).filter((option) => {
-    if (seen.has(option.kind)) return false;
-    seen.add(option.kind);
-    return true;
-  });
-  const chosen = recovery ? [recovery.existing, ...recovery.options].find(o => o.id === (selectionId ?? recovery.recommended_option_id)) : undefined;
+  const available = recovery ? [recovery.existing,...recovery.options] : [];
+  const alternatives = optionIds.map(id=>available.find(option=>option.id === id)).filter((option):option is RecoveryOption=>Boolean(option));
+  const chosen = recovery ? [recovery.existing, ...recovery.options].find(o => o.id === (selectionId ?? optionIds[0] ?? recovery.recommended_option_id)) : undefined;
   const plan = chosen?.plan ?? computed.simulation.optimized;
   const equipment =
     chosen?.simulation.equipment ?? computed.simulation.equipment;
@@ -127,8 +127,9 @@ export function InlinePlan({
           ? ` · ${Math.round((1 - computed.sunshine_factor) * 100)}% less sunshine`
           : ""}
       </p>
-      <p className="plan-date">{selectionId ? "Selected comparison" : "Recommended comparison"}: {chosen ? recoveryTitle(chosen.kind) : "Equipment rescheduling"}</p>
-      <Disclosure title="Equipment times in this plan" keepMounted={false}>
+      <p className="plan-date">{optionIds.length > 1 ? "Calculated comparisons" : `${selectionId ? "Selected comparison" : "Recommended plan"}: ${chosen ? recoveryTitle(chosen.kind) : "When to run equipment"}`}</p>
+      {selectionId ? <dl className="focused-plan-facts"><div><dt>Essential power missing</dt><dd>{num(chosen?.metrics.essential_unserved_kwh ?? plan.metrics.critical_unserved_kwh)} kWh</dd></div><div><dt>Lowest battery</dt><dd>{num(plan.metrics.min_soc_kwh)} kWh</dd></div><div><dt>Unfinished work</dt><dd>{num(chosen?.metrics.flexible_unfinished_kwh ?? plan.metrics.flexible_deferred_kwh)} kWh</dd></div></dl> : null}
+      {showSchedule ? <Disclosure title="Equipment times in this plan" keepMounted={false}>
         <ul className="assistant-plan-actions">
           {plan.flexible_tasks.map((task) => (
             <li key={task.task_id}>
@@ -156,7 +157,7 @@ export function InlinePlan({
           These are hourly slots; some contain partial use. They do not
           establish a complete medical equipment cycle.
         </p>
-      </Disclosure>
+      </Disclosure> : null}
       {alternatives.length ? (
         <div className="inline-options">
           <h3>Calculated alternatives</h3>
@@ -174,7 +175,7 @@ export function InlinePlan({
           {plan.metrics.critical_unserved_kwh.toFixed(6)} kWh.
         </p>
         <ul>
-          {(recovery?.assumptions ?? computed.simulation.assumptions).map(
+          {(chosen?.simulation.assumptions ?? recovery?.assumptions ?? computed.simulation.assumptions).map(
             (a) => (
               <li key={a}>{a}</li>
             ),

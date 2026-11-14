@@ -39,12 +39,70 @@ class TestOutlook:
 def wire(name, arguments):
     return httpx.Response(200, json={'message':{'role':'assistant','content':'UNVERIFIED RAW MODEL TEXT', 'tool_calls':[{'function':{'name':name,'arguments':arguments}}]}})
 
+def authored(message):
+    return httpx.Response(200,json={'message':{'role':'assistant','content':message}})
+
+
+def natural_session(payload):
+    """Synthetic native choices; every state change and numerical fact stays real."""
+    messages=payload['messages']
+    question=next(m['content'] for m in reversed(messages) if m.get('role')=='user' and not m['content'].startswith(('Canonical clinic data:','That attempt was rejected:')))
+    context=json.loads(next(m['content'].split('Canonical clinic data: ',1)[1] for m in messages if m.get('content','').startswith('Canonical clinic data: ')))
+    result=next(((m.get('tool_name'),json.loads(m['content'])) for m in reversed(messages) if m.get('role')=='tool' and '"facts"' in m.get('content','')),None)
+    if result and messages[-1]['role']=='tool':
+        action,data=result;facts=data['facts'];ids=[];refs=[];schedule=False;kind='conversation'
+        if data.get('active_energy_proposal') and action in ('propose_energy_settings','update_energy_settings_draft'):
+            message='The power settings are ready for review. They stay proposed until you explicitly confirm.';kind='energy_review'
+        elif data.get('active_draft') and action not in ('recompute_clinic_plan','explain_current_plan'):
+            draft=data['active_draft'];kind='activity_review';message='Your activity remains a draft. '+(facts.get('missing_detail','Please review and confirm its requirements.'))
+        elif data['plan_status']=='current':
+            kind='explanation' if action=='explain_current_plan' else 'calculation';refs=['essential_summary','scope']
+            base=facts['essential_summary'];message=f"Here is my review for clinic staff. The existing baseline leaves {base['remaining_unserved_essential_energy']} of essential energy unserved in the model."
+            if 'selected_option' in facts:
+                option=facts['selected_option'];ids=[option['exact_selected_option_id']];refs.append('selected_option')
+                message+=f" The selected {option['kind']} comparison leaves {option['remaining_unserved_essential_energy']} unserved."
+                for change in option['hypothetical_changes']:message+=f" The selected hypothetical change is {change['before']} to {change['after']}."
+            else:
+                options=[(key,value) for key,value in facts.items() if key.startswith('option_') and '_case_' not in key and isinstance(value,dict)]
+                chosen=options[:3] if 'compare' in question.lower() else options[:1]
+                for key,option in chosen:
+                    refs.append(key);ids.append(option['option_id']);message+=f" The {option['kind']} comparison leaves {option['remaining_unserved_essential_energy']} of essential energy unserved."
+                schedule=not ('compare' in question.lower())
+            if 'unconfirmed_notice' in facts:refs.append('unconfirmed_notice');message+=' '+facts['unconfirmed_notice']
+            message+=' Please review these modeled results; they are not a clinical guarantee.'
+        elif data['plan_status']=='failed':
+            message='The calculation could not finish. Your confirmed requirements are saved; retry when weather is available.'
+        else:
+            names=[a['details']['name'] for a in context.get('confirmed_activities',[])];message='The confirmed activities are '+', '.join(names)+'.' if names else 'There are no confirmed activities yet.'
+        return wire('respond_to_user',{'message':message,'fact_references':refs,'presentation':{'kind':kind,'option_ids':ids,'show_schedule':schedule}})
+    lower=question.strip().lower()
+    if lower in ('hello','hi','hello!'):
+        return authored('Hello! I’m here to help with your clinic’s day. What would you like to plan?')
+    if 'thank' in lower:return authored('You’re welcome! What would you like to look at next?')
+    if 'brainstorm' in lower or 'what can you help' in lower:
+        return authored('We could explore equipment times or more solar as ideas. I can calculate a comparison when you want; these ideas have not been evaluated yet.')
+    if lower in ('what are the confirmed activities?','which activities are confirmed?'):return wire('inspect_planning_state',{})
+    if 'starting charge' in lower or 'current reading' in lower or 'battery capacity' in lower:
+        values={}
+        for field,pattern in [('battery_capacity_kwh',r'battery capacity[^\d]*(\d+(?:\.\d+)?)\s*kWh'),('initial_battery_pct',r'starting charge[^\d]*(\d+(?:\.\d+)?)%'),('current_battery_pct',r'current reading[^\d]*(\d+(?:\.\d+)?)%')]:
+            match=re.search(pattern,question,re.I)
+            if match:values[field]=float(match[1])
+        return wire('update_energy_settings_draft' if context.get('active_energy_proposal_id') else 'propose_energy_settings',values)
+    if 'explain' in lower and 'plan' in lower:return wire('explain_current_plan',{})
+    if 'vaccination campaign' in lower and 'change' not in lower:return wire('propose_activity',{'name':'vaccination campaign','start_hour':9,'end_hour':15})
+    if '10 AM' in question:return wire('update_activity_draft',{'start_hour':10})
+    if 'refrigerator' in lower:
+        device=next(e for e in context['equipment_inventory'] if 'refrigerator' in e['name'].lower());return wire('update_activity_draft',{'equipment_ids':[device['id']]})
+    return wire('recompute_clinic_plan',{'include_recovery':True})
+
+
 def handler(request):
     if request.url.path == '/api/tags':
         return httpx.Response(200, json={'models':[{'name':'llama3.1:8b','capabilities':['tools']}]})
     payload = json.loads(request.content)
     names = {tool['function']['name'] for tool in payload['tools']}
     messages = payload['messages']
+    if 'respond_to_user' in names:return natural_session(payload)
     if names == {'compose_planning_reply'}:
         source = next(json.loads(m['content']) for m in messages if m.get('role') == 'user' and m.get('content','').startswith('{') and 'verified_facts' in m['content'])
         required = source['required_references']
@@ -68,10 +126,10 @@ def handler(request):
                 sentences.append(f"The lowest stored battery energy is {item['lowest_stored_energy']}, against the {item['reserve_target']} reserve target.")
         return wire('compose_planning_reply', {'message':' '.join(sentences), 'fact_references':selected})
     question = next((m['content'].split('Current operator request: ', 1)[1] for m in reversed(messages) if m.get('content', '').startswith('Current operator request: ')), '')
-    context = json.loads(next(m['content'].split('Canonical state (data): ', 1)[1] for m in messages if m.get('content', '').startswith('Canonical state (data): ')))
     if names == {'conversational_reply'}:
         kind = 'thanks' if 'thank' in question.lower() else 'help' if 'help' in question.lower() else 'greeting'
         return wire('conversational_reply', {'kind':kind, 'message':"Hello! I’m here to help with your clinic’s day. What would you like to plan?" if kind == 'greeting' else "You’re welcome! Tell me what you’d like to explore next."})
+    context = json.loads(next(m['content'].split('Canonical state (data): ', 1)[1] for m in messages if m.get('content', '').startswith('Canonical state (data): ')))
     details = {}
     if names == {'explain_current_plan'}:
         return wire('explain_current_plan', {})

@@ -12,7 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Disclosure } from "@/components/Disclosure";
 import { api, num } from "@/lib/clinic";
 import type { AgentStatus } from "../../contracts/agent";
-import type { ActivityProposal, ComputedPlan } from "../../contracts/planning";
+import type { ActivityDraft, ActivityProposal, ComputedPlan, EnergySettingsProposal } from "../../contracts/planning";
 import {
   Workspace,
   useWorkspaceNavigation,
@@ -25,25 +25,20 @@ import { WeatherSection } from "@/features/planning/WeatherSection";
 import { SolutionsSection } from "@/features/planning/SolutionsSection";
 import { BatterySummary } from "@/features/planning/BatterySummary";
 import { AddEquipment } from "@/features/planning/AddEquipment";
+import { ActivityWorkspace, type ActivitySelection } from "@/features/planning/ActivityWorkspace";
+import { EnergySettingsWorkspace, type EnergySelection } from "@/features/planning/EnergySettingsWorkspace";
+import type { EnergyFormValue } from "@/features/planning/EnergySettingsEditor";
 import { InlinePlan } from "@/features/planning/InlinePlan";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant" | "notice";
-  text: string;
-  tools?: string[];
-  inputRevision?: number;
-  plan?: ComputedPlan;
-  date?: string;
-  sessionId?: string;
-  retryQuestion?: string;
-  selectionId?: string;
-}
+import { restoreMessages, resultAttachment, type ChatMessage } from "@/features/planning/conversation-view";
+import { EnergySettingsReview } from "@/features/planning/EnergySettingsReview";
 const toolLabels: Record<string, string> = {
   conversational_reply: "Answered your message",
   explain_current_plan: "Reviewed the selected plan",
   inspect_planning_state: "Reviewed the clinic details",
   review_activity_proposal: "Prepared the activity for review",
+  propose_energy_settings: "Prepared power settings for review",
+  update_energy_settings_draft: "Updated the power settings draft",
   propose_activity: "Prepared an activity draft",
   update_activity_draft: "Updated the activity draft",
   propose_activity_revision: "Prepared an activity change",
@@ -51,13 +46,17 @@ const toolLabels: Record<string, string> = {
   recompute_clinic_plan: "Calculated the plan and checked the weather",
 };
 const planQuestion =
-  "Calculate the clinic’s electricity plan and compare recovery options. Describe the proposed actions and remaining limitations for clinic staff in plain English.";
+  "Will we have enough electricity for our planned clinic activities? Help us decide what needs to change.";
 export default function App() {
   const session = usePlanningSession();
   const { state, busy } = session;
   const route = useWorkspaceNavigation();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [historyLoading,setHistoryLoading]=useState(false);
+  const [historyError,setHistoryError]=useState("");
   const [text, setText] = useState("");
+  const [energySelection,setEnergySelection]=useState<EnergySelection | null>(null);
+  const [activitySelection, setActivitySelection] = useState<ActivitySelection | null>(null);
   const [equipmentOpen, setEquipmentOpen] = useState(false);
   const [agent, setAgent] = useState<AgentStatus | null>(null);
   const [modelError, setModelError] = useState(false);
@@ -77,8 +76,25 @@ export default function App() {
   const recovery = computed?.recovery;
   const selected = recovery ? [recovery.existing, ...recovery.options].find(option => option.id === (state?.selected_recovery_intervention_id ?? recovery.existing.id)) ?? recovery.existing : undefined;
   const latestPlanMessageId = messages.filter(item => item.plan).at(-1)?.id;
-  const addMessage = (message: Omit<Message, "id">) =>
-    setMessages((items) => [...items, { id: crypto.randomUUID(), ...message }]);
+  function addMessage(message:Omit<ChatMessage,"id"|"createdAt">,id:string=crypto.randomUUID()) {
+    setMessages(items=>[...items,{id,createdAt:new Date().toISOString(),...message}]);return id;
+  }
+  async function loadHistory(snapshot=session.stateRef.current,signal?:AbortSignal) {
+    if(!snapshot)return;setHistoryLoading(true);setHistoryError("");
+    try {
+      const history=await planningApi.conversation(snapshot.id,signal);
+      if(signal?.aborted || session.stateRef.current?.id !== snapshot.id)return;
+      const current=session.stateRef.current;
+      setMessages(items=>{
+        const cached=new Map(items.map(item=>[item.id,item]));
+        const restored=restoreMessages(history.messages,current).map(item=>({...cached.get(item.id),...item}));
+        const localNotices=items.filter(item=>item.role === "notice" && !item.presentation && !history.messages.some(remote=>remote.id===item.id));
+        return [...restored,...localNotices].sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
+      });
+    } catch {if(!signal?.aborted)setHistoryError("The conversation could not be loaded. Your clinic information is still available.");}
+    finally {if(!signal?.aborted)setHistoryLoading(false);}
+  }
+  useEffect(()=>{const abort=new AbortController();if(state?.id)void loadHistory(state,abort.signal);return ()=>abort.abort();},[state?.id]);
   async function checkModel() {
     setModelError(false);
     try {
@@ -105,48 +121,27 @@ export default function App() {
     requestAnimationFrame(() => input.current?.focus());
   }
   async function say(question: string, showUser = true) {
-    if (!question.trim() || busy || !session.stateRef.current) return;
+    if (!question.trim() || busy || historyLoading || !session.stateRef.current) return;
     following.current = true;
     setText("");
     setReplyReady(false);
-    if (showUser) addMessage({ role: "user", text: question });
-    const before = session.stateRef.current.computed_plan;
+    const optimisticUserId = showUser ? addMessage({ role: "user", text: question }) : undefined;
     const response = await session.run(
       "LifeLine is preparing your response…",
       (s) => planningApi.ask(s, question),
       (r) => r.state,
-      true,
     );
+    if(response?.user_message_id && optimisticUserId)setMessages(items=>items.map(item=>item.id === optimisticUserId ? {...item,id:response.user_message_id!} : item));
     if (response?.mode === "local_tool_agent") {
-      const result = response.state.computed_plan;
-      const newPlan =
-        response.state.plan_status === "current" &&
-        result?.input_revision === response.state.input_revision &&
-        (response.tool_calls.includes("explain_current_plan") || !before ||
-          before.generation !== result.generation ||
-          before.input_revision !== result.input_revision ||
-          before.computed_at !== result.computed_at);
-      addMessage({
-        role: "assistant",
-        text: response.message,
-        tools: response.tool_calls,
-        inputRevision: response.state.input_revision,
-        ...(newPlan
-          ? {
-              plan: result!,
-              date: response.state.planning_date,
-              sessionId: response.state.id,
-              selectionId: response.tool_calls.includes("explain_current_plan") ? response.state.selected_recovery_intervention_id ?? response.state.computed_plan?.recovery?.existing.id : undefined,
-            }
-          : {}),
-      });
+      addMessage({role:"assistant",text:response.message,tools:response.tool_calls,presentation:response.presentation,...resultAttachment(response.presentation,response.state)},response.message_id ?? undefined);
       setReplyReady(true);
     } else if (response) {
       addMessage({
         role: "notice",
         text: "The local assistant couldn’t finish this reply. Please retry.",
         retryQuestion: question,
-      });
+        presentation: response.presentation,
+      },response.message_id ?? undefined);
     } else {
       addMessage({
         role: "notice",
@@ -182,12 +177,13 @@ export default function App() {
             ? "Activity confirmed. The energy calculation needs to be retried."
             : "Activity confirmed.",
       });
-      await say(
-        "Calculate recovery options for the activity just confirmed. Describe the updated electricity plan and next actions to clinic staff in plain English.",
-        false,
-      );
+      if (response.plan_status === "current" && response.computed_plan) {
+        addMessage({role:"notice",text:"Updated electricity plan",plan:response.computed_plan,date:response.planning_date,sessionId:response.id});
+        setReplyReady(true);
+      }
     }
     setNarrationPending(false);
+    return Boolean(response);
   }
   async function cancel(proposal: ActivityProposal) {
     const response = await session.run(
@@ -196,7 +192,27 @@ export default function App() {
       (s) => s,
     );
     if (response) addMessage({ role: "notice", text: "Draft cancelled." });
+    return Boolean(response);
   }
+  async function saveActivity(details:ActivityDraft, revision:number, proposalId?:string, targetId?:string) {
+    const response = await session.run("Saving the activity draft…", s => proposalId ? planningApi.edit({...s,revision},proposalId,details) : planningApi.propose({...s,revision},details,targetId), s=>s);
+    return response?.active_proposal_id ?? null;
+  }
+  async function saveEnergy(value:EnergyFormValue,revision:number,proposalId?:string) {
+    const response = await session.run("Saving the power settings draft…",s=>proposalId ? planningApi.editEnergy({...s,revision},proposalId,value.settings,value.reading) : planningApi.proposeEnergy({...s,revision},value.settings,value.reading),s=>s);
+    return response?.active_energy_proposal_id ?? null;
+  }
+  async function confirmEnergy(proposal:EnergySettingsProposal) {
+    const receipt=`energy-${proposal.id}`;let key=confirmationKeys.current.get(receipt);if(!key){key=crypto.randomUUID();confirmationKeys.current.set(receipt,key);}
+    const response=await session.run("Updating power settings and calculating the plan…",s=>planningApi.confirmEnergy(s,proposal.id,key!),s=>s,true);
+    if(response){addMessage({role:"notice",text:response.plan_status === "failed" ? "Power settings saved. The energy calculation needs to be retried." : "Power settings saved. The electricity plan is updated.",...(response.plan_status === "current" && response.computed_plan ? {plan:response.computed_plan,date:response.planning_date,sessionId:response.id} : {})});setReplyReady(true);}
+    return Boolean(response);
+  }
+  async function rejectEnergy(proposal:EnergySettingsProposal) {
+    const response=await session.run("Cancelling the power settings draft…",s=>planningApi.rejectEnergy(s,proposal.id),s=>s);
+    if(response)addMessage({role:"notice",text:"Power settings draft cancelled."});return Boolean(response);
+  }
+  function openEnergy() {setEnergySelection(state?.active_energy_proposal_id ? {kind:"proposal",id:state.active_energy_proposal_id} : {kind:"new"});}
   const currentWeather = state?.forecast_reference ?? session.weather;
   const existing = computed?.simulation.baseline.metrics;
   const outlook = existing
@@ -315,7 +331,9 @@ export default function App() {
             </Button>
           </div>
         ) : null}
-        {state && !messages.length ? (
+        {historyLoading ? <p role="status" className="chat-loading">Loading your conversation…</p> : null}
+        {historyError ? <div className="chat-initial-error" role="alert"><p>{historyError}</p><Button variant="outline" onClick={()=>void loadHistory()}>Retry conversation</Button></div> : null}
+        {state && !messages.length && !historyLoading ? (
           <div className="chat-welcome">
             <h1>How can LifeLine help today?</h1>
             <p>
@@ -370,7 +388,7 @@ export default function App() {
                   {message.role === "user" ? "You" : "LifeLine"}
                 </strong>
               ) : null}
-              {message.plan && !current ? <p className="chat-result-note">Earlier calculated response · not the active plan</p> : null}
+              {(message.plan && !current) || (message.presentation?.generation != null && (message.presentation.generation !== computed?.generation || message.presentation.input_revision !== computed?.input_revision)) ? <p className="chat-result-note">Earlier calculated response · not the active plan</p> : null}
               <p className="assistant-text">{message.text}</p>
               {message.retryQuestion ? (
                 <Button
@@ -387,7 +405,7 @@ export default function App() {
               !busy &&
               !narrationPending ? (
                 current ? (
-                  <InlinePlan computed={message.plan} date={message.date!} selectionId={message.selectionId} />
+                  <InlinePlan computed={message.plan} date={message.date!} selectionId={message.selectionId} optionIds={message.optionIds} showSchedule={message.showSchedule ?? true}/>
                 ) : (
                   <Disclosure
                     title={`Earlier plan · ${message.date}${message.plan.sunshine_factor < 1 ? ` · ${Math.round((1 - message.plan.sunshine_factor) * 100)}% less sunshine` : ""}`}
@@ -400,15 +418,17 @@ export default function App() {
                       computed={message.plan}
                       date={message.date!}
                       selectionId={message.selectionId}
+                      optionIds={message.optionIds}
+                      showSchedule={message.showSchedule ?? true}
                       historical
                     />
                   </Disclosure>
                 )
               ) : null}
-              {message.tools?.length ? (
+              {message.tools?.some(tool => !["conversational_reply","respond_to_user","compose_planning_reply"].includes(tool)) ? (
                 <Disclosure title="What LifeLine checked" keepMounted={false}>
                   <ul>
-                    {message.tools.map((tool, i) => (
+                    {message.tools.filter(tool => !["conversational_reply","respond_to_user","compose_planning_reply"].includes(tool)).map((tool, i) => (
                       <li key={`${tool}-${i}`}>{toolLabels[tool] ?? tool}</li>
                     ))}
                   </ul>
@@ -425,7 +445,7 @@ export default function App() {
         ) : null}
         {state ? errorUI : null}
         {planFailure}
-        {activeProposal && state && !busy && !narrationPending ? (
+        {activeProposal && state && messages.at(-1)?.presentation?.kind === "activity_review" && !busy && !narrationPending ? (
           <ActivityConfirmation
             key={`${activeProposal.id}-${state.revision}`}
             proposal={activeProposal}
@@ -433,13 +453,10 @@ export default function App() {
             busy={false}
             onConfirm={() => void confirm(activeProposal)}
             onCancel={() => void cancel(activeProposal)}
-            onEdit={() =>
-              focusChat(
-                `Change ${activeProposal.details.name ?? "this activity"}: `,
-              )
-            }
+            onEdit={() => setActivitySelection({kind:"proposal",id:activeProposal.id})}
           />
         ) : null}
+        {state && messages.at(-1)?.presentation?.kind === "energy_review" && !busy ? (()=>{const proposal=state.energy_proposals.find(p=>p.id===state.active_energy_proposal_id && p.status === "draft");return proposal ? <EnergySettingsReview current={state.energy_settings} proposed={proposal.proposed_energy_settings} changes={proposal.settings} date={state.planning_date} timezone={state.timezone} reading={proposal.current_battery_reading} updatesReading={proposal.updates_current_battery_reading} busy={Boolean(busy)} confirmDisabled={proposal.base_input_revision !== state.input_revision} onConfirm={()=>void confirmEnergy(proposal)} onCancel={()=>void rejectEnergy(proposal)} onEdit={()=>setEnergySelection({kind:"proposal",id:proposal.id})}/> : null;})() : null}
         {state &&
         messages.length > 0 &&
         !computed &&
@@ -455,6 +472,8 @@ export default function App() {
         ) : null}
       </div>
       <div className="chat-composer-region">
+        {state && !busy && !historyLoading && activeProposal && messages.at(-1)?.presentation?.kind !== "activity_review" ? <Button className="draft-shortcut" variant="ghost" onClick={()=>setActivitySelection({kind:"proposal",id:activeProposal.id})}>Review activity draft · {activeProposal.details.name ?? "New activity"}</Button> : null}
+        {state && !busy && !historyLoading && state.active_energy_proposal_id && messages.at(-1)?.presentation?.kind !== "energy_review" ? <Button className="draft-shortcut" variant="ghost" onClick={openEnergy}>Review power settings draft</Button> : null}
         <form
           className="chat-composer"
           onSubmit={(event) => {
@@ -472,7 +491,7 @@ export default function App() {
             onChange={(event) => setText(event.target.value)}
             placeholder="Message LifeLine…"
             maxLength={2000}
-            disabled={!state || Boolean(busy) || narrationPending}
+            disabled={!state || Boolean(busy) || narrationPending || historyLoading}
             onKeyDown={(event) => {
               if (
                 event.key === "Enter" &&
@@ -488,7 +507,7 @@ export default function App() {
             type="submit"
             aria-label="Send message"
             disabled={
-              !state || Boolean(busy) || narrationPending || !text.trim()
+              !state || Boolean(busy) || narrationPending || historyLoading || !text.trim()
             }
           >
             {busy || narrationPending ? (
@@ -513,6 +532,7 @@ export default function App() {
           state={state}
           busy={Boolean(busy)}
           onChat={focusChat}
+          onActivity={setActivitySelection}
         onAddEquipment={() => setEquipmentOpen(true)}
         />
         <WeatherSection location={state.location} date={state.planning_date} computed={computed} selected={selected} />
@@ -522,14 +542,16 @@ export default function App() {
           aria-labelledby="energy-title"
           tabIndex={0}
         >
-          <h2 id="energy-title">Battery &amp; Energy</h2>
+          <div className="panel-heading"><h2 id="energy-title">Battery &amp; Energy</h2><Button variant="outline" disabled={Boolean(busy)} onClick={openEnergy}>Power setup</Button></div>
           <div className="overview-square-body">
+            {computed && busy ? <p className="panel-footnote" role="status">LifeLine is working. Showing the last verified calculation.</p> : null}
             {computed ? (
               <BatterySummary computed={computed} date={state.planning_date} selected={selected} />
             ) : (
-              <p className="panel-lead">Ask LifeLine to check the battery.</p>
+              <p className="panel-lead">Set the power assumptions, then ask LifeLine to check the day’s electricity.</p>
             )}
             <Disclosure title="Battery assumptions" keepMounted={false}>
+              <p>{state.current_battery_reading ? `Recorded reading: ${num(state.current_battery_reading.energy_kwh)} kWh at ${new Intl.DateTimeFormat("en",{dateStyle:"medium",timeStyle:"short",timeZone:state.timezone ?? undefined}).format(new Date(state.current_battery_reading.measured_at))}.` : "No current battery reading is recorded."}</p>
               <p>
                 Assumed stored energy at midnight:{" "}
                 {state.clinic.initial_battery_kwh != null
@@ -597,6 +619,8 @@ export default function App() {
         </>
       }
     />
-    {state ? <AddEquipment open={equipmentOpen} date={state.planning_date} onClose={() => setEquipmentOpen(false)} onSubmit={requestPlan} /> : null}
+    {state && energySelection ? <EnergySettingsWorkspace selection={energySelection} state={state} busy={Boolean(busy)} error={session.error} onSave={saveEnergy} onConfirm={confirmEnergy} onReject={rejectEnergy} onClose={()=>setEnergySelection(null)}/> : null}
+    {state && activitySelection ? <ActivityWorkspace selection={activitySelection} state={state} busy={Boolean(busy) || narrationPending} error={session.error} onSave={saveActivity} onConfirm={confirm} onReject={cancel} onClose={()=>setActivitySelection(null)} /> : null}
+    {state ? <AddEquipment open={equipmentOpen} date={state.planning_date} busy={Boolean(busy)} error={session.error} onClose={() => setEquipmentOpen(false)} onDraft={async details=>{const id=await saveActivity(details,state.revision);if(id){setEquipmentOpen(false);setActivitySelection({kind:"proposal",id});return true;}return false;}} /> : null}
   </>);
 }

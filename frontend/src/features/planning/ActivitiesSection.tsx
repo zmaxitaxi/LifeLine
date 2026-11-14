@@ -1,23 +1,24 @@
 import type { PlanningState } from "../../../../contracts/planning";
 import { Button } from "@/components/ui/button";
 import { shortName, num, timeRanges } from "@/lib/clinic";
+import type { ActivitySelection } from "./ActivityWorkspace";
 import { activityView } from "./activity-view";
 
-export function ActivitiesSection({ state, busy, onChat, onAddEquipment }: {
-  state: PlanningState; busy: boolean; onChat: (message?: string) => void; onAddEquipment: () => void;
+export function ActivitiesSection({ state, busy, onChat, onAddEquipment, onActivity }: {
+  state: PlanningState; busy: boolean; onChat: (message?: string) => void; onAddEquipment: () => void; onActivity:(selection:ActivitySelection)=>void;
 }) {
   const drafts = state.proposals.filter(p => p.status === "draft");
   return <section data-overview-section="activities" className="overview-section overview-square" aria-labelledby="activities-title" tabIndex={0}>
     <h2 id="activities-title">Activities &amp; Equipment</h2>
     <div className="overview-square-body">
-      <div className="panel-actions"><Button variant="outline" disabled={busy} onClick={onAddEquipment}>Add equipment</Button><Button variant="ghost" disabled={busy} onClick={() => onChat("Plan a clinic activity: ")}>Add activity</Button></div>
+      <div className="panel-actions"><Button variant="outline" disabled={busy} onClick={onAddEquipment}>Add equipment</Button><Button variant="ghost" disabled={busy} onClick={() => onActivity({kind:"new"})}>Add activity</Button></div>
       {state.confirmed_activities.length ? <ul className="activity-quick-list">
         {state.confirmed_activities.map(activity => {
           const view = activityView(activity.id, activity.details, state);
-          return <li key={activity.id} data-testid="confirmed-activity"><Button className="activity-chat-line" variant="ghost" disabled={busy} onClick={() => onChat(`Change ${view.name}: `)}><strong>{view.name}</strong><span>{view.operatingWindow}</span></Button></li>;
+          return <li key={activity.id} data-testid="confirmed-activity"><Button className="activity-chat-line" variant="ghost" disabled={busy} onClick={() => onActivity({kind:"activity",id:activity.id})}><strong>{view.name}</strong><span>{view.operatingWindow}</span></Button></li>;
         })}
       </ul> : null}
-      {drafts.length ? <Button className="draft-chat-link" variant="ghost" onClick={() => onChat()}>{drafts.length} {drafts.length === 1 ? "draft" : "drafts"} in chat · review</Button> : null}
+      {drafts.length ? <ul className="activity-drafts" aria-label="Activity drafts">{drafts.map(draft=><li key={draft.id}><Button variant="ghost" disabled={busy} onClick={()=>onActivity({kind:"proposal",id:draft.id})}>{draft.details.name ?? "New activity"} · draft · review</Button></li>)}</ul> : null}
       <h3>Equipment <span className="equipment-count">{state.equipment_inventory.length}</span></h3>
       <ul className="equipment-list">
         {state.equipment_inventory.map(e => <li key={e.id}><details className="equipment-item">

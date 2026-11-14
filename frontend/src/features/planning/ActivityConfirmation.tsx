@@ -14,6 +14,7 @@ export function ActivityConfirmation({
   onConfirm,
   onCancel,
   onEdit,
+  editLabel = "Edit details",
 }: {
   proposal: ActivityProposal;
   state: PlanningState;
@@ -21,6 +22,7 @@ export function ActivityConfirmation({
   onConfirm: () => void;
   onCancel: () => void;
   onEdit: () => void;
+  editLabel?: string;
 }) {
   const uid = useId();
   const activity = activityView(proposal.id, proposal.details, state, proposal);
@@ -53,7 +55,7 @@ export function ActivityConfirmation({
               <li key={field}>{field}</li>
             ))}
           </ul>
-          <p>Give LifeLine these details in chat.</p>
+          <p>Add these details below, or tell LifeLine in chat.</p>
         </div>
       ) : null}
       {activity.affectedRequirements.length ? (
@@ -77,7 +79,7 @@ export function ActivityConfirmation({
           Confirm
         </Button>
         <Button variant="outline" disabled={busy} onClick={onEdit}>
-          Edit in chat
+          {editLabel}
         </Button>
         <Button variant="ghost" disabled={busy} onClick={onCancel}>
           Cancel

@@ -2148,3 +2148,28 @@ a {
   .overview-square .battery-time-labels span:nth-child(2),
   .overview-square .battery-time-labels span:nth-child(4) { display: none; }
 }
+.activity-workspace { width: min(650px, calc(100% - 28px)); }
+.activity-workspace [data-slot="input"], .activity-workspace select { min-height: 44px; font-size: 16px; }
+.activity-workspace [data-slot="native-select-wrapper"] { width: 100%; }
+.activity-workspace [data-slot="field"][data-orientation="horizontal"] { min-height: 44px; }
+.activity-workspace [data-slot="field-label"] { line-height: 1.5; }
+.activity-workspace .activity-confirmation { margin: 0; border: 0; padding: 0; }
+.editor-date { color: var(--muted); font-size: 14px; }
+.editor-error { color: var(--destructive); margin-block: 12px; line-height: 1.5; }
+.activity-drafts { list-style: none; padding: 0; margin: 8px 0; }
+.activity-drafts button { white-space: normal; text-align: left; height: auto; min-height: 44px; }
+.energy-workspace { width: min(660px, calc(100% - 28px)); }
+.energy-workspace [data-slot="input"], .energy-workspace select { min-height: 44px; font-size: 16px; }
+.energy-workspace [data-slot="native-select-wrapper"] { width: 100%; }
+.energy-workspace .disclosure p, .energy-review p { margin-block: 12px; line-height: 1.6; }
+.energy-review table caption { text-align: left; font-size: 15px; font-weight: 600; padding-block: 8px; }
+.energy-review .plan-outcomes { font-size: 14px; }
+.panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; min-height: 54px; }
+.panel-heading h2 { font-size: 19px; font-weight: 600; letter-spacing: -0.3px; }
+.panel-heading button { flex-shrink: 0; }
+@media (min-width: 600px) and (max-width: 767px) { .panel-heading h2 { font-size: 17px; }.panel-heading button { padding-inline: 8px; } }
+.focused-plan-facts { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-block: 12px; font-size: 14px; }
+.focused-plan-facts dt { color: var(--muted); font-size: 12px; }
+.focused-plan-facts dd { font-weight: 600; }
+.draft-shortcut { align-self: flex-start; margin-bottom: 5px; white-space: normal; height: auto; min-height: 44px; text-align: left; }
+.two-page-app .notice-message:has(.inline-plan) { color: var(--foreground); font-size: 15px; }

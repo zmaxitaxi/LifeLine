@@ -1,6 +1,9 @@
 /** Transport adapter for Main Chat's contracts/planning.ts. No client planner. */
 import type {
   ActivityDraft,
+  EnergySettingsPatch,
+  BatteryReading,
+  PlanningConversation,
   CreatePlanningSession,
   PlanningState,
   SessionAgentResponse,
@@ -19,6 +22,7 @@ async function request<T>(
   method = "GET",
   body?: unknown,
   signal?: AbortSignal,
+  timeoutMs=90000,
 ): Promise<T> {
   let response: Response;
   try {
@@ -27,8 +31,8 @@ async function request<T>(
       headers: body === undefined ? {} : { "Content-Type": "application/json" },
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: signal
-        ? AbortSignal.any([signal, AbortSignal.timeout(90000)])
-        : AbortSignal.timeout(90000),
+        ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)])
+        : AbortSignal.timeout(timeoutMs),
     });
   } catch (error) {
     if (signal?.aborted) throw error;
@@ -91,6 +95,11 @@ export const planningApi = {
       "POST",
       { expected_revision: state.revision },
     ),
+  conversation: (id:string, signal?:AbortSignal) => request<PlanningConversation>(`${sessionPath(id)}/conversation`,"GET",undefined,signal),
+  proposeEnergy: (state:PlanningState, settings:EnergySettingsPatch, reading?:BatteryReading|null) => request<PlanningState>(`${sessionPath(state.id)}/energy-proposals`,"POST",{expected_revision:state.revision,settings,...(reading !== undefined ? {current_battery_reading:reading} : {})}),
+  editEnergy: (state:PlanningState, id:string, settings:EnergySettingsPatch, reading?:BatteryReading|null) => request<PlanningState>(`${sessionPath(state.id)}/energy-proposals/${encodeURIComponent(id)}`,"PATCH",{expected_revision:state.revision,settings,...(reading !== undefined ? {current_battery_reading:reading} : {})}),
+  confirmEnergy: (state:PlanningState,id:string,key:string) => request<PlanningState>(`${sessionPath(state.id)}/energy-proposals/${encodeURIComponent(id)}/confirm`,"POST",{expected_revision:state.revision,idempotency_key:key}),
+  rejectEnergy: (state:PlanningState,id:string) => request<PlanningState>(`${sessionPath(state.id)}/energy-proposals/${encodeURIComponent(id)}/reject`,"POST",{expected_revision:state.revision}),
   recompute: (state: PlanningState, sunshine_factor = state.sunshine_factor) =>
     request<PlanningState>(`${sessionPath(state.id)}/recompute`, "POST", {
       expected_revision: state.revision,
@@ -119,6 +128,7 @@ export const planningApi = {
       "POST",
       { expected_revision: state.revision, question },
       signal,
+      120000,
     ),
 };
 export function currentPlan(
