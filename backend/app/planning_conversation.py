@@ -332,7 +332,7 @@ def validate_grounded_prose(message, facts, selected):
                 if quantity_role(facts[key], source_start, source_end) == role]
             if not any(source_unit == unit and abs(value-original) <= 1e-6 for original,source_unit in role_values):
                 raise PlanningError('INVALID_ACTIVITY', 'A quantity was labeled as a different metric than its verified source.')
-    if selected and not re.search(r'\b(?:model\w*|forecast|assumptions?|hypothetical|illustrative|draft|unconfirmed|review)\b',message,re.I):
+    if 'essential_summary' in selected and not re.search(r'\b(?:model\w*|forecast|assumptions?|hypothetical|illustrative|draft|unconfirmed|review)\b',message,re.I):
         raise PlanningError('INVALID_ACTIVITY', 'Explain the modeled or draft basis and the need for review.')
 
 
@@ -392,7 +392,8 @@ async def synthesize_reply(state, question, calls, agent):
     if options or 'selected_option' in facts:
         # Keep recovery prose focused; the complete numerical plan stays in state.
         facts.pop('battery_summary', None)
-        facts.pop('weather_basis', None)
+        if not re.search(r'sun|weather|forecast|cloud|%',question,re.I):
+            facts.pop('weather_basis', None)
     parameters = GroundedReply.model_json_schema()
     parameters['properties']['fact_references']['items'] = {'type':'string','enum':list(facts)}
     parameters['properties']['message']['description'] = 'Write the WHOLE natural nurse-readable reply in your own words. NEVER print source IDs/field names in the message. Write under about a hundred words, as short paragraphs without numbered lists. All quantities must exactly match cited tool facts with units. Discuss required facts and several actual recovery alternatives. Keep it concise, qualified and reviewable; do not claim clinical safety or direct equipment control.'

@@ -264,3 +264,20 @@ def test_model_can_select_social_reply_for_ordinary_variants(question,kind):
         s=create(c);d=ask(c,s,question)
         assert d['mode']=='local_tool_agent' and d['message']==message
         assert d['state']==s and not weather
+
+
+def test_natural_clarification_does_not_need_a_technical_draft_or_model_preface():
+    message='What time does the campaign start?'
+    assert render_grounded_reply({'message':message,'fact_references':['missing_detail']},
+        {'missing_detail':'Please provide the local start time.'},{'missing_detail'},set())==message
+
+
+def test_cloudier_synthesis_keeps_verified_factor_in_current_source_context():
+    agent,calls=agent_with([{'name':'recompute_clinic_plan','arguments':{'include_recovery':True}}])
+    service,_=service_for()
+    with TestClient(create_app(forecast_service=service,agent_service=agent)) as c:
+        d=ask(c,create(c),'What if sunshine is 50% lower? Compare recovery options.')
+        assert d['state']['sunshine_factor']==.5
+        compose=next(json.loads(call.content) for call in reversed(calls) if call.method=='POST' and {t['function']['name'] for t in json.loads(call.content)['tools']}=={'compose_planning_reply'})
+        facts=json.loads(compose['messages'][1]['content'])['verified_facts']
+        assert facts['weather_basis']['forecast_irradiation_used']=='50%'
