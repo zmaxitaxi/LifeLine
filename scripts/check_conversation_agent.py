@@ -76,6 +76,9 @@ def main():
             before=deepcopy(state);count=weather.calls;native.clear();started=monotonic()
             response=client.post(f"/api/planning/sessions/{state['id']}/agent",json={'expected_revision':state['revision'],'question':question})
             data=response.json();current=data.get('state',state)
+            if response.status_code!=200:
+                latest=client.get(f"/api/planning/sessions/{state['id']}")
+                if latest.status_code==200: current=latest.json()
             good=response.status_code==200 and data.get('mode')=='local_tool_agent' and authored(data,native)
             try: good=bool(good and check(current,before,data,weather.calls-count))
             except (KeyError,TypeError,IndexError): good=False
