@@ -67,6 +67,14 @@ is relevant. Ordinary conversation does not automatically display every plan.
 The numerical API contracts remain strict even when a native model's tool
 template needs a narrowly scoped argument adapter.
 
+Native `propose_energy_settings` and `update_energy_settings_draft` stage flat
+operator-stated settings only; the model cannot confirm them. Explicit
+`initial_battery_pct` and `current_battery_pct` are converted by Python using the
+proposed capacity, with the current percentage timestamped when received. An
+explicit current reading remains separate from midnight energy. Field/source
+guards reject invented values, unit errors and swapping capacity with starting
+energy. The runtime verifies these guards independently of Llama tool choice.
+
 ## Validation
 
 `backend/tests/test_energy_settings.py` exercises reviewed before/after state,

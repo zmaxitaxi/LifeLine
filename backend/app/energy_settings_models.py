@@ -35,7 +35,9 @@ class EnergySettingsPatch(StrictModel):
     max_charge_kw: Power | SkipJsonSchema[None] = None
     max_discharge_kw: Power | SkipJsonSchema[None] = None
 
-    @field_validator('*', mode='before')
+    @field_validator('battery_capacity_kwh', 'initial_battery_kwh', 'reserve_kwh',
+        'pv_capacity_kw', 'charge_efficiency', 'discharge_efficiency', 'max_charge_kw',
+        'max_discharge_kw', mode='before')
     @classmethod
     def no_explicit_null(cls, value):
         return ConfigOverrides.explicit_null_is_invalid(value)
