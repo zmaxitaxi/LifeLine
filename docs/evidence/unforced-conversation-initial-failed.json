@@ -1,0 +1,563 @@
+{
+  "started_at": "2026-11-14T01:49:15.954733+00:00",
+  "implementation_commit": "c6116d9dd3f6e3e95a7e2e1a169d7aebbf14a742",
+  "backend_uncommitted_changes": false,
+  "scope": "Genuine local native content/tool choices. Weather is actual Open-Meteo; all numerical state comes from the existing model. Compact snapshots retain computed metrics, tested alternatives and forecast provenance.",
+  "turns": [
+    {
+      "question": "Hello, how are things?",
+      "seconds": 5.722178750205785,
+      "weather_calls": 0,
+      "http_status": 200,
+      "native_turns": [
+        {
+          "turn": {
+            "type": "tool_call",
+            "call": {
+              "index": 0,
+              "name": "respond_to_user",
+              "arguments": {
+                "message": "Hello, how are things?",
+                "presentation": {
+                  "kind": "conversation"
+                }
+              }
+            },
+            "content": ""
+          },
+          "seconds": 5.707721583079547,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        }
+      ],
+      "passed": true,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "Hello, how are things?",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "5e3ced9e-ca12-4973-8d4b-4864058bfab4",
+        "user_message_id": "3c74a79b-0ab2-4939-ba26-e0b3b84eb191"
+      },
+      "state": {
+        "id": "e8d100ca-3a65-4664-8fa9-12ea71a0c60e",
+        "revision": 0,
+        "input_revision": 0,
+        "selected_clinic_id": "illustrative-conversation",
+        "clinic_name": "Illustrative native verification",
+        "location": {
+          "latitude": -0.0917,
+          "longitude": 34.768
+        },
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "clinic": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "max_discharge_kw": 0.4,
+          "scenario": "normal",
+          "equipment": [
+            {
+              "id": "evening",
+              "name": "Illustrative essential evening equipment",
+              "category": "critical",
+              "power_kw": 1.0,
+              "required_hours": [
+                19,
+                20
+              ]
+            }
+          ],
+          "weather_dataset": "synthetic"
+        },
+        "equipment_inventory": [
+          {
+            "id": "evening",
+            "name": "Illustrative essential evening equipment",
+            "category": "critical",
+            "power_kw": 1.0,
+            "required_hours": [
+              19,
+              20
+            ]
+          }
+        ],
+        "energy_settings": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "charge_efficiency": 0.95,
+          "discharge_efficiency": 0.95,
+          "max_charge_kw": 4.0,
+          "max_discharge_kw": 0.4,
+          "additional_critical_kw": 0.0
+        },
+        "current_battery_reading": null,
+        "energy_proposals": [],
+        "active_energy_proposal_id": null,
+        "confirmed_activities": [],
+        "proposals": [],
+        "active_proposal_id": null,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "selected_recovery_intervention_id": null,
+        "sunshine_factor": 1.0
+      }
+    },
+    {
+      "question": "What can you help me do here?",
+      "seconds": 13.641305041033775,
+      "weather_calls": 0,
+      "http_status": 200,
+      "native_turns": [
+        {
+          "turn": {
+            "type": "tool_call",
+            "call": {
+              "index": 0,
+              "name": "respond_to_user",
+              "arguments": {
+                "message": "I can help you plan activities, electricity, and answer any questions you have. What would you like to do?",
+                "presentation": {
+                  "kind": "conversation"
+                }
+              }
+            },
+            "content": ""
+          },
+          "seconds": 13.608273959252983,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        }
+      ],
+      "passed": true,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "I can help you plan activities, electricity, and answer any questions you have. What would you like to do?",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "398eedcb-77bd-4bc0-96cd-cf3e1eb2112a",
+        "user_message_id": "e7943f7c-19a8-4da0-b04c-74b0b8f4aaf3"
+      },
+      "state": {
+        "id": "e8d100ca-3a65-4664-8fa9-12ea71a0c60e",
+        "revision": 0,
+        "input_revision": 0,
+        "selected_clinic_id": "illustrative-conversation",
+        "clinic_name": "Illustrative native verification",
+        "location": {
+          "latitude": -0.0917,
+          "longitude": 34.768
+        },
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "clinic": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "max_discharge_kw": 0.4,
+          "scenario": "normal",
+          "equipment": [
+            {
+              "id": "evening",
+              "name": "Illustrative essential evening equipment",
+              "category": "critical",
+              "power_kw": 1.0,
+              "required_hours": [
+                19,
+                20
+              ]
+            }
+          ],
+          "weather_dataset": "synthetic"
+        },
+        "equipment_inventory": [
+          {
+            "id": "evening",
+            "name": "Illustrative essential evening equipment",
+            "category": "critical",
+            "power_kw": 1.0,
+            "required_hours": [
+              19,
+              20
+            ]
+          }
+        ],
+        "energy_settings": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "charge_efficiency": 0.95,
+          "discharge_efficiency": 0.95,
+          "max_charge_kw": 4.0,
+          "max_discharge_kw": 0.4,
+          "additional_critical_kw": 0.0
+        },
+        "current_battery_reading": null,
+        "energy_proposals": [],
+        "active_energy_proposal_id": null,
+        "confirmed_activities": [],
+        "proposals": [],
+        "active_proposal_id": null,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "selected_recovery_intervention_id": null,
+        "sunshine_factor": 1.0
+      }
+    },
+    {
+      "question": "Could more battery storage help? I am just discussing an unevaluated idea, not asking for a calculation yet.",
+      "seconds": 11.903354750014842,
+      "weather_calls": 0,
+      "http_status": 200,
+      "native_turns": [
+        {
+          "turn": {
+            "type": "tool_call",
+            "call": {
+              "index": 0,
+              "name": "respond_to_user",
+              "arguments": {
+                "message": "Could more battery storage help? I am just discussing an unevaluated idea, not asking for a calculation yet.",
+                "fact_references": [],
+                "presentation": {
+                  "kind": "conversation"
+                }
+              }
+            },
+            "content": ""
+          },
+          "seconds": 11.874399583786726,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        }
+      ],
+      "passed": true,
+      "response": {
+        "mode": "local_tool_agent",
+        "model": "llama3.1:8b",
+        "message": "Could more battery storage help? I am just discussing an unevaluated idea, not asking for a calculation yet.",
+        "needs_clarification": false,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "067bd6f6-fc6a-44d4-b23f-99d695b5ecd1",
+        "user_message_id": "4e4ddbd5-7222-46d9-8841-59ec3c52020c"
+      },
+      "state": {
+        "id": "e8d100ca-3a65-4664-8fa9-12ea71a0c60e",
+        "revision": 0,
+        "input_revision": 0,
+        "selected_clinic_id": "illustrative-conversation",
+        "clinic_name": "Illustrative native verification",
+        "location": {
+          "latitude": -0.0917,
+          "longitude": 34.768
+        },
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "clinic": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "max_discharge_kw": 0.4,
+          "scenario": "normal",
+          "equipment": [
+            {
+              "id": "evening",
+              "name": "Illustrative essential evening equipment",
+              "category": "critical",
+              "power_kw": 1.0,
+              "required_hours": [
+                19,
+                20
+              ]
+            }
+          ],
+          "weather_dataset": "synthetic"
+        },
+        "equipment_inventory": [
+          {
+            "id": "evening",
+            "name": "Illustrative essential evening equipment",
+            "category": "critical",
+            "power_kw": 1.0,
+            "required_hours": [
+              19,
+              20
+            ]
+          }
+        ],
+        "energy_settings": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "charge_efficiency": 0.95,
+          "discharge_efficiency": 0.95,
+          "max_charge_kw": 4.0,
+          "max_discharge_kw": 0.4,
+          "additional_critical_kw": 0.0
+        },
+        "current_battery_reading": null,
+        "energy_proposals": [],
+        "active_energy_proposal_id": null,
+        "confirmed_activities": [],
+        "proposals": [],
+        "active_proposal_id": null,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "selected_recovery_intervention_id": null,
+        "sunshine_factor": 1.0
+      }
+    },
+    {
+      "question": "Can our clinic safely operate tomorrow given the weather forecast? Please compare only relevant modeled alternatives.",
+      "seconds": 24.50862241629511,
+      "weather_calls": 0,
+      "http_status": 200,
+      "native_turns": [
+        {
+          "turn": {
+            "type": "message",
+            "content": "{\"name\": \"recompute_clinic_plan\", \"parameters\": {\"include_recovery\": True, \"sunshine_factor\": 1.0}}"
+          },
+          "seconds": 11.065194541122764,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "{\"name\": \"recompute_clinic_plan\", \"parameters\": {\"include_recovery\": True, \"sunshine_factor\": 1.0}}"
+          },
+          "seconds": 2.2227045842446387,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "{\"name\": \"recompute_clinic_plan\", \"parameters\": {\"include_recovery\": True, \"sunshine_factor\": 1.0}}"
+          },
+          "seconds": 2.233917917124927,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "{\"name\": \"recompute_clinic_plan\", \"parameters\": {\"include_recovery\": True, \"sunshine_factor\": 1.0}}"
+          },
+          "seconds": 2.2469619582407176,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "{\"name\": \"recompute_clinic_plan\", \"parameters\": {\"include_recovery\": True, \"sunshine_factor\": 1.0}}"
+          },
+          "seconds": 2.212300917133689,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "{\"name\": \"recompute_clinic_plan\", \"parameters\": {\"include_recovery\": True, \"sunshine_factor\": 1.0}}"
+          },
+          "seconds": 2.26967054232955,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        },
+        {
+          "turn": {
+            "type": "message",
+            "content": "{\"name\": \"recompute_clinic_plan\", \"parameters\": {\"include_recovery\": True, \"sunshine_factor\": 1.0}}"
+          },
+          "seconds": 2.219320415984839,
+          "offered_tools": [
+            "inspect_planning_state",
+            "propose_activity",
+            "explain_current_plan",
+            "recompute_clinic_plan",
+            "propose_energy_settings",
+            "respond_to_user"
+          ]
+        }
+      ],
+      "passed": false,
+      "response": {
+        "mode": "local_agent_unavailable",
+        "model": null,
+        "message": "The local model could not produce a validated response. Your current state is preserved; retry the request.",
+        "needs_clarification": true,
+        "clarification_fields": [],
+        "tool_calls": [],
+        "presentation": {
+          "kind": "conversation",
+          "input_revision": null,
+          "generation": null,
+          "option_ids": [],
+          "show_schedule": false
+        },
+        "message_id": "3fbc8f93-64d7-498f-b4ff-55756903d32e",
+        "user_message_id": "ae30af40-8c3b-4838-a9a7-b21d7e800a0a"
+      },
+      "state": {
+        "id": "e8d100ca-3a65-4664-8fa9-12ea71a0c60e",
+        "revision": 0,
+        "input_revision": 0,
+        "selected_clinic_id": "illustrative-conversation",
+        "clinic_name": "Illustrative native verification",
+        "location": {
+          "latitude": -0.0917,
+          "longitude": 34.768
+        },
+        "planning_date": "2026-11-15",
+        "timezone": "Africa/Nairobi",
+        "clinic": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "max_discharge_kw": 0.4,
+          "scenario": "normal",
+          "equipment": [
+            {
+              "id": "evening",
+              "name": "Illustrative essential evening equipment",
+              "category": "critical",
+              "power_kw": 1.0,
+              "required_hours": [
+                19,
+                20
+              ]
+            }
+          ],
+          "weather_dataset": "synthetic"
+        },
+        "equipment_inventory": [
+          {
+            "id": "evening",
+            "name": "Illustrative essential evening equipment",
+            "category": "critical",
+            "power_kw": 1.0,
+            "required_hours": [
+              19,
+              20
+            ]
+          }
+        ],
+        "energy_settings": {
+          "battery_capacity_kwh": 8.0,
+          "initial_battery_kwh": 6.0,
+          "reserve_kwh": 1.0,
+          "pv_capacity_kw": 1.5,
+          "charge_efficiency": 0.95,
+          "discharge_efficiency": 0.95,
+          "max_charge_kw": 4.0,
+          "max_discharge_kw": 0.4,
+          "additional_critical_kw": 0.0
+        },
+        "current_battery_reading": null,
+        "energy_proposals": [],
+        "active_energy_proposal_id": null,
+        "confirmed_activities": [],
+        "proposals": [],
+        "active_proposal_id": null,
+        "plan_status": "not_computed",
+        "plan_error": null,
+        "selected_recovery_intervention_id": null,
+        "sunshine_factor": 1.0
+      }
+    }
+  ],
+  "passed": false,
+  "observation_note": "The primary clinic-weather request failed: the model printed a Python-style function envelope as ordinary content, which was never executed. Original social pass flags checked authorship/nonmutation only; raw greeting and idea messages reveal unhelpful echoes, not substantive answers. Subsequent code adds non-echo/protocol correction."
+}
