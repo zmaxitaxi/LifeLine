@@ -10,7 +10,7 @@ The application distinguishes synthetic examples, unverified user inputs, publis
 - Local day: January 14, 2025, Africa/Nairobi (EAT, UTC+3).
 - [Original API request](https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=34.768&latitude=-0.0917&start=20250113&end=20250114&format=JSON&time-standard=UTC).
 - Parameter: `ALLSKY_SFC_SW_DWN`; source response units **Wh/m²**, hourly. API v2.10.4; response source `SYN1DEG`.
-- Original response retained in [data/nasa_power_raw.json](data/nasa_power_raw.json). Processed local day and SHA-256 are in [data/kisumu_weather.json](data/kisumu_weather.json).
+- Original response retained in [data/nasa_power_raw.json](../data/nasa_power_raw.json). Processed local day and SHA-256 are in [data/kisumu_weather.json](../data/kisumu_weather.json).
 - Processing: select 24 UTC values corresponding to local 00:00–23:00, including 21:00–23:00 UTC on the previous date; divide Wh/m² by 1,000. Total local-day irradiation is **6.91772 kWh/m²**. Validate all values as finite/nonnegative and no greater than 2 kWh/m² per hour; reject missing/fill values, including −999.
 - Conversion: modeled PV energy = nameplate kW × 0.80 performance ratio × hourly irradiation / reference 1 kW/m² × user scenario factor. This is a horizontal-irradiance approximation, not a calibrated tilted-array yield model.
 - Native satellite grid-cell averages are not on-site pyranometer readings. NASA describes solar data as inferred from satellite observations using radiative-transfer models. No site-specific accuracy claim is made. [NASA data FAQ](https://power.larc.nasa.gov/docs/faqs/data/)
@@ -22,9 +22,9 @@ Attribution: data obtained from NASA Langley Research Center's POWER project, fu
 
 ## Equipment demand
 
-The demo equipment powers/schedules in [contracts/scenarios.json](contracts/scenarios.json) remain **synthetic, illustrative values**. User equipment is labeled `user_entered_unverified`; entry into the app does not validate its accuracy or clinical suitability. Power × required duration defines flexible energy; selected critical hours define fixed critical demand.
+The demo equipment powers/schedules in [contracts/scenarios.json](../contracts/scenarios.json) remain **synthetic, illustrative values**. User equipment is labeled `user_entered_unverified`; entry into the app does not validate its accuracy or clinical suitability. Power × required duration defines flexible energy; selected critical hours define fixed critical demand.
 
-Published reference ratings were extracted from SEforALL/CLASP's [2025 report, p.13](https://www.seforall.org/system/files/2025-07/SEforALL%20report-medical-appliances-resource-constrained-settings.pdf). The small factual extraction is in [data/published_equipment_ratings.json](data/published_equipment_ratings.json). It records W→kW conversion and source page. It does not supply measured hourly demand or clinical schedules. Copyright remains with the publication's rights holders; the report is linked, not republished or treated as an openly licensed raw monitoring dataset.
+Published reference ratings were extracted from SEforALL/CLASP's [2025 report, p.13](https://www.seforall.org/system/files/2025-07/SEforALL%20report-medical-appliances-resource-constrained-settings.pdf). The small factual extraction is in [data/published_equipment_ratings.json](../data/published_equipment_ratings.json). It records W→kW conversion and source page. It does not supply measured hourly demand or clinical schedules. Copyright remains with the publication's rights holders; the report is linked, not republished or treated as an openly licensed raw monitoring dataset.
 
 No downloadable, machine-readable whole-clinic hourly demand dataset was obtained from the reviewed report. Its published charts and selected appliance monitoring do not justify fabricating a clinic load trace. Therefore demand remains a transparent synthetic/user-configured profile. Clinical equipment duration, priority, and flexibility must be supplied and reviewed by the operator. No published rating is silently installed as a medical scheduling recommendation.
 

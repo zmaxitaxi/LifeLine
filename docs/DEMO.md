@@ -1,6 +1,6 @@
 # Two-minute LifeLine demonstration
 
-**Current assistant: Llama 3.1 8B running locally through Ollama.** It understands questions and chooses validated tools. Python computes energy figures, schedules, assessments and explanations. Deterministic offline/guided modes remain as explicit fallbacks; they are not the primary local AI.
+**Default assistant: Llama 3.1 8B running locally through Ollama.** It understands questions and chooses validated tools. Python computes energy figures, schedules, assessments and explanations. Deterministic guided fallback is labeled when used.
 
 ## Start and check
 
@@ -10,7 +10,7 @@ If Ollama is not already running, in a separate terminal:
 OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 ollama serve
 ```
 
-On a fresh machine, install Ollama and download the model with `ollama pull llama3.1:8b`. This Mac already has both. No Anthropic, OpenAI or Wajo key is needed for the application.
+On a fresh machine, follow the [setup instructions](../README.md#run-the-complete-demo), install Ollama and download the model with `ollama pull llama3.1:8b`. The default application needs no cloud AI key.
 
 From the repository root:
 
@@ -27,7 +27,7 @@ Before presenting, verify fresh weather and the agent:
 .venv/bin/python scripts/check_local_agent.py --midnight-battery-kwh 6
 ```
 
-**Live-weather update, November 13:** the Mac's normal connection recovered without code or network-setting changes. Fresh actual weather and the complete forecast-to-model calculation passed at **12:35 PM Pacific**. [Diagnosis and recovery](WEATHER_NETWORK.md). Earlier failures were TLS-handshake stalls before HTTP, not an established Mac/Windows application defect. Check the presentation network again; no uptime guarantee is implied. The separate five-question local-LLM replay remains a replay, not a fresh-weather or comprehensive LLM evaluation.
+Check the actual presentation network and warm the model before rehearsing. Forecasts and latency vary; the two-minute timing below is a guide. Dated availability incidents and smoke runs are in the [development record](DEVELOPMENT.md#historical-verification-evidence).
 
 ## Live storyline
 
@@ -40,15 +40,19 @@ Before presenting, verify fresh weather and the agent:
 | 90–110 s | Ask “What happens if we receive 50% less sunlight?” | Read the computed reduced-sunshine result. Without adopting the proposal, this still uses the original inventory. If showing adoption, click the button, reconfirm inputs and recalculate first. Show the actual reserve/shortage warning. |
 | 110–120 s | Limits and next step | “LifeLine makes energy constraints understandable. Next is a technician-reviewed inventory and measured-data pilot. No clinical validation or measured health benefit is claimed.” |
 
-An incomplete sterilization question triggers clarification for missing nameplate power, runtime and permitted start. Do not rehearse against fixed live numerical values: forecasts change.
+For an optional follow-up, ask “What happens if we receive 50% less sunlight?” and read the calculated result. An incomplete sterilizer request should ask for missing rated power, duration and operating window; a hypothetical consecutive-load calculation does not certify a medical cycle or silently change the inventory. Do not rehearse against fixed live numerical values.
 
-## Reliable offline demonstration
+## When weather is unavailable
 
 If live weather is unavailable, show the error openly, select **historical NASA weather** or **synthetic sunshine**, and use the local example planner. Historical/synthetic simulation and the rule-based assistant work offline after installation. These are different data modes, not replacement live forecasts.
 
-Original equal-work example: both alternatives complete 2.1 kWh and preserve 2.211 kWh more at midnight than the fixed schedule. Sunshine-first ties MILP. Distinguish midnight gain from the 0.368 kWh daily-minimum gain.
+The model CLI also runs without a weather service:
 
-For the constrained-work example, choose **Detailed mode → Load competing-window example**. The actual model completes all 3.8 kWh; the fixed schedule leaves 1.030 kWh unfinished and sunshine-first leaves 0.330 kWh unfinished. Essential demand/reserve are protected. Reversing greedy task order closes the completion gap. See [full inputs and caveats](STRONGEST_DEMO.md).
+```bash
+PYTHONPATH=backend .venv/bin/python -m app.model_demo scheduling
+```
+
+The [benchmark](BENCHMARK.md) records the equal-work battery example and honest heuristic tie. Use **Detailed mode → Load competing-window example** for the constructed work-completion case. Reversing greedy task order removes its heuristic gap. See [inputs and caveats](DEVELOPMENT.md#constructed-demonstration-findings).
 
 To repeat the explicitly labeled recorded-forecast local-AI verification:
 
@@ -57,4 +61,4 @@ To repeat the explicitly labeled recorded-forecast local-AI verification:
   --recorded-forecast docs/evidence/live-forecast-run.json
 ```
 
-This runs the actual local LLM and numerical model using a dated forecast snapshot. It does not configure the running application to use a stale forecast. Evidence: [local-agent replay](docs/evidence/local-agent-recorded-weather-run.json), [earlier actual retrieval](docs/evidence/live-forecast-run.json), [earlier failed connection](docs/evidence/current-live-weather-check.json), [fresh Mac recovery](docs/evidence/mac-weather-live-recovery.json). No presentation video has been recorded by this task.
+This runs the actual local LLM and numerical model using a dated snapshot. It does not configure the application to use a stale forecast or count as fresh-live verification. The [earlier replay](evidence/local-agent-recorded-weather-run.json) is a five-question integration sample, not the [comprehensive evaluation](DEVELOPMENT.md#local-llm-evaluation).

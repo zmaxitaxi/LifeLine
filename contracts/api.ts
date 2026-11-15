@@ -1,7 +1,7 @@
 /**
  * LifeLine API contract v1.0 — implemented by backend/app/models.py.
  * Numeric values are finite. Hour is a slot index 0..23, boundary is 0..24.
- * See docs/BUILD_BRIEF.md for validation and cross-field constraints.
+ * See docs/ARCHITECTURE.md for validation and cross-field constraints.
  */
 export type ScenarioId = "scheduling" | "normal" | "storm" | "high_demand";
 export type RiskStatus = "OK" | "RESERVE_AT_RISK" | "CRITICAL_SHORTAGE";

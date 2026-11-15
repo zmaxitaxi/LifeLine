@@ -4,7 +4,7 @@ LifeLine retrieves actual Open-Meteo weather-model forecasts for operator-select
 
 ## Run and demonstrate
 
-Use the normal [application commands](README.md). Asking the primary forecast question in the main question box opens the live-weather workflow and requests the reviewed midnight assumption; computed answers return to the conversation. You can also open **Live weather forecast and tomorrow’s plan**, select a representative location or enter coordinates, and fetch today/tomorrow. Enter and confirm the assumed battery energy **at local midnight for the selected day**, then calculate a forecast-backed plan. Example locations are representative points, not partner clinics.
+Use the normal [application commands](../README.md). Asking the primary forecast question in the main question box opens the live-weather workflow and requests the reviewed midnight assumption; computed answers return to the conversation. You can also open **Live weather forecast and tomorrow’s plan**, select a representative location or enter coordinates, and fetch today/tomorrow. Enter and confirm the assumed battery energy **at local midnight for the selected day**, then calculate a forecast-backed plan. Example locations are representative points, not partner clinics.
 
 The primary question is: “Can our clinic safely operate tomorrow given the weather forecast?” The answer is computed from configured equipment, retrieved weather and the reviewed midnight assumption. Local **Llama 3.1 8B through Ollama** can now select validated tools through `/api/agent/ask`; it never supplies weather or energy calculations. The original `/api/planner/ask` remains a limited, explicitly non-LLM guided fallback. Unknown guided requests ask for clarification and do not alter equipment.
 
@@ -42,7 +42,7 @@ Data attribution: [Weather data by Open-Meteo.com](https://open-meteo.com/) unde
 
 ## HTTP and structured tools
 
-Existing `/api/simulate`, scenarios, historical data and health behavior remain intact. New endpoints:
+Existing `/api/simulate`, scenarios, historical data and health behavior remain intact. Forecast and guided-tool endpoints:
 
 | Endpoint | Purpose |
 |---|---|
@@ -68,16 +68,14 @@ Existing `/api/simulate`, scenarios, historical data and health behavior remain 
 
 Tools bind the clinic equipment, physical limits, location and starting-energy assumption outside model-generated arguments. The model-facing planning arguments can select the day and sensitivity factors; attempts to add or change equipment through tool arguments are rejected. Calls cannot access arbitrary URLs or operate devices.
 
-Local-agent setup requires Ollama and the selected installed model, without an API key. The app uses a fixed localhost model endpoint and rejects cloud model records. All weather and numerical calculations remain backend-owned. Wajo was tested separately with a privately configured key; it is not used by the app. See [agent architecture](ARCHITECTURE.md) and [Wajo findings](WAJO_INVESTIGATION.md).
+Local-agent setup requires Ollama and the selected installed model, without an API key. The app uses a fixed localhost model endpoint and rejects cloud model records. All weather and numerical calculations remain backend-owned. Wajo was tested separately with a privately configured key; it is not used by the app. See [agent architecture](ARCHITECTURE.md) and [Wajo findings](DEVELOPMENT.md#provider-investigation-and-decision).
 
-Current verification note, November 13: the Mac's normal route recovered at approximately **12:31 PM Pacific**, with no OS/DNS/TLS or application change. A fresh full application run retrieved actual weather at **12:35:35 PM Pacific**, then passed forecast conversion and physical-accounting checks. [Recovery evidence](docs/evidence/mac-weather-live-recovery.json). Earlier connection failures and recorded replays are retained as dated records, not silently overwritten or relabeled as live.
-
-The investigation observed successful DNS/TCP followed by a stalled TLS handshake, reproducible with HTTPX, native curl and Chromium. Other verified public API routes worked from the same Mac, and the original route later recovered. Caden's successful Windows request used a different time/network; its destination IP was not recorded. The evidence does not establish an operating-system defect or identify the exact failing server/network component. See [network diagnosis and safe reproduction](WEATHER_NETWORK.md). The app retains its ordinary hostname, certificate verification, retry/cache behavior and unavailable response; no IP override was retained.
+The November 13 Mac TLS incident, later fresh retrieval and safe reproduction commands are consolidated in [weather troubleshooting](DEVELOPMENT.md#weather-incident-and-troubleshooting). Those dated observations are not a present availability check. The application retains its ordinary hostname, certificate verification, retry/cache behavior and unavailable response.
 
 ## Verification
 
-Thirty-seven forecast-specific backend tests exercise mocked transports and clocks, independent energy accounting for every method and sensitivity case, preceding-hour alignment, date boundaries, fractional-hour zones, 23/25-hour days, missing data, units, astronomical night, cache coalescing/expiry/staleness, failure fallback, strict arguments and protected requirements. Tests require no provider network.
+Forecast-specific backend tests exercise mocked transports and clocks, independent energy accounting for every method and sensitivity case, preceding-hour alignment, date boundaries, fractional-hour zones, 23/25-hour days, missing data, units, astronomical night, cache coalescing/expiry/staleness, failure fallback, strict arguments and protected requirements. Tests require no provider network.
 
-Four browser tests calculate fixture-backed plans through the actual Python API/model, cover uncertainty and impossible starting conditions, exercise explicit failure/validation messages and keyboard/mobile controls. `backend/tests/forecast_browser_fixture.py` exists solely for tests and is never imported by the production application.
+Browser tests calculate fixture-backed plans through the actual Python API/model and cover uncertainty, impossible starting conditions, explicit failure/validation messages and keyboard/mobile controls. `backend/tests/forecast_browser_fixture.py` exists solely for tests and is never imported by the production application. Current acceptance criteria and dated execution records are in [development verification](DEVELOPMENT.md#acceptance-criteria).
 
-An additional **real live browser/HTTP run** retrieved Kisumu weather on `2026-11-13T08:34:16.390183Z` for local November 14. With 1.5 kW PV and the explicitly assumed 6 kWh midnight charge, estimated solar was 7.1316 kWh, minimum optimized battery 4.8311579 kWh and flexible deferral zero. At 50% lower sunlight, estimated solar was 3.5658 kWh, minimum battery 4.03761 kWh and flexible deferral 2.1 kWh. Essential unmet demand was zero in these cases. This is one forecast snapshot with illustrative demand, not a general reliability finding. [Recorded inputs/source/metrics](docs/evidence/live-forecast-run.json).
+An additional **real live browser/HTTP run** retrieved Kisumu weather on `2026-11-13T08:34:16.390183Z` for local November 14. With 1.5 kW PV and the explicitly assumed 6 kWh midnight charge, estimated solar was 7.1316 kWh, minimum optimized battery 4.8311579 kWh and flexible deferral zero. At 50% lower sunlight, estimated solar was 3.5658 kWh, minimum battery 4.03761 kWh and flexible deferral 2.1 kWh. Essential unmet demand was zero in these cases. This is one forecast snapshot with illustrative demand, not a general reliability finding. [Recorded inputs/source/metrics](evidence/live-forecast-run.json).
