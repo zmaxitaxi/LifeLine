@@ -1,4 +1,4 @@
-"""Comprehensive local-LLM evaluation (docs/source/Local_LLM_Evaluation_Brief.md).
+"""Comprehensive local-LLM evaluation documented in docs/VALIDATION.md.
 
 Real installed model through the real /api/agent/ask endpoint and the real
 simulator/optimizer. Nothing about the model is mocked. LocalAgent.decide is

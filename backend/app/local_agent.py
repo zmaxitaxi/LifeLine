@@ -395,7 +395,7 @@ async def ask_agent(context,catalog,service,lock,agent,progress=None):
         history.append(q)
     # Earlier questions go in ONE labeled context message. Sent as separate user
     # turns, llama3.1:8b tries to answer every one (prose or several calls), which
-    # fails single-call validation. See docs/AGENT_EVALUATION_REVIEW.md finding 1.
+    # fails single-call validation. See docs/VALIDATION.md for the earlier continuity findings.
     if history:
         messages.append({'role':'user','content':'Earlier operator messages in this conversation, oldest first. They were already handled. '
             'Use them only to resolve references and stated values in the current request; do not answer them again: '

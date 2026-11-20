@@ -1,16 +1,13 @@
 # LifeLine: two-minute Haiku demo
 
-Use these prompts verbatim with the example clinic below. They were exercised
-through the real browser with actual `claude-haiku-5-5`, synthetic demo weather,
-the existing simulator/MILP, explicit confirmations and saved state. This is a
-rehearsed path, not a guarantee that an API or generated reply cannot fail.
+This three-prompt walkthrough was rehearsed in the browser with actual Claude Haiku, labeled sample weather, and the real simulator and optimizer. Allow time for external API replies.
 
 ## Before the timer
 
-1. Open `http://127.0.0.1:8020/`. Check the **sample weather, not a live forecast**
-   label and that the message box is available. The ready provider/model label
-   is intentionally hidden from the header; `/api/agent/status` reports Haiku.
-   The assistant needs internet even though sample weather does not.
+1. Start the [app in demo mode](../README.md#run-locally). Open the local URL
+   from your launch command (port 8000 in the README). Check the **sample
+   weather, not a live forecast** label and that the message box is available.
+   `/api/agent/status` reports Haiku and its availability.
 2. Click **Change clinic** if a clinic is already open. Create a **separate**
    clinic named `LifeLine presentation`; choose **Kisumu**. This preserves your
    other saved clinic. Do not resume a previously edited demo for this script.
@@ -150,43 +147,31 @@ Ask for actual computed equipment slots without another calculation:
 Using the current optimized schedule, what are the auxiliary laundry's hourly slots? Use the existing calculation; do not recalculate or change equipment.
 ```
 
-## Verification scope
+## Rehearse against an isolated server
 
-The genuine desktop rehearsal covers fresh setup, complete vaccination drafting,
-draft reload, explicit confirmation, repeat-confirm idempotency, one shared
-refrigerator, revision/cancellation, cloudy recovery, comparison selection,
-read-only explanation, reviewed solar changes, reload and backend-restart
-persistence. It also checks meaningful rendering, no framework overlay, no page
-errors and screenshots at the important steps. Browser plugin was unavailable;
-the repository's Playwright installation was used at 1280 × 1000.
-
-The complete five-prompt workflow passed in **30.1 seconds** of automated browser
-time, excluding narration. The separate three-prompt presentation passed in
-**21.0 seconds**. Its observed replies took **5.2s / 6.4s / 6.8s** for vaccination,
-cloudy recovery and solar settings. A read-only laundry-slot follow-up passed and
-matched the actual 10:00–11:00 and 11:00–12:00 allocations in that saved result.
-Both saved clinics and their conversations survived a real backend restart.
-These are observations, not latency or arbitrary-language guarantees. The
-regression suites pass **525 backend tests and 56 browser tests**.
-
-A repeated short run exposed a source-validation bug: “essential demand met but
-flexible work unfinished” was incorrectly treated as claiming all work was met.
-The fix checks both clauses against the exact option, supplies its actual reserve
-target and correctly identifies battery metrics and parenthetical original
-capacity. Regression tests still reject false all-work coverage and mismatched
-minimum/reserve figures. Earlier failed evidence is retained locally.
-
-Reproduce against a separate persistent demo server on port 8038, never a second
-worker sharing the presentation's state file:
+With the UI built and the server credentials configured, start a separate
+instance with a fresh private state file. This rehearsal makes billed Anthropic
+API requests and creates an example clinic through the browser.
 
 ```bash
-node scripts/rehearse_haiku_demo.mjs
-node scripts/rehearse_haiku_demo.mjs --core
-# Restart that isolated backend with the SAME test state file, then:
-node scripts/rehearse_haiku_demo.mjs --restore
+rehearsal_state_path="$(mktemp -d)/planning-state.json"
+LIFELINE_STATE_PATH="$rehearsal_state_path" \
+  LIFELINE_WEATHER_MODE=demo .venv/bin/python -m uvicorn app.main:app \
+  --app-dir backend --host 127.0.0.1 --port 8038
 ```
 
-Use `LIFELINE_REHEARSAL_OUTPUT` to keep a separate output folder for each run and
-reuse the same folder for `--restore`. The runner makes actual billed Haiku
-requests and creates an isolated example through the UI. Detailed state,
-conversation and screenshots stay in the OS temporary directory, not the repo.
+In another terminal, install Chromium if needed and run the three-prompt path:
+
+```bash
+npm --prefix frontend exec -- playwright install chromium
+node scripts/rehearse_haiku_demo.mjs --core
+```
+
+Omit `--core` for the longer workflow. To test restart recovery, restart the
+isolated server with the same `rehearsal_state_path`, then run
+`node scripts/rehearse_haiku_demo.mjs --restore`. Reuse the same
+`LIFELINE_REHEARSAL_OUTPUT` if set. The default output folder is
+`lifeline-haiku-full-rehearsal` under the OS temporary directory.
+
+See [observed rehearsal results](VALIDATION.md#assistant-and-browser-verification)
+and [live weather verification](WEATHER.md#verify-and-troubleshoot).

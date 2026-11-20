@@ -285,7 +285,7 @@ def test_malformed_provider_message_preserves_guided_fallback(message):
 
 
 def test_earlier_questions_are_one_labeled_context_message_not_separate_turns():
-    # Regression for docs/AGENT_EVALUATION_REVIEW.md finding 1: separate user turns
+    # Regression for local-model history handling: separate user turns
     # made the real model answer every earlier question and fail validation.
     service,_=service_for()
     agent,requests=agent_with([{'name':'plan_forecast','arguments':{'day':'tomorrow','reduced_sunshine_factors':[.5]}}])
@@ -345,7 +345,7 @@ def test_unrequested_reduced_factor_does_not_replace_the_forecast_answer():
     assert not d['message'].startswith('With ')
 
 
-# --- Regressions from the comprehensive evaluation (LLM_EVALUATION.md) ---
+# --- Regressions from the local-model evaluation in docs/VALIDATION.md ---
 
 def ask(question, calls, previous=(), **changes):
     service,_=service_for()
